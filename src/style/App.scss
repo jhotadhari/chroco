@@ -96,6 +96,8 @@
 @include bsBanner("");
 
 
+@import "./variables/bootstrap";
+
 // scss-docs-start import-stack
 // Configuration
 @import "~bootstrap/scss/functions";

@@ -130,7 +130,7 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
       />
 
       <button
-        className="btn save"
+        className="btn flex-shrink-0 save"
         onClick={ updateTimeSlot }
         disabled={ ! Object.keys( editTimeSlot ).length }
       >
@@ -139,7 +139,7 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
 
       <button
         type='button'
-        className="btn delete"
+        className="btn flex-shrink-0 delete"
         onClick={ deleteTimeSlot }
       >
         delete
@@ -148,7 +148,7 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
       <button
         type='button'
         disabled={ item.dateStop }
-        className="btn stop"
+        className="btn flex-shrink-0 stop"
         onClick={ stopTimeSlot }
       >
         stop

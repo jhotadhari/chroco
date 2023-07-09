@@ -9,11 +9,12 @@ export const CreateTimeSlot = ( { items, setTimeSlots } ) => {
   const [title, setTitle] = useState("");
 
   return (
-    <div className="align-items-center container d-flex py-4">
+    // <div className="align-items-center container d-flex py-4 ">
+    <div className="container input-group py-4 ">
 
       <input
         type="text"
-        className="form-control"
+        className="form-control mr-3"
         placeholder="Enter TimeSlot"
         onChange={ ( e ) => {
           setTitle( e.target.value );

@@ -37,7 +37,7 @@ function App() {
       <div className="settings container py-4">
 
         <button
-          className='btn'
+          className='btn me-3'
           type='button'
           onClick={ e => {
             e.preventDefault();
