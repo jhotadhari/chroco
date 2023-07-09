@@ -18,10 +18,14 @@ contextBridge.exposeInMainWorld( 'api', {
 
     settings: {
         ui: {
-            // return   bool    isDarkMode
-            toggle: () => ipcRenderer.invoke('dark-mode:toggle'),
-            // return   null
-            system: () => ipcRenderer.invoke('dark-mode:system'),
+            'darkMode': {
+                // return   bool    isDarkMode
+                toggle: () => ipcRenderer.invoke('api:settings:ui:darkMode:toogle'),
+                // return   null
+                system: () => ipcRenderer.invoke('api:settings:ui:darkMode:system'),
+                // return   string  dark|light
+                getThemeSource: () => ipcRenderer.invoke('api:settings:ui:darkMode:getThemeSource'),
+            },
         },
     },
 

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import dayjs from "dayjs";
 // import db from "../../public/nedb/db";
-// import "../App.css";
 const { api } = window;
 
 
@@ -10,12 +9,12 @@ export const CreateTimeSlot = ( { items, setTimeSlots } ) => {
   const [title, setTitle] = useState("");
 
   return (
-    <div className="formContainer">
+    <div className="align-items-center container d-flex py-4">
 
       <input
         type="text"
+        className="form-control"
         placeholder="Enter TimeSlot"
-        className="inputTODO"
         onChange={ ( e ) => {
           setTitle( e.target.value );
         } }
@@ -23,8 +22,8 @@ export const CreateTimeSlot = ( { items, setTimeSlots } ) => {
       />
 
       <button
-        className="addTimeSlot"
         type='button'
+        className='btn'
         onClick={ e => {
           e.preventDefault();
           api.timeSlots.add( {

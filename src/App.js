@@ -1,5 +1,5 @@
 // import logo from './logo.svg';
-import './App.css';
+import './style/App.scss';
 import { useEffect, useState } from "react";
 // import db from "./nedb/db";
 // import db from "db";
@@ -9,41 +9,54 @@ import { useEffect, useState } from "react";
 
 import { CreateTimeSlot } from "./Components/CreateTimeSlot";
 import { TimeSlots } from "./Components/TimeSlots";
+const { api } = window;
 
 function App() {
   const [items, setTimeSlots] = useState([]);
+  const [themeSource, setThemeSource] = useState( false );
 
   useEffect(() => {
-    window.api.timeSlots.get().then( timeSlots => {
+    api.timeSlots.get().then( timeSlots => {
       setTimeSlots( timeSlots );
     } );
   }, [] );
 
-  return (
-    <div className="App">
-      <div className="dark-mode">
+  useEffect(() => {
+    if ( ! themeSource ) {
+      api.settings.ui.darkMode.getThemeSource().then( src => {
+        setThemeSource( src );
+      } );
+    }
+  }, [themeSource] );
+
+  return <div
+    className="container-xxl"
+    data-bs-theme={ themeSource }
+  >
+
+      <div className="settings container py-4">
 
         <button
+          className='btn'
           type='button'
           onClick={ e => {
             e.preventDefault();
-            window.api.settings.ui.toggle().then( isDarkMode => {
-              console.log( 'debug isDarkMode', isDarkMode ); // debug
-            } );
+            api.settings.ui.darkMode.toggle().then( isDarkMode => setThemeSource( false ) );
           } }
         >Toggle Dark Mode</button>
 
         <button
+          className='btn'
           type='button'
           onClick={ e => {
             e.preventDefault();
-            window.api.settings.ui.system().then( () => {
-              // document.getElementById('theme-source').innerHTML = 'System'
-            } );
+            api.settings.ui.darkMode.system().then( () => setThemeSource( false ) );
           } }
         >Reset to System Theme</button>
 
       </div>
+
+
 
       <CreateTimeSlot
         items={items}
@@ -53,8 +66,7 @@ function App() {
         items={items}
         setTimeSlots={setTimeSlots}
       />
-    </div>
-  );
+  </div>;
 }
 
 export default App;

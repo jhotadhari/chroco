@@ -1,0 +1,182 @@
+/* .App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+} */
+
+/* @media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+} */
+
+/* .App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+} */
+
+/* .App-link {
+  color: #61dafb;
+} */
+/*
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} */
+
+
+// // Load font_faces
+// @import "~bootstrap/scss/ruem_frontend/fonts/fonts_master";
+
+// // Load and overwrite Bootstrap variables
+// @import "~bootstrap/scss/ruem_frontend/variables_site/variables_site";
+
+// // Loads Bootstrap4 base
+// @import "~bootstrap/scss/~bootstrap/scss/functions";
+// @import "~bootstrap/scss/~bootstrap/scss/variables";
+// @import "~bootstrap/scss/~bootstrap/scss/mixins";
+// @import "~bootstrap/scss/~bootstrap/scss/root";
+// @import "~bootstrap/scss/~bootstrap/scss/reboot";
+// @import "~bootstrap/scss/~bootstrap/scss/print";
+// @import "~bootstrap/scss/~bootstrap/scss/code";
+// @import "~bootstrap/scss/~bootstrap/scss/type";
+// @import "~bootstrap/scss/~bootstrap/scss/images";
+// @import "~bootstrap/scss/~bootstrap/scss/grid";
+// @import "~bootstrap/scss/~bootstrap/scss/tables";
+// @import "~bootstrap/scss/~bootstrap/scss/forms";
+// @import "~bootstrap/scss/~bootstrap/scss/buttons";
+// @import "~bootstrap/scss/~bootstrap/scss/transitions";
+// @import "~bootstrap/scss/~bootstrap/scss/dropdown";
+// @import "~bootstrap/scss/~bootstrap/scss/button-group";
+// @import "~bootstrap/scss/~bootstrap/scss/input-group";
+// @import "~bootstrap/scss/~bootstrap/scss/custom-forms";
+// @import "~bootstrap/scss/~bootstrap/scss/nav";
+// @import "~bootstrap/scss/~bootstrap/scss/navbar";
+// @import "~bootstrap/scss/~bootstrap/scss/card";
+// @import "~bootstrap/scss/~bootstrap/scss/breadcrumb";
+// @import "~bootstrap/scss/~bootstrap/scss/pagination";
+// @import "~bootstrap/scss/~bootstrap/scss/badge";
+// @import "~bootstrap/scss/~bootstrap/scss/jumbotron";
+// @import "~bootstrap/scss/~bootstrap/scss/alert";
+// @import "~bootstrap/scss/~bootstrap/scss/progress";
+// @import "~bootstrap/scss/~bootstrap/scss/media";
+// @import "~bootstrap/scss/~bootstrap/scss/list-group";
+// @import "~bootstrap/scss/~bootstrap/scss/close";
+// @import "~bootstrap/scss/~bootstrap/scss/toasts";
+// @import "~bootstrap/scss/~bootstrap/scss/modal";
+// @import "~bootstrap/scss/~bootstrap/scss/tooltip";
+// @import "~bootstrap/scss/~bootstrap/scss/popover";
+// @import "~bootstrap/scss/~bootstrap/scss/carousel";
+// @import "~bootstrap/scss/~bootstrap/scss/spinners";
+// @import "~bootstrap/scss/~bootstrap/scss/utilities";
+
+
+// @import "~bootstrap/scss/./mixins/**/*.scss";
+// @import './generic.scss';
+// @import './hamburgers.scss';
+// @import './understrap.scss';
+// @import './site.scss';
+// @import "~bootstrap/scss/./components/**/*.scss";
+
+
+@import "~bootstrap/scss/mixins/banner";
+@include bsBanner("");
+
+
+// scss-docs-start import-stack
+// Configuration
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/variables-dark";
+@import "~bootstrap/scss/maps";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/utilities";
+
+// Layout & components
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/dropdown";
+@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/accordion";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/progress";
+@import "~bootstrap/scss/list-group";
+@import "~bootstrap/scss/close";
+@import "~bootstrap/scss/toasts";
+@import "~bootstrap/scss/modal";
+@import "~bootstrap/scss/tooltip";
+@import "~bootstrap/scss/popover";
+@import "~bootstrap/scss/carousel";
+@import "~bootstrap/scss/spinners";
+@import "~bootstrap/scss/offcanvas";
+@import "~bootstrap/scss/placeholders";
+
+// Helpers
+@import "~bootstrap/scss/helpers";
+
+// Utilities
+@import "~bootstrap/scss/utilities/api";
+// scss-docs-end import-stack
+
+
+
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: #333; color: white; }
+}
+
+@media (prefers-color-scheme: light) {
+  body { background: #ddd; color: black; }
+}
+
+
+// .settings,
+// .timeSlot-create {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding: 0.5rem;
+// }
+
+// .timeSlots-container {
+//   list-style: none;
+// }
+
+// .timeSlot {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding: 0.5rem;
+
+
+// }

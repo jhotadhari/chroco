@@ -1,10 +1,19 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
 import { useState } from "react";
-import "../App.css";
 
 
 const { api } = window;
+
+const Duration = ( {
+  start,
+  stop,
+} ) => {
+
+  return <div className="timeSlot--duration">
+    { ( start && stop ? dayjs( stop ).diff( dayjs( start ), 'minute' ) : '---' ) + ' min' }
+  </div>;
+};
 
 export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
 
@@ -65,16 +74,14 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
   //   } );
   // };
 
-
-
-
-
   return <li
-    className="item"
+    className="d-flex justify-content-between align-items-center py-1"
   >
-      <div className="title">
+
+      <div className="timeSlot--title">
         <input
           className={ classnames( {
+            'form-control': true,
             'dirty': editTimeSlot.title && editTimeSlot.title !== item.title,
           } ) }
           type="text"
@@ -85,10 +92,10 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
         />
       </div>
 
-
-      <div className="date">
+      <div className="timeSlot--dateStart">
         <input
           className={ classnames( {
+            'form-control': true,
             'dirty': editTimeSlot.dateStart && editTimeSlot.dateStart !== item.dateStart,
           } ) }
           type="text"
@@ -99,32 +106,31 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
         />
       </div>
 
-      <div className="date">
-        { item.dateStop && <input
+      <div className="timeSlot--dateStop">
+        <input
+          className={ classnames( {
+            'form-control': true,
+            'dirty': editTimeSlot.dateStop && editTimeSlot.dateStop !== item.dateStop,
+          } ) }
           type="text"
+          disabled={ ! item.dateStop }
           onChange={ ( e ) => {
             // setEditTimeSlot( { ...editTimeSlot, dateStop: dayjs( e.target.value ).valueOf() } );
           } }
-          value={ dayjs( item.dateStop ).format('YYYY-MM-DD HH:mm:ss') }
-        /> }
-
-        { ! item.dateStop && <button
-          type='button'
-          className="stop"
-          onClick={ stopTimeSlot }
-        >
-          stop
-        </button> }
+          value={ item.dateStop
+            ? dayjs( editTimeSlot.dateStop ? editTimeSlot.dateStop : item.dateStop ).format('YYYY-MM-DD HH:mm:ss')
+            : '---'
+          }
+        />
       </div>
 
-      <div className="duration">
-        { ( editTimeSlot.dateStart ? editTimeSlot.dateStart : item.dateStart ) && ( editTimeSlot.dateStop ? editTimeSlot.dateStop : item.dateStop ) && <>
-          { dayjs( editTimeSlot.dateStop ? editTimeSlot.dateStop : item.dateStop ).diff( dayjs( editTimeSlot.dateStart ? editTimeSlot.dateStart : item.dateStart ), 'minute' ) + ' min' }
-        </> }
-      </div>
+      <Duration
+        start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : item.dateStart }
+        stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : item.dateStop }
+      />
 
       <button
-        className="save"
+        className="btn save"
         onClick={ updateTimeSlot }
         disabled={ ! Object.keys( editTimeSlot ).length }
       >
@@ -133,15 +139,26 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
 
       <button
         type='button'
-        className="delete"
+        className="btn delete"
         onClick={ deleteTimeSlot }
       >
         delete
+      </button>
+
+      <button
+        type='button'
+        disabled={ item.dateStop }
+        className="btn stop"
+        onClick={ stopTimeSlot }
+      >
+        stop
       </button>
 
       {/* <button className="restart" onClick={ restartTimeSlot }>
         restart
       </button> */}
 
-    </li>;
+
+
+  </li>;
 };
