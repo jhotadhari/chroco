@@ -10,6 +10,36 @@ const api = {
     settings: {},
 };
 
+// return   promise resolve object timeSlot schema
+api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
+    resolve( {
+        _id: {
+            type: 'text',
+            title: '',
+        },
+        title: {
+            type: 'text',
+            title: 'Title',
+        },
+        project: {
+            type: 'text',
+            title: 'Project',
+        },
+        client: {
+            type: 'text',
+            title: 'Client',
+        },
+        dateStart: {
+            type: 'date',
+            title: 'Start',
+        },
+        dateStop: {
+            type: 'date',
+            title: 'Stop',
+        },
+    } );
+} );
+
 // return   promise resolve array   timeSlots
 api.timeSlots.get = () => new Promise( ( resolve, reject ) => {
     db.timeSlots.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
@@ -109,6 +139,7 @@ const setupApi = () => {
      * timeSlots
      *
      */
+    ipcMain.handle( 'api:timeSlots:schema', (_) =>                  api.timeSlots.schema() );
     ipcMain.handle( 'api:timeSlots:get', (_) =>                     api.timeSlots.get() );
     ipcMain.handle( 'api:timeSlots:getCurrent', (_) =>              api.timeSlots.getCurrent() );
     ipcMain.handle( 'api:timeSlots:stop', ( _, timeSlot ) =>        api.timeSlots.stop( timeSlot ) );

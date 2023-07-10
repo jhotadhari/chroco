@@ -5,6 +5,8 @@ const {
 
 contextBridge.exposeInMainWorld( 'api', {
     timeSlots: {
+        // return   promise resolve object timeSlot schema
+        schema: () => ipcRenderer.invoke( 'api:timeSlots:schema' ),
         // return   promise resolve array   timeSlots
         get: () => ipcRenderer.invoke( 'api:timeSlots:get' ),
         // return   promise resolve object   timeSlot
