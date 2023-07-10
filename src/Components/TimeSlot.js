@@ -26,14 +26,22 @@ const isValidDateInput = dateInputString => {
   return true;
 };
 
+const formatSeconds = seconds => {
+  let d = Number( seconds );
+  let h = Math.floor( d / 3600 );
+  let m = Math.floor( d % 3600 / 60 );
+  // let s = Math.floor( d % 3600 % 60 );
+  return ( h ? h + ' h ' : '' ) + m + ' m';
+};
 
 const Duration = ( {
   start,
   stop,
 } ) => {
-
   return <div className="timeSlot--duration">
-    { ( start && stop ? dayjs( stop ).diff( dayjs( start ), 'minute' ) : '---' ) + ' min' }
+    { ( start && stop
+      ? formatSeconds( dayjs( stop ).diff( dayjs( start ), 'second' ) )
+      : '- m' ) }
   </div>;
 };
 
