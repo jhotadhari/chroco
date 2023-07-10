@@ -17,28 +17,3 @@ $black:    #000 !default;
 
 $btn-disabled-opacity:        .25;
 $btn-link-disabled-color:     $gray-300;
-
-[data-bs-theme="light"] {
-    .btn {
-        --#{$prefix}btn-border-color: #{$gray-700};
-        --#{$prefix}btn-hover-border-color: #{$black};
-    }
-}
-[data-bs-theme="dark"] {
-    .btn {
-        --#{$prefix}btn-border-color: #{$gray-500};
-        --#{$prefix}btn-hover-border-color: #{$white};
-    }
-}
-
-.form-control {
-
-    &.dirty {
-        border-color: var(--bssuccess) !important;
-    }
-
-    &.invalid {
-        border-color: var(--bsdanger)  !important;
-    }
-
-}

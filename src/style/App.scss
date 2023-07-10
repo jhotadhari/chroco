@@ -182,3 +182,36 @@
 
 
 // }
+
+
+[data-bs-theme="light"] {
+  .btn {
+      --#{$prefix}btn-border-color: #{$gray-700};
+      --#{$prefix}btn-hover-border-color: #{$black};
+  }
+}
+[data-bs-theme="dark"] {
+  .btn {
+      --#{$prefix}btn-border-color: #{$gray-500};
+      --#{$prefix}btn-hover-border-color: #{$white};
+  }
+}
+
+.form-control {
+  &.dirty {
+      border-color: var(--bssuccess) !important;
+  }
+  &.invalid {
+      border-color: var(--bsdanger) !important;
+  }
+}
+
+.timeSlot--duration {
+  padding: $btn-padding-y $btn-padding-x;
+  margin: -#{$btn-padding-y} -#{$btn-padding-x};
+  border: $btn-border-width solid transparent;
+  border-radius: $btn-border-radius;
+  &.invalid {
+      border-color: var(--bsdanger) !important;
+  }
+}

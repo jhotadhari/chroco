@@ -27,11 +27,16 @@ const isValidDateInput = dateInputString => {
 };
 
 const formatSeconds = seconds => {
+  let isNeg = false;
+  if ( seconds < 0 ) {
+    isNeg = true;
+    seconds = seconds * ( -1 );
+  }
   let d = Number( seconds );
   let h = Math.floor( d / 3600 );
   let m = Math.floor( d % 3600 / 60 );
   // let s = Math.floor( d % 3600 % 60 );
-  return ( h ? h + ' h ' : '' ) + m + ' m';
+  return ( isNeg ? '- ' : '' ) + ( h ? h + ' h ' : '' ) + m + ' m';
 };
 
 const Duration = ( {
@@ -39,10 +44,18 @@ const Duration = ( {
   stop,
 } ) => {
   stop = stop ? stop : dayjs();
-  return <div className="timeSlot--duration">
-    { ( start && stop
-      ? formatSeconds( dayjs( stop ).diff( dayjs( start ), 'second' ) )
-      : '- m' ) }
+  const seconds = start && stop
+    ? dayjs( stop ).diff( dayjs( start ), 'second' )
+    : false;
+  return <div
+    className={ classnames( {
+      "timeSlot--duration": true,
+      invalid: seconds < 0,
+    } ) }
+  >
+    { false !== seconds
+      ? formatSeconds( seconds )
+      : '- m' }
   </div>;
 };
 
