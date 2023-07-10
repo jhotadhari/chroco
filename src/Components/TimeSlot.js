@@ -90,10 +90,12 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
 
   const deleteTimeSlot = ( e ) => {
     e.preventDefault();
-    api.timeSlots.delete( timeSlot._id ).then( timeSlots => {
-      const newTimeSlots = [...timeSlots];
-      newTimeSlots.splice( idx, 1 );
-      setTimeSlots( newTimeSlots );
+    api.timeSlots.delete( timeSlot._id ).then( numberDeleted => {
+      if ( numberDeleted ) {
+        const newTimeSlots = [...timeSlots];
+        newTimeSlots.splice( idx, 1 );
+        setTimeSlots( newTimeSlots );
+      }
     } );
   };
 

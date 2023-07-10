@@ -11,8 +11,7 @@ contextBridge.exposeInMainWorld( 'api', {
         add: newTimeSlot => ipcRenderer.invoke( 'api:timeSlots:add', newTimeSlot ),
         // return   promise resolve number  numberUpdated
         update: newTimeSlot => ipcRenderer.invoke( 'api:timeSlots:update', newTimeSlot ),
-
-
+        // return   promise resolve number  numberDeleted
         delete: id => ipcRenderer.invoke( 'api:timeSlots:delete', id ),
     },
 
