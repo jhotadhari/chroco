@@ -4,10 +4,14 @@ const {
 const path = require('path');
 const Datastore = require('nedb');
 
-const db = new Datastore( {
-  autoload: true,
-  filename: path.join( app.getPath("userData"), "/fucking-simple-time-tracker.db"),
-  timestampData: true,
-} );
+const db = {
+  timeSlots: new Datastore( {
+    autoload: true,
+    filename: path.join( app.getPath("userData"), "/timeSlots.db"),
+    timestampData: true,
+  } ),
+
+
+};
 
 module.exports = db;

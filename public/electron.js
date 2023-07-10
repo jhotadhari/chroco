@@ -94,8 +94,14 @@ let shouldCompactDatafile = true;
 app.on( 'before-quit', ( e ) => {
     if ( shouldCompactDatafile ) {
         e.preventDefault()
-        db.persistence.compactDatafile();
-        db.on( 'compaction.done', () => {
+		Promise.all( Object.keys( db ).map( key => {
+			return new Promise( resolve => {
+                db[key].persistence.compactDatafile();
+                db[key].on( 'compaction.done', () => {
+                    resolve( true );
+                } );
+			} );
+		} ) ).then( () => {
             shouldCompactDatafile = false;
             app.quit();
         } );

@@ -11,7 +11,7 @@ const setupApi = () => {
      *
      */
     ipcMain.handle( 'api:timeSlots:get', (_) => new Promise( ( resolve, reject ) => {
-        db.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
+        db.timeSlots.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
             if ( err ) {
                 reject( err );
             }
@@ -20,7 +20,7 @@ const setupApi = () => {
     } ) );
 
     ipcMain.handle( 'api:timeSlots:delete', ( _, id ) => new Promise( ( resolve, reject ) => {
-        db.remove( { _id: id }, ( err, result ) => {
+        db.timeSlots.remove( { _id: id }, ( err, result ) => {
             if ( err ) {
                 reject( err );
             }
@@ -29,7 +29,7 @@ const setupApi = () => {
     } ) );
 
     ipcMain.handle( 'api:timeSlots:add', ( _, newTimeSlot ) => new Promise( ( resolve, reject ) => {
-        db.insert( newTimeSlot, ( err, addedTimeSlot ) => {
+        db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
             if ( err ) {
                 reject( err );
             }
@@ -41,7 +41,7 @@ const setupApi = () => {
         if ( ! newTimeSlot._id ) {
             reject( '??? err no _id' );
         } else {
-            db.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
+            db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
                 if ( err ) {
                     reject( err );
                 }
