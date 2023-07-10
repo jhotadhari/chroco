@@ -1,10 +1,12 @@
 import { useState } from "react";
 import dayjs from "dayjs";
-// import db from "../../public/nedb/db";
 const { api } = window;
 
-
-export const CreateTimeSlot = ( { timeSlots, setTimeSlots } ) => {
+export const CreateTimeSlot = ( {
+  timeSlots,
+  setTimeSlots,
+  timeSlotCurrent,
+} ) => {
 
   const [title, setTitle] = useState("");
 
@@ -12,6 +14,7 @@ export const CreateTimeSlot = ( { timeSlots, setTimeSlots } ) => {
 
     <input
       type="text"
+      disabled={ !! timeSlotCurrent }
       className="form-control mr-3"
       placeholder="Enter TimeSlot"
       onChange={ ( e ) => {
@@ -23,6 +26,7 @@ export const CreateTimeSlot = ( { timeSlots, setTimeSlots } ) => {
     <button
       type='button'
       className='btn'
+      disabled={ !! timeSlotCurrent }
       onClick={ e => {
         e.preventDefault();
         api.timeSlots.add( {
@@ -30,7 +34,6 @@ export const CreateTimeSlot = ( { timeSlots, setTimeSlots } ) => {
           dateStart: dayjs().valueOf(),
           dateStop: false,
         } ).then( addedTimeSlot => {
-            console.log( 'debug addedTimeSlot', addedTimeSlot ); // debug
             setTitle( '' );
             setTimeSlots( [
               addedTimeSlot,

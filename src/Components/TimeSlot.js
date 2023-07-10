@@ -38,6 +38,7 @@ const Duration = ( {
   start,
   stop,
 } ) => {
+  stop = stop ? stop : dayjs();
   return <div className="timeSlot--duration">
     { ( start && stop
       ? formatSeconds( dayjs( stop ).diff( dayjs( start ), 'second' ) )
@@ -52,7 +53,10 @@ const DateInput = ( {
   setEditTimeSlot,
 } ) => {
   const [tempVal, setTempVal] = useState( false );
-  const val = dayjs( editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format('YYYY-MM-DD HH:mm:ss');
+  const val = timeSlot[field]
+    ? dayjs( editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format('YYYY-MM-DD HH:mm:ss')
+    : '';
+
   return <div className={ "timeSlot--" + field }>
     <input
       id={ "timeSlot--" + field }
@@ -62,6 +66,7 @@ const DateInput = ( {
         'invalid': tempVal && ! isValidDateInput( tempVal ),
       } ) }
       type="text"
+      disabled={ ! timeSlot[field] }
       onBlur={ () => {
         if ( tempVal && isValidDateInput( tempVal ) ) {
           setTempVal( false );
@@ -101,14 +106,10 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
 
   const stopTimeSlot = ( e ) => {
     e.preventDefault();
-    const newTimeSlot = {
-      ...timeSlot,
-      dateStop: dayjs().valueOf(),
-    };
-    api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
-      if ( numberUpdated ) {
+    api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
+      if ( updatedTimeSlot ) {
         const newTimeSlots = [...timeSlots];
-        newTimeSlots.splice( idx, 1, newTimeSlot );
+        newTimeSlots.splice( idx, 1, updatedTimeSlot );
         setTimeSlots( newTimeSlots );
       }
     } );
@@ -210,8 +211,6 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
       {/* <button className="restart" onClick={ restartTimeSlot }>
         restart
       </button> */}
-
-
 
   </li>;
 };

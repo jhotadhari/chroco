@@ -12,7 +12,8 @@ import { TimeSlots } from "./Components/TimeSlots";
 const { api } = window;
 
 function App() {
-  const [timeSlots, setTimeSlots] = useState([]);
+  const [timeSlots, setTimeSlots] = useState( [] );
+  const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
   const [themeSource, setThemeSource] = useState( false );
 
   useEffect(() => {
@@ -20,6 +21,12 @@ function App() {
       setTimeSlots( timeSlots );
     } );
   }, [] );
+
+  useEffect(() => {
+    api.timeSlots.getCurrent().then( timeSlotCurrent => {
+      setTimeSlotCurrent( timeSlotCurrent );
+    } );
+  }, [timeSlots] );
 
   useEffect(() => {
     if ( ! themeSource ) {
@@ -61,10 +68,12 @@ function App() {
       <CreateTimeSlot
         timeSlots={timeSlots}
         setTimeSlots={setTimeSlots}
+        timeSlotCurrent={timeSlotCurrent}
       />
       <TimeSlots
         timeSlots={timeSlots}
         setTimeSlots={setTimeSlots}
+        timeSlotCurrent={timeSlotCurrent}
       />
   </div>;
 }
