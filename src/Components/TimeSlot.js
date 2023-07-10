@@ -1,9 +1,31 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 
 const { api } = window;
+
+
+
+const isValidDateInput = dateInputString => {
+  const regex = /([0-9]{4})-([0-9]{2})-([0-9]{2})\s([0-2][0-9]):([0-5][0-9]):([0-5][0-9])/;
+  if ( ! regex.test( dateInputString ) ) {
+    return false;
+  }
+  const dateParsed = regex.exec( dateInputString );
+  if (
+    7 !== dateParsed.length
+    || parseInt( dateParsed[2], 10 ) > 12   // month
+    || parseInt( dateParsed[3], 10 ) > 31   // day
+    || parseInt( dateParsed[4], 10 ) > 23   // hour
+    || parseInt( dateParsed[5], 10 ) > 59   // minute
+    || parseInt( dateParsed[6], 10 ) > 59   // second
+  ) {
+    return false;
+  }
+  return true;
+};
+
 
 const Duration = ( {
   start,
@@ -15,14 +37,53 @@ const Duration = ( {
   </div>;
 };
 
-export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
+const DateInput = ( {
+  field,
+  timeSlot,
+  editTimeSlot,
+  setEditTimeSlot,
+} ) => {
+  const [tempVal, setTempVal] = useState( false );
+  const val = dayjs( editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format('YYYY-MM-DD HH:mm:ss');
+  return <div className={ "timeSlot--" + field }>
+    <input
+      id={ "timeSlot--" + field }
+      className={ classnames( {
+        'form-control': true,
+        'dirty': tempVal || ( editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] ),
+        'invalid': tempVal && ! isValidDateInput( tempVal ),
+      } ) }
+      type="text"
+      onBlur={ () => {
+        if ( tempVal && isValidDateInput( tempVal ) ) {
+          setTempVal( false );
+        }
+      } }
+      onChange={ ( e ) => {
+        setTempVal( e.target.value );
+        if ( isValidDateInput( e.target.value ) ) {
+          setEditTimeSlot( {
+            ...editTimeSlot,
+            [field]: dayjs( e.target.value ).valueOf(),
+          } );
+        }
+      } }
+      value={ tempVal
+        ? tempVal
+        : val
+      }
+    />
+  </div>
+};
+
+export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
 
   const [editTimeSlot, setEditTimeSlot] = useState( {} );
 
   const deleteTimeSlot = ( e ) => {
     e.preventDefault();
-    api.timeSlots.delete( item._id ).then( timeSlots => {
-      const newTimeSlots = [...items];
+    api.timeSlots.delete( timeSlot._id ).then( timeSlots => {
+      const newTimeSlots = [...timeSlots];
       newTimeSlots.splice( idx, 1 );
       setTimeSlots( newTimeSlots );
     } );
@@ -31,12 +92,12 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
   const stopTimeSlot = ( e ) => {
     e.preventDefault();
     const newTimeSlot = {
-      ...item,
+      ...timeSlot,
       dateStop: dayjs().valueOf(),
     };
     api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
       if ( numberUpdated ) {
-        const newTimeSlots = [...items];
+        const newTimeSlots = [...timeSlots];
         newTimeSlots.splice( idx, 1, newTimeSlot );
         setTimeSlots( newTimeSlots );
       }
@@ -46,12 +107,12 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
   const updateTimeSlot = ( e ) => {
     e.preventDefault();
     const newTimeSlot = {
-      ...item,
+      ...timeSlot,
       ...editTimeSlot,
     };
     api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
       if ( numberUpdated ) {
-        const newTimeSlots = [...items];
+        const newTimeSlots = [...timeSlots];
         newTimeSlots.splice( idx, 1, newTimeSlot );
         setTimeSlots( newTimeSlots );
         setEditTimeSlot( {} );
@@ -82,51 +143,33 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
         <input
           className={ classnames( {
             'form-control': true,
-            'dirty': editTimeSlot.title && editTimeSlot.title !== item.title,
+            'dirty': editTimeSlot.title && editTimeSlot.title !== timeSlot.title,
           } ) }
           type="text"
           onChange={ ( e ) => {
             setEditTimeSlot( { ...editTimeSlot, title: e.target.value } );
           } }
-          value={ editTimeSlot.title ? editTimeSlot.title : item.title }
+          value={ editTimeSlot.title ? editTimeSlot.title : timeSlot.title }
         />
       </div>
 
-      <div className="timeSlot--dateStart">
-        <input
-          className={ classnames( {
-            'form-control': true,
-            'dirty': editTimeSlot.dateStart && editTimeSlot.dateStart !== item.dateStart,
-          } ) }
-          type="text"
-          onChange={ ( e ) => {
-            // setEditTimeSlot( { ...editTimeSlot, dateStart: dayjs( e.target.value ).valueOf() } );
-          } }
-          value={ dayjs(  editTimeSlot.dateStart ? editTimeSlot.dateStart : item.dateStart ).format('YYYY-MM-DD HH:mm:ss') }
-        />
-      </div>
+      <DateInput
+        field='dateStart'
+        timeSlot={ timeSlot }
+        editTimeSlot={ editTimeSlot }
+        setEditTimeSlot={ setEditTimeSlot }
+      />
 
-      <div className="timeSlot--dateStop">
-        <input
-          className={ classnames( {
-            'form-control': true,
-            'dirty': editTimeSlot.dateStop && editTimeSlot.dateStop !== item.dateStop,
-          } ) }
-          type="text"
-          disabled={ ! item.dateStop }
-          onChange={ ( e ) => {
-            // setEditTimeSlot( { ...editTimeSlot, dateStop: dayjs( e.target.value ).valueOf() } );
-          } }
-          value={ item.dateStop
-            ? dayjs( editTimeSlot.dateStop ? editTimeSlot.dateStop : item.dateStop ).format('YYYY-MM-DD HH:mm:ss')
-            : '---'
-          }
-        />
-      </div>
+      <DateInput
+        field='dateStop'
+        timeSlot={ timeSlot }
+        editTimeSlot={ editTimeSlot }
+        setEditTimeSlot={ setEditTimeSlot }
+      />
 
       <Duration
-        start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : item.dateStart }
-        stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : item.dateStop }
+        start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : timeSlot.dateStart }
+        stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
       />
 
       <button
@@ -147,7 +190,7 @@ export const TimeSlot = ({ item, idx, items, setTimeSlots }) => {
 
       <button
         type='button'
-        disabled={ item.dateStop }
+        disabled={ timeSlot.dateStop }
         className="btn flex-shrink-0 stop"
         onClick={ stopTimeSlot }
       >

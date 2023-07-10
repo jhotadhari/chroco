@@ -30,3 +30,15 @@ $btn-link-disabled-color:     $gray-300;
         --#{$prefix}btn-hover-border-color: #{$white};
     }
 }
+
+.form-control {
+
+    &.dirty {
+        border-color: var(--bssuccess) !important;
+    }
+
+    &.invalid {
+        border-color: var(--bsdanger)  !important;
+    }
+
+}

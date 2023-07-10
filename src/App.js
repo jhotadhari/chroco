@@ -12,7 +12,7 @@ import { TimeSlots } from "./Components/TimeSlots";
 const { api } = window;
 
 function App() {
-  const [items, setTimeSlots] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
   const [themeSource, setThemeSource] = useState( false );
 
   useEffect(() => {
@@ -30,11 +30,11 @@ function App() {
   }, [themeSource] );
 
   return <div
-    className="container-xxl"
+    className=""
     data-bs-theme={ themeSource }
   >
 
-      <div className="settings container py-4">
+      <div className="settings container-fluid py-4">
 
         <button
           className='btn me-3'
@@ -59,11 +59,11 @@ function App() {
 
 
       <CreateTimeSlot
-        items={items}
+        timeSlots={timeSlots}
         setTimeSlots={setTimeSlots}
       />
       <TimeSlots
-        items={items}
+        timeSlots={timeSlots}
         setTimeSlots={setTimeSlots}
       />
   </div>;

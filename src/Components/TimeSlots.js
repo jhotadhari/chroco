@@ -1,17 +1,17 @@
 import { TimeSlot } from "./TimeSlot";
 
-export const TimeSlots = ({ items, setTimeSlots }) => {
+export const TimeSlots = ({ timeSlots, setTimeSlots }) => {
   return (
     <ul
-      className="container py-4 list-unstyled"
+      className="container-fluid py-4 list-unstyled"
     >
-      { [...items].map( ( val, idx ) => (
+      { [...timeSlots].map( ( timeSlot, idx ) => (
         <TimeSlot
-          key={val._id}
-          item={val}
-          idx={idx}
-          items={items}
-          setTimeSlots={setTimeSlots}
+          key={ timeSlot._id }
+          timeSlot={ timeSlot }
+          idx={ idx }
+          timeSlots={ timeSlots }
+          setTimeSlots={ setTimeSlots }
         />
       ) ) }
     </ul>
