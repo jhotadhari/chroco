@@ -9,6 +9,7 @@ const {
 const isDev = require('electron-is-dev');
 const path = require('path')
 const setupApi = require('./setupApi');
+const db = require('./nedb/db');
 
 
 function createWindow() {
@@ -85,5 +86,18 @@ app.on('window-all-closed', () => {
 app.on( 'activate', () => {
     if ( BrowserWindow.getAllWindows().length === 0 ) {
         createWindow();
+    }
+} );
+
+// Compact db when closing app.
+let shouldCompactDatafile = true;
+app.on( 'before-quit', ( e ) => {
+    if ( shouldCompactDatafile ) {
+        e.preventDefault()
+        db.persistence.compactDatafile();
+        db.on( 'compaction.done', () => {
+            shouldCompactDatafile = false;
+            app.quit();
+        } );
     }
 } );
