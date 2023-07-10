@@ -144,20 +144,27 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
     } );
   };
 
-  // const restartTimeSlot = ( e ) => {
-  //   e.preventDefault();
-  //   let { _id, ...newTimeSlot } = editTimeSlot;
-  //   newTimeSlot = {
-  //     ...newTimeSlot,
-  //     dateStart: dayjs().valueOf(),
-  //     dateStop: false,
-  //   };
-
-  //   db.insert( newTimeSlot, ( err, newDoc ) => {
-  //     if (!err) {
-  //     }
-  //   } );
-  // };
+  const startTimeSlot = ( e ) => {
+    e.preventDefault();
+    const newTimeSlot = {
+      ...timeSlot,
+      dateStart: dayjs().valueOf(),
+      dateStop: false,
+    };
+    [
+      '_id',
+      'createdAt',
+      'updatedAt',
+    ].map( key => {
+      delete newTimeSlot[key];
+    } );
+    api.timeSlots.add( newTimeSlot ).then( addedTimeSlot => {
+      setTimeSlots( [
+        addedTimeSlot,
+        ...timeSlots,
+      ] );
+  } );
+  };
 
   return <li
     className="d-flex justify-content-between align-items-center py-1"
@@ -221,9 +228,14 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
         stop
       </button>
 
-      {/* <button className="restart" onClick={ restartTimeSlot }>
-        restart
-      </button> */}
+      <button
+        type='button'
+        disabled={ ! timeSlot.dateStop }
+        className="btn flex-shrink-0 start"
+        onClick={ startTimeSlot }
+      >
+        start
+      </button>
 
   </li>;
 };
