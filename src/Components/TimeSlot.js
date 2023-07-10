@@ -102,6 +102,27 @@ const DateInput = ( {
   </div>
 };
 
+const Input = ( {
+  field,
+  timeSlot,
+  editTimeSlot,
+  setEditTimeSlot,
+} ) => {
+  return <div className={ "timeSlot--" + field }>
+    <input
+      className={ classnames( {
+        'form-control': true,
+        'dirty': editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field],
+      } ) }
+      type="text"
+      onChange={ ( e ) => {
+        setEditTimeSlot( { ...editTimeSlot, title: e.target.value } );
+      } }
+      value={ editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
+    />
+  </div>;
+};
+
 export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
 
   const [editTimeSlot, setEditTimeSlot] = useState( {} );
@@ -169,20 +190,26 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
   return <li
     className="d-flex justify-content-between align-items-center py-1"
   >
+      <Input
+        field='title'
+        timeSlot={ timeSlot }
+        editTimeSlot={ editTimeSlot }
+        setEditTimeSlot={ setEditTimeSlot }
+      />
 
-      <div className="timeSlot--title">
-        <input
-          className={ classnames( {
-            'form-control': true,
-            'dirty': editTimeSlot.title && editTimeSlot.title !== timeSlot.title,
-          } ) }
-          type="text"
-          onChange={ ( e ) => {
-            setEditTimeSlot( { ...editTimeSlot, title: e.target.value } );
-          } }
-          value={ editTimeSlot.title ? editTimeSlot.title : timeSlot.title }
-        />
-      </div>
+      <Input
+        field='project'
+        timeSlot={ timeSlot }
+        editTimeSlot={ editTimeSlot }
+        setEditTimeSlot={ setEditTimeSlot }
+      />
+
+      <Input
+        field='client'
+        timeSlot={ timeSlot }
+        editTimeSlot={ editTimeSlot }
+        setEditTimeSlot={ setEditTimeSlot }
+      />
 
       <DateInput
         field='dateStart'
