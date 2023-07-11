@@ -20,8 +20,9 @@ export const TimeSlotsTable = () => {
 							return null;
 						}
 						return <th
+							key={ key }
 							scope="col"
-							colspan={ 'title' === key ? 2 : 1 }
+							colSpan={ 'title' === key ? 2 : 1 }
 						>{ timeSlotSchema[key].title }</th>
 					} ) : '' }
 					<th scope="col">Duration</th>

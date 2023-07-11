@@ -200,23 +200,23 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
       if ( '_id' === key ) {
         return null;
       }
-      console.log( 'debug timeSlotSchema', timeSlotSchema ); // debug
-      console.log( 'debug key', key ); // debug
       switch( timeSlotSchema[key].type ) {
         case 'text':
             return <td
-              className={ "timeSlot--" + key }
-              colspan={ 'title' === key ? 2 : 1 }
-            ><Input
               key={ key }
+              className={ "timeSlot--" + key }
+              colSpan={ 'title' === key ? 2 : 1 }
+            ><Input
               field={ key }
               timeSlot={ timeSlot }
               editTimeSlot={ editTimeSlot }
               setEditTimeSlot={ setEditTimeSlot }
             /></td>;
         case 'date':
-          return <td className={ "timeSlot--" + key }><DateInput
+          return <td
+            className={ "timeSlot--" + key }
             key={ key }
+          ><DateInput
             field={ key }
             timeSlot={ timeSlot }
             editTimeSlot={ editTimeSlot }

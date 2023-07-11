@@ -80,13 +80,22 @@ function App() {
         >Toggle Dark Mode</button>
 
         <button
-          className='btn'
+          className='btn me-3'
           type='button'
           onClick={ e => {
             e.preventDefault();
             api.settings.ui.darkMode.system().then( () => setThemeSource( false ) );
           } }
         >Reset to System Theme</button>
+
+        <button
+          className='btn'
+          type='button'
+          onClick={ e => {
+            e.preventDefault();
+            api.db.compact();
+          } }
+        >Compact db</button>
 
       </div>
 
