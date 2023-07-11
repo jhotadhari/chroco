@@ -66,6 +66,7 @@ const Duration = ( {
 const DateInput = ( {
   field,
   timeSlot,
+  updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
@@ -73,12 +74,13 @@ const DateInput = ( {
   const val = timeSlot[field]
     ? dayjs( editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format('YYYY-MM-DD HH:mm:ss')
     : '';
+  const isDirty = tempVal || ( editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] );
 
   return <input
-      id={ "timeSlot--" + field }
+      onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( { includeFields: [field] } ) }
       className={ classnames( {
         'form-control': true,
-        'dirty': tempVal || ( editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] ),
+        'dirty': isDirty,
         'invalid': tempVal && ! isValidDateInput( tempVal ),
       } ) }
       type="text"
@@ -107,13 +109,17 @@ const DateInput = ( {
 const Input = ( {
   field,
   timeSlot,
+  updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
+  const isDirty = editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
+
   return <input
+      onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( { includeFields: [field] } ) }
       className={ classnames( {
         'form-control': true,
-        'dirty': editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field],
+        'dirty': isDirty,
       } ) }
       type="text"
       onChange={ ( e ) => {
@@ -133,8 +139,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
 		setTimeSlots,
 	} = useContext( Context );
 
-  const deleteTimeSlot = ( e ) => {
-    e.preventDefault();
+  const deleteTimeSlot = () => {
     api.timeSlots.delete( timeSlot._id ).then( numberDeleted => {
       if ( numberDeleted ) {
         const newTimeSlots = [...timeSlots];
@@ -144,8 +149,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
     } );
   };
 
-  const stopTimeSlot = ( e ) => {
-    e.preventDefault();
+  const stopTimeSlot = () => {
     api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
       if ( updatedTimeSlot ) {
         const newTimeSlots = [...timeSlots];
@@ -155,24 +159,34 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
     } );
   };
 
-  const updateTimeSlot = ( e ) => {
-    e.preventDefault();
-    const newTimeSlot = {
-      ...timeSlot,
-      ...editTimeSlot,
-    };
+  const updateTimeSlot = ( { includeFields } ) => {
+    let newEditTimeSlot = {};
+    let newTimeSlot = {...timeSlot};
+    if ( includeFields ) {
+      Object.keys( editTimeSlot ).map( key => {
+        if ( includeFields.includes( key ) ) {
+          newTimeSlot[key] = editTimeSlot[key];
+        } else {
+          newEditTimeSlot[key] = editTimeSlot[key];
+        }
+      } );
+    } else {
+      newTimeSlot = {
+        ...newTimeSlot,
+        ...editTimeSlot,
+      };
+    }
     api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
       if ( numberUpdated ) {
         const newTimeSlots = [...timeSlots];
         newTimeSlots.splice( idx, 1, newTimeSlot );
         setTimeSlots( newTimeSlots );
-        setEditTimeSlot( {} );
+        setEditTimeSlot( newEditTimeSlot );
       }
     } );
   };
 
-  const startTimeSlot = ( e ) => {
-    e.preventDefault();
+  const startTimeSlot = () => {
     const newTimeSlot = {
       ...timeSlot,
       dateStart: dayjs().valueOf(),
@@ -186,7 +200,10 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
       delete newTimeSlot[key];
       return null;
     } );
-    api.timeSlots.add( newTimeSlot ).then( addedTimeSlot => {
+    // console.log( 'debug newTimeSlot', newTimeSlot ); // debug
+    api.timeSlots.add( newTimeSlot ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
+      // console.log( 'debug addedTimeSlot', addedTimeSlot ); // debug
+      // console.log( 'debug stoppedTimeSlot', stoppedTimeSlot ); // debug
       setTimeSlots( [
         addedTimeSlot,
         ...timeSlots,
@@ -209,6 +226,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
             ><Input
               field={ key }
               timeSlot={ timeSlot }
+              updateTimeSlot={ updateTimeSlot }
               editTimeSlot={ editTimeSlot }
               setEditTimeSlot={ setEditTimeSlot }
             /></td>;
@@ -219,6 +237,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
           ><DateInput
             field={ key }
             timeSlot={ timeSlot }
+            updateTimeSlot={ updateTimeSlot }
             editTimeSlot={ editTimeSlot }
             setEditTimeSlot={ setEditTimeSlot }
           /></td>;
