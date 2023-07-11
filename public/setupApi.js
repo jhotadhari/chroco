@@ -114,12 +114,16 @@ api.timeSlots.delete = id => new Promise( ( resolve, reject ) => {
     } );
 } );
 
-// return   promise resolve object  newTimeSlot
+// return   promise resolve object  addedTimeSlot, stoppedTimeSlot
 api.timeSlots.add = newTimeSlot => new Promise( ( resolve, reject ) => {
-    const add = () => {
+    const add = stoppedTimeSlot => {
         db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
             db.current.insert( { type: 'timeSlot', connectedId: addedTimeSlot._id }, ( err, addedCurrent ) => {
-                resolve( addedTimeSlot );
+                const result = {
+                    addedTimeSlot,
+                    stoppedTimeSlot,
+                };
+                resolve( result );
             } );
         } );
     };
@@ -128,11 +132,12 @@ api.timeSlots.add = newTimeSlot => new Promise( ( resolve, reject ) => {
         if ( currentTimeSlot ) {
             api.timeSlots.stop( currentTimeSlot ).then( stoppedTimeSlot => {
                 if ( stoppedTimeSlot ) {
-                    add();
+                    add( stoppedTimeSlot );
                 }
             } )
+        } else {
+            add();
         }
-        add();
     } )
 } );
 

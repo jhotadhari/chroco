@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import dayjs from "dayjs";
 import Context from '../Context';
+import { sortTimeSlotsCompare } from "../utils";
 const { api } = window;
 
 export const CreateTimeSlot = () => {
@@ -36,12 +37,20 @@ export const CreateTimeSlot = () => {
           title,
           dateStart: dayjs().valueOf(),
           dateStop: false,
-        } ).then( addedTimeSlot => {
+        } ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
             setTitle( '' );
-            setTimeSlots( [
+            const newTimeSlots = [
               addedTimeSlot,
               ...timeSlots,
-            ] );
+            ];
+            if ( stoppedTimeSlot ) {
+            const idxStopped = newTimeSlots.findIndex( ts => ts._id === stoppedTimeSlot._id );
+              if ( idxStopped ) {
+                newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
+              }
+            }
+            newTimeSlots.sort( sortTimeSlotsCompare );
+            setTimeSlots( newTimeSlots );
         } );
       } }
     >

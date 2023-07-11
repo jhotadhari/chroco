@@ -14,6 +14,7 @@ import Context from './Context';
 
 import { CreateTimeSlot } from "./Components/CreateTimeSlot";
 import { TimeSlotsTable } from "./Components/TimeSlotsTable";
+import { sortTimeSlotsCompare } from "./utils";
 const { api } = window;
 
 
@@ -32,6 +33,7 @@ function App() {
 
   useEffect(() => {
     api.timeSlots.get().then( timeSlots => {
+      timeSlots.sort( sortTimeSlotsCompare );
       setTimeSlots( timeSlots );
     } );
   }, [] );

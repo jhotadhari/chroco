@@ -7,6 +7,7 @@ import {
   // useRef
 } from "react";
 import Context from '../Context';
+import { sortTimeSlotsCompare } from "../utils";
 const { api } = window;
 
 
@@ -144,6 +145,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
       if ( numberDeleted ) {
         const newTimeSlots = [...timeSlots];
         newTimeSlots.splice( idx, 1 );
+        newTimeSlots.sort( sortTimeSlotsCompare );
         setTimeSlots( newTimeSlots );
       }
     } );
@@ -154,6 +156,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
       if ( updatedTimeSlot ) {
         const newTimeSlots = [...timeSlots];
         newTimeSlots.splice( idx, 1, updatedTimeSlot );
+        newTimeSlots.sort( sortTimeSlotsCompare );
         setTimeSlots( newTimeSlots );
       }
     } );
@@ -180,6 +183,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
       if ( numberUpdated ) {
         const newTimeSlots = [...timeSlots];
         newTimeSlots.splice( idx, 1, newTimeSlot );
+        newTimeSlots.sort( sortTimeSlotsCompare );
         setTimeSlots( newTimeSlots );
         setEditTimeSlot( newEditTimeSlot );
       }
@@ -200,14 +204,19 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
       delete newTimeSlot[key];
       return null;
     } );
-    // console.log( 'debug newTimeSlot', newTimeSlot ); // debug
     api.timeSlots.add( newTimeSlot ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
-      // console.log( 'debug addedTimeSlot', addedTimeSlot ); // debug
-      // console.log( 'debug stoppedTimeSlot', stoppedTimeSlot ); // debug
-      setTimeSlots( [
+      const newTimeSlots = [
         addedTimeSlot,
         ...timeSlots,
-      ] );
+      ];
+      if ( stoppedTimeSlot ) {
+      const idxStopped = newTimeSlots.findIndex( ts => ts._id === stoppedTimeSlot._id );
+        if ( idxStopped ) {
+          newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
+        }
+      }
+      newTimeSlots.sort( sortTimeSlotsCompare );
+      setTimeSlots( newTimeSlots );
   } );
   };
 
