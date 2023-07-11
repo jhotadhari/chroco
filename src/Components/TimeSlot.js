@@ -117,7 +117,7 @@ const Input = ( {
       } ) }
       type="text"
       onChange={ ( e ) => {
-        setEditTimeSlot( { ...editTimeSlot, title: e.target.value } );
+        setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
       } }
       value={ editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
     />;
