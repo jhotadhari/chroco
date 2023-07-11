@@ -1,8 +1,12 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
-import { useState, useEffect, useRef } from "react";
-
-
+import {
+  useState,
+  useContext,
+  // useEffect,
+  // useRef
+} from "react";
+import Context from '../Context';
 const { api } = window;
 
 
@@ -47,7 +51,7 @@ const Duration = ( {
   const seconds = start && stop
     ? dayjs( stop ).diff( dayjs( start ), 'second' )
     : false;
-  return <div
+  return <td
     className={ classnames( {
       "timeSlot--duration": true,
       invalid: seconds < 0,
@@ -56,7 +60,7 @@ const Duration = ( {
     { false !== seconds
       ? formatSeconds( seconds )
       : '- m' }
-  </div>;
+  </td>;
 };
 
 const DateInput = ( {
@@ -70,8 +74,7 @@ const DateInput = ( {
     ? dayjs( editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format('YYYY-MM-DD HH:mm:ss')
     : '';
 
-  return <div className={ "timeSlot--" + field }>
-    <input
+  return <input
       id={ "timeSlot--" + field }
       className={ classnames( {
         'form-control': true,
@@ -98,8 +101,7 @@ const DateInput = ( {
         ? tempVal
         : val
       }
-    />
-  </div>
+    />;
 };
 
 const Input = ( {
@@ -108,8 +110,7 @@ const Input = ( {
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
-  return <div className={ "timeSlot--" + field }>
-    <input
+  return <input
       className={ classnames( {
         'form-control': true,
         'dirty': editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field],
@@ -119,13 +120,18 @@ const Input = ( {
         setEditTimeSlot( { ...editTimeSlot, title: e.target.value } );
       } }
       value={ editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
-    />
-  </div>;
+    />;
 };
 
-export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
+export const TimeSlot = ( { timeSlot, idx } ) => {
 
   const [editTimeSlot, setEditTimeSlot] = useState( {} );
+
+	const {
+		timeSlotSchema,
+		timeSlots,
+		setTimeSlots,
+	} = useContext( Context );
 
   const deleteTimeSlot = ( e ) => {
     e.preventDefault();
@@ -178,6 +184,7 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
       'updatedAt',
     ].map( key => {
       delete newTimeSlot[key];
+      return null;
     } );
     api.timeSlots.add( newTimeSlot ).then( addedTimeSlot => {
       setTimeSlots( [
@@ -187,82 +194,70 @@ export const TimeSlot = ({ timeSlot, idx, timeSlots, setTimeSlots }) => {
   } );
   };
 
-  return <li
-    className="d-flex justify-content-between align-items-center py-1"
-  >
-      <Input
-        field='title'
-        timeSlot={ timeSlot }
-        editTimeSlot={ editTimeSlot }
-        setEditTimeSlot={ setEditTimeSlot }
-      />
+  return <tr>
 
-      <Input
-        field='project'
-        timeSlot={ timeSlot }
-        editTimeSlot={ editTimeSlot }
-        setEditTimeSlot={ setEditTimeSlot }
-      />
-
-      <Input
-        field='client'
-        timeSlot={ timeSlot }
-        editTimeSlot={ editTimeSlot }
-        setEditTimeSlot={ setEditTimeSlot }
-      />
-
-      <DateInput
-        field='dateStart'
-        timeSlot={ timeSlot }
-        editTimeSlot={ editTimeSlot }
-        setEditTimeSlot={ setEditTimeSlot }
-      />
-
-      <DateInput
-        field='dateStop'
-        timeSlot={ timeSlot }
-        editTimeSlot={ editTimeSlot }
-        setEditTimeSlot={ setEditTimeSlot }
-      />
+    { !! timeSlotSchema ? Object.keys( timeSlotSchema ).map( key => {
+      if ( '_id' === key ) {
+        return null;
+      }
+      console.log( 'debug timeSlotSchema', timeSlotSchema ); // debug
+      console.log( 'debug key', key ); // debug
+      switch( timeSlotSchema[key].type ) {
+        case 'text':
+            return <td
+              className={ "timeSlot--" + key }
+              colspan={ 'title' === key ? 2 : 1 }
+            ><Input
+              key={ key }
+              field={ key }
+              timeSlot={ timeSlot }
+              editTimeSlot={ editTimeSlot }
+              setEditTimeSlot={ setEditTimeSlot }
+            /></td>;
+        case 'date':
+          return <td className={ "timeSlot--" + key }><DateInput
+            key={ key }
+            field={ key }
+            timeSlot={ timeSlot }
+            editTimeSlot={ editTimeSlot }
+            setEditTimeSlot={ setEditTimeSlot }
+          /></td>;
+        default:
+            return null;
+      }
+    } ) : '' }
 
       <Duration
         start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : timeSlot.dateStart }
         stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
       />
 
-      <button
-        className="btn flex-shrink-0 save"
-        onClick={ updateTimeSlot }
-        disabled={ ! Object.keys( editTimeSlot ).length }
-      >
-        save
-      </button>
+      <td className={ "timeSlot--actions d-flex" }>
+        <button
+          className="btn me-2 save"
+          onClick={ updateTimeSlot }
+          disabled={ ! Object.keys( editTimeSlot ).length }
+        >
+          save
+        </button>
 
-      <button
-        type='button'
-        className="btn flex-shrink-0 delete"
-        onClick={ deleteTimeSlot }
-      >
-        delete
-      </button>
+        <button
+          type='button'
+          className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
+          onClick={ timeSlot.dateStop ? startTimeSlot : stopTimeSlot }
+        >
+          { timeSlot.dateStop ? 'Start' : 'Stop' }
+        </button>
 
-      <button
-        type='button'
-        disabled={ timeSlot.dateStop }
-        className="btn flex-shrink-0 stop"
-        onClick={ stopTimeSlot }
-      >
-        stop
-      </button>
+        <button
+          type='button'
+          className="btn delete"
+          onClick={ deleteTimeSlot }
+        >
+          delete
+        </button>
 
-      <button
-        type='button'
-        disabled={ ! timeSlot.dateStop }
-        className="btn flex-shrink-0 start"
-        onClick={ startTimeSlot }
-      >
-        start
-      </button>
+      </td>
 
-  </li>;
+  </tr>;
 };

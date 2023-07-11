@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import dayjs from "dayjs";
+import Context from '../Context';
 const { api } = window;
 
-export const CreateTimeSlot = ( {
-  timeSlots,
-  setTimeSlots,
-  timeSlotCurrent,
-} ) => {
+export const CreateTimeSlot = () => {
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState( '' );
+
+	const {
+		timeSlots,
+		setTimeSlots,
+		timeSlotCurrent,
+	} = useContext( Context );
 
   return <div className="container-fluid input-group py-4 ">
 

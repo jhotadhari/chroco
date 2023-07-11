@@ -1,20 +1,34 @@
 // import logo from './logo.svg';
 import './style/App.scss';
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  useContext,
+} from "react";
 // import db from "./nedb/db";
 // import db from "db";
 
 
+import Context from './Context';
 
 
 import { CreateTimeSlot } from "./Components/CreateTimeSlot";
-import { TimeSlots } from "./Components/TimeSlots";
+import { TimeSlotsTable } from "./Components/TimeSlotsTable";
 const { api } = window;
 
+
+
 function App() {
+  const [timeSlotSchema, setTimeSlotSchema] = useState( null );
   const [timeSlots, setTimeSlots] = useState( [] );
   const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
   const [themeSource, setThemeSource] = useState( false );
+
+  useEffect(() => {
+    api.timeSlots.schema().then( schema => {
+      setTimeSlotSchema( schema );
+    } );
+  }, [] );
 
   useEffect(() => {
     api.timeSlots.get().then( timeSlots => {
@@ -36,11 +50,24 @@ function App() {
     }
   }, [themeSource] );
 
+
+
+
+
+
+
+
   return <div
     className=""
     data-bs-theme={ themeSource }
   >
-
+    <Context.Provider value={ {
+      timeSlotSchema,
+      timeSlots,
+      setTimeSlots,
+      timeSlotCurrent,
+      // setTimeSlotCurrent,
+    } }>
       <div className="settings container-fluid py-4">
 
         <button
@@ -63,18 +90,11 @@ function App() {
 
       </div>
 
+      <CreateTimeSlot/>
 
+      <TimeSlotsTable/>
 
-      <CreateTimeSlot
-        timeSlots={timeSlots}
-        setTimeSlots={setTimeSlots}
-        timeSlotCurrent={timeSlotCurrent}
-      />
-      <TimeSlots
-        timeSlots={timeSlots}
-        setTimeSlots={setTimeSlots}
-        timeSlotCurrent={timeSlotCurrent}
-      />
+    </Context.Provider>
   </div>;
 }
 
