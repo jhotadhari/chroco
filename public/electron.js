@@ -8,8 +8,7 @@ const {
 
 const isDev = require('electron-is-dev');
 const path = require('path')
-const setupApi = require('./setupApi');
-const db = require('./nedb/db');
+const { setupApi, api } = require('./setupApi');
 
 
 function createWindow() {
@@ -94,14 +93,7 @@ let shouldCompactDatafile = true;
 app.on( 'before-quit', ( e ) => {
     if ( shouldCompactDatafile ) {
         e.preventDefault()
-		Promise.all( Object.keys( db ).map( key => {
-			return new Promise( resolve => {
-                db[key].persistence.compactDatafile();
-                db[key].on( 'compaction.done', () => {
-                    resolve( true );
-                } );
-			} );
-		} ) ).then( () => {
+        api.db.compact().then( () => {
             shouldCompactDatafile = false;
             app.quit();
         } );

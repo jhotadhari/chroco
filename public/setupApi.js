@@ -6,9 +6,23 @@ const db = require('./nedb/db');
 const dayjs = require('dayjs');
 
 const api = {
+    db: {},
     timeSlots: {},
     settings: {},
 };
+
+api.db.compact = () => new Promise( ( resolve, reject ) => {
+    Promise.all( Object.keys( db ).map( key => {
+        return new Promise( res => {
+            db[key].persistence.compactDatafile();
+            db[key].on( 'compaction.done', () => {
+                res( true );
+            } );
+        } );
+    } ) ).then( () => {
+        resolve( true );
+    } );
+} );
 
 // return   promise resolve object timeSlot schema
 api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
@@ -135,6 +149,8 @@ api.timeSlots.update = newTimeSlot => new Promise( ( resolve, reject ) => {
 
 const setupApi = () => {
 
+    ipcMain.handle( 'api:db:compact', (_) =>                        api.db.compact() );
+
     /**
      * timeSlots
      *
@@ -177,4 +193,7 @@ const setupApi = () => {
     } );
 
 }
-module.exports = setupApi;
+module.exports = {
+    setupApi,
+    api
+};
