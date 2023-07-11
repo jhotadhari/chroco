@@ -52,13 +52,6 @@ function App() {
     }
   }, [themeSource] );
 
-
-
-
-
-
-
-
   return <div
     className=""
     data-bs-theme={ themeSource }
@@ -68,7 +61,7 @@ function App() {
       timeSlots,
       setTimeSlots,
       timeSlotCurrent,
-      // setTimeSlotCurrent,
+      themeSource,
     } }>
       <div className="settings container-fluid py-4">
 

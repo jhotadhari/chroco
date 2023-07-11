@@ -207,11 +207,13 @@
 }
 
 .timeSlot--duration {
-  padding: $btn-padding-y $btn-padding-x;
-  margin: -#{$btn-padding-y} -#{$btn-padding-x};
-  border: $btn-border-width solid transparent;
-  border-radius: $btn-border-radius;
-  &.invalid {
-      border-color: var(--bsdanger) !important;
+  .invalid {
+    border: $btn-border-width solid transparent;
+    border-radius: $btn-border-radius;
+    border-color: var(--bsdanger) !important;
   }
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-width: 0;
 }

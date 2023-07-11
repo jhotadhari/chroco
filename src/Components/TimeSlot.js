@@ -55,12 +55,21 @@ const Duration = ( {
   return <td
     className={ classnames( {
       "timeSlot--duration": true,
-      invalid: seconds < 0,
+      "text-end": true,
+      'align-middle': true,
+      'bg-transparent': true,
     } ) }
   >
-    { false !== seconds
-      ? formatSeconds( seconds )
-      : '- m' }
+    <span
+      className={ classnames( {
+        invalid: seconds < 0,
+        'p-2': true,
+      } ) }
+    >
+      { false !== seconds
+        ? formatSeconds( seconds )
+        : '- m' }
+    </span>
   </td>;
 };
 
@@ -230,7 +239,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
         case 'text':
             return <td
               key={ key }
-              className={ "timeSlot--" + key }
+              className={ "bg-transparent timeSlot--" + key }
               colSpan={ 'title' === key ? 2 : 1 }
             ><Input
               field={ key }
@@ -241,7 +250,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
             /></td>;
         case 'date':
           return <td
-            className={ "timeSlot--" + key }
+            className={ "bg-transparent timeSlot--" + key }
             key={ key }
           ><DateInput
             field={ key }
@@ -260,7 +269,7 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
         stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
       />
 
-      <td className={ "timeSlot--actions d-flex" }>
+      <td className={ "bg-transparent timeSlot--actions d-flex" }>
         <button
           className="btn me-2 save"
           onClick={ updateTimeSlot }
