@@ -38,13 +38,13 @@ const Duration = ( {
   const seconds = start && stop
     ? dayjs( stop ).diff( dayjs( start ), 'second' )
     : false;
-  return <td
-    colSpan="1"
+  return <div
     className={ classnames( {
       "timeSlot--duration": true,
       "text-end": true,
       'align-middle': true,
       'bg-transparent': true,
+      'col-3': true,
     } ) }
     >
     <span
@@ -58,7 +58,7 @@ const Duration = ( {
         ? formatSeconds( seconds )
         : '- m' }
     </span>
-  </td>;
+  </div>;
 };
 
 const DateInput = ( {
@@ -248,9 +248,9 @@ export const TimeSlot = ( {
   } );
   };
 
-  return <tr>
+  return <div className="row">
 
-    <td className="bg-transparent"></td>
+    <div className="col-1"></div>
 
     { !! timeSlotSchema ? Object.keys( timeSlotSchema ).map( key => {
       if ( '_id' === key ) {
@@ -258,29 +258,30 @@ export const TimeSlot = ( {
       }
       switch( timeSlotSchema[key].type ) {
         case 'text':
-            return <td
+            return <div
               key={ key }
-              className={ "bg-transparent timeSlot--" + key }
-              colSpan={ 'title' === key ? 2 : 1 }
+              className={ classnames( [
+                'timeSlot--' + key,
+                'title' === key ? 'col-9' : 'col-4'
+              ] ) }
             ><Input
               field={ key }
               timeSlot={ timeSlot }
               updateTimeSlot={ updateTimeSlot }
               editTimeSlot={ editTimeSlot }
               setEditTimeSlot={ setEditTimeSlot }
-            /></td>;
+            /></div>;
         case 'date':
-          return <td
-            className={ "bg-transparent timeSlot--" + key }
+          return <div
+            className={ "col-4 timeSlot--" + key }
             key={ key }
-            colSpan="1"
           ><DateInput
             field={ key }
             timeSlot={ timeSlot }
             updateTimeSlot={ updateTimeSlot }
             editTimeSlot={ editTimeSlot }
             setEditTimeSlot={ setEditTimeSlot }
-          /></td>;
+          /></div>;
         default:
             return null;
       }
@@ -294,9 +295,8 @@ export const TimeSlot = ( {
         }
       />
 
-      <td
-        colSpan="1"
-        className={ "bg-transparent timeSlot--actions d-flex" }
+      <div
+        className={ "col-4 timeSlot--actions d-flex" }
       >
         <button
           className="btn me-2 save"
@@ -322,7 +322,7 @@ export const TimeSlot = ( {
           delete
         </button>
 
-      </td>
+      </div>
 
-  </tr>;
+  </div>;
 };

@@ -162,26 +162,6 @@
 }
 
 
-// .settings,
-// .timeSlot-create {
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   padding: 0.5rem;
-// }
-
-// .timeSlots-container {
-//   list-style: none;
-// }
-
-// .timeSlot {
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   padding: 0.5rem;
-
-
-// }
 
 
 [data-bs-theme="light"] {
@@ -220,30 +200,11 @@
   }
 }
 
-.table  > * > * > td:first-child {
-  width: 1rem;
-}
-// .table > :not(caption) > * > * {
-//   border-bottom-width: 0;
-// }
-
-.spacer {
-
-}
-
-.timeSlot {
-  &--duration {
-    width: 6rem;
-  }
-  &--project,
-  &--client {
-    width: 12rem;
-  }
-  &--dateStart,
-  &--dateStop {
-    max-width: 8rem;
-  }
-  &--actions {
-    width: 8rem;
+.timeSlots-table {
+  & > .row {
+    margin-bottom: map-get($spacers, 2 );
+    &.spacer {
+      margin-bottom: map-get($spacers, 3 );
+    }
   }
 }

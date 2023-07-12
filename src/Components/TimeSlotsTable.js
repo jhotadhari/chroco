@@ -58,13 +58,13 @@ const GroupDuration = ( {
 			: acc;
 	}, 0 );
 
-	return <td
-	  colSpan="1"
+	return <div
 	  className={ classnames( {
 		"timeSlot--duration": true,
 		"text-end": true,
 		'align-middle': true,
 		'bg-transparent': true,
+		'col-3': true,
 	  } ) }
 	>
 	  <span
@@ -77,7 +77,7 @@ const GroupDuration = ( {
 		  ? formatSeconds( seconds )
 		  : '- m' }
 	  </span>
-	</td>;
+	</div>;
   };
 
 const GroupHeader = ( {
@@ -130,18 +130,15 @@ const GroupHeader = ( {
 		}, Promise.resolve() );
 	};
 
-	return <tr>
-		<td
-			className="bg-transparent"
-			colSpan='1'
-		>
+	return <div className="row">
+		<div className="col-1" >
 			 <button
 				className="btn border-0"
 				onClick={ () => setExpanded( ! expanded ) }
 			>
 				{ expanded ? '-' : '+' }
 			</button>
-		</td>
+		</div>
 
 		{ <>
 			{ [
@@ -149,26 +146,28 @@ const GroupHeader = ( {
 				'project',
 				'client',
 			].map( key => {
-				return <td
+				return <div
 				key={ key }
-				className={ "bg-transparent timeSlot--" + key }
-				colSpan={ 'title' === key ? 2 : 1 }
+				className={ classnames( [
+					'timeSlot--' + key,
+					'title' === key ? 'col-9' : 'col-4'
+				] ) }
 			><GroupInput
 				field={ key }
 				timeSlot={ timeSlotsSlice[0] }
 				updateTimeSlots={ updateTimeSlots }
 				editTimeSlot={ editTimeSlot }
 				setEditTimeSlot={ setEditTimeSlot }
-			/></td>;
+			/></div>;
 			} ) }
 
-			<td className="bg-transparent"></td>
-			<td className="bg-transparent"></td>
+			<div className="col-4"></div>
+			<div className="col-4"></div>
 			<GroupDuration
 				timeSlotsSlice={ timeSlotsSlice }
 			/>
 
-			<td className={ "bg-transparent timeSlot--actions d-flex" }>
+			<div className={ "col-4 timeSlot--actions d-flex" }>
 				<button
 					className="btn me-2 save"
 					onClick={ updateTimeSlots }
@@ -176,10 +175,10 @@ const GroupHeader = ( {
 				>
 					save
 				</button>
-			</td>
+			</div>
 
 		</> }
-	</tr>;
+	</div>;
 };
 
 const DateGroup = ( {
@@ -204,19 +203,16 @@ const DateGroup = ( {
 			/>
 		) ) }
 
-		<tr><td
-			className='bg-transparent spacer'
-			colSpan={ Object.keys( timeSlotSchema ).length + 4 }
-		></td></tr>
+		<div className="row spacer">
+			<div className='col'></div>
+		</div>
 	</>;
 };
 
 export const TimeSlotsTable = () => {
 
 	const {
-		timeSlotSchema,
 		timeSlots,
-		themeSource,
 	} = useContext( Context );
 
 	const timeSlotsGrouped = {};
@@ -252,53 +248,19 @@ export const TimeSlotsTable = () => {
 		} );
 	} );
 
-  	return <div
-		className='container-fluid py-4'
-	>
-		<table
-			className={ classnames( {
-				"py-4": true,
-				"table": true,
-				"table-borderless": true,
-				"table-sm": true,
-				"table-dark": 'dark' === themeSource,
-			} ) }
-		>
-			<thead>
-				<tr>
-					<th className='bg-transparent' scope="col"> </th>
-					{ !! timeSlotSchema ? Object.keys( timeSlotSchema ).map( key => {
-						if ( '_id' === key ) {
-							return null;
-						}
-						return <th
-							key={ key }
-							className='bg-transparent'
-							scope="col"
-							colSpan={ 'title' === key ? 2 : 1 }
-						>{ timeSlotSchema[key].title }</th>
-					} ) : '' }
-					<th className='bg-transparent' scope="col">Duration</th>
-					<th className='bg-transparent' scope="col">Actions</th>
-				</tr>
-			</thead>
-
-			<tbody>
-				{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
-					<tr>
-						<td
-							className="bg-transparent"
-							colSpan={ Object.keys( timeSlotSchema ).length + 2 }
-						>
-							{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
-						</td>
-					</tr>
-					{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
-						key={ groupId }
-						timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
-					/> ) }
-				</Fragment> ) }
-			</tbody>
-		</table>
+  	return <div className='container-fluid py-4' >
+		<div className="py-4 timeSlots-table" >
+			{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
+				<div className="row">
+					<div className="col" >
+						{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
+					</div>
+				</div>
+				{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
+					key={ groupId }
+					timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
+				/> ) }
+			</Fragment> ) }
+		</div>
 	</div> ;
 };

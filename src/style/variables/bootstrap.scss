@@ -17,3 +17,12 @@ $black:    #000 !default;
 
 $btn-disabled-opacity:        .25;
 $btn-link-disabled-color:     $gray-300;
+
+
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns:                33;
+$grid-gutter-width:           1rem;
+// $grid-row-columns:            6 !default;
