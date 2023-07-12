@@ -66,41 +66,24 @@ api.timeSlots.getCurrent = () => new Promise( ( resolve, reject ) => {
     db.current.find( { type: 'timeSlot' } ).exec( ( err, currents ) => {
 
         if ( currents.length ) {
+            // Should be length 1,
 
+            let timeSlot = null;
             resolve( [...currents].reduce( ( accumulatorPromise, current, index ) => {
                 return accumulatorPromise.then( () => {
-
-
                     return new Promise( ( res, reject ) => {
-
                         db.timeSlots.find( { _id: current.connectedId } ).limit( 1 ).exec( ( err, timeSlots ) => {
                             if ( timeSlots.length ) {
+                                timeSlot = timeSlots[0];
                                 res( timeSlots[0] );
                             } else {
                                 // This should actually not happen. Just delete that zombie.
-                                console.log( 'debug no timeSlot found current', current ); // debug
-
                                 db.current.remove( { type: 'timeSlot', _id: current._id }, ( err, numberDeleted ) => {
-                                    // db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
-                                    //     if ( numberUpdated ) {
-                                    //         resolve( newTimeSlot );
-                                    //     }
-                                    //     reject();
-                                    // } );
-
-                                    console.log( 'debug numberDeleted', numberDeleted ); // debug
-                                    console.log( 'debug err', err ); // debug
-                                    res( true );
+                                    res( timeSlot );
                                 } );
-
-
                             }
-
                         } );
-
                     } );
-
-
                 } ).catch( err => console.log( err ) );
             }, Promise.resolve() ) );
 

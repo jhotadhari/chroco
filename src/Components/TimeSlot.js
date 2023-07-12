@@ -301,7 +301,10 @@ export const TimeSlot = ( {
 		setTimeSlots,
 	} = useContext( Context );
 
-  return <div className="row">
+  return <div className={ classnames( [
+		'row',
+		! timeSlot.dateStop > 0 ? 'highlight' : '',
+	] ) }>
 
     <div className="col-1"></div>
 

@@ -135,7 +135,7 @@ export const CreateTimeSlot = () => {
 					{ timeSlotCurrent && <Icon type='stop'/> }
 				</button>
 
-				<button
+				{ timeSlot._id && <button
 					type='button'
 					className="btn delete"
 					onClick={ () => deleteTimeSlot( {
@@ -146,7 +146,7 @@ export const CreateTimeSlot = () => {
 					title="Delete"
 				>
 					<Icon type='trash'/>
-				</button>
+				</button> }
 
 			</div>
     	</div>

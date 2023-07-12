@@ -2,7 +2,11 @@ import classnames from "classnames";
 import dayjs from "dayjs";
 import { useState, useContext, Fragment } from "react";
 import Context from '../Context';
-import { TimeSlot } from "./TimeSlot";
+import {
+	TimeSlot,
+	stopTimeSlot,
+	startTimeSlot,
+} from "./TimeSlot";
 import Icon from "./Icon";
 import {
 	sortTimeSlotsCompare,
@@ -98,6 +102,7 @@ const GroupHeader = ( {
 	timeSlotsSlice,
 	expanded,
 	setExpanded,
+	timeSlotsSliceCurrents,
 } ) => {
 
 	const {
@@ -144,10 +149,18 @@ const GroupHeader = ( {
 		}, Promise.resolve() );
 	};
 
-	return <div className="row">
-		<div className="col-1" >
+	return <div className={ classnames( [
+		'row',
+		! expanded && timeSlotsSliceCurrents.length > 0 ? 'highlight' : '',
+	] ) }>
+		<div className="col-1 d-flex align-items-center" >
+
+			<span>
+				{ timeSlotsSlice.length }
+			</span>
+
 			 <button
-				className="btn border-0"
+				className="btn border-0 ps-1"
 				onClick={ () => setExpanded( ! expanded ) }
 				title={ expanded ? 'Collapse' : 'Expand' }
 			>
@@ -192,6 +205,32 @@ const GroupHeader = ( {
 				>
 					<Icon type='save'/>
 				</button>
+
+				<button
+					type='button'
+					className={ 'btn me-2 ' + ( timeSlotsSliceCurrents.length ? 'stop' : 'start' ) }
+					onClick={ () => {
+						if ( timeSlotsSliceCurrents.length ) {
+							// stop all, should be max one.
+							[...timeSlotsSliceCurrents].map( timeSlot => stopTimeSlot( {
+								timeSlot,
+								timeSlots,
+								setTimeSlots,
+							} ) );
+						} else {
+							// start new one
+							startTimeSlot( {
+								timeSlot: timeSlotsSlice[0],
+								timeSlots,
+								setTimeSlots,
+							} )
+						}
+					} }
+					title={ timeSlotsSliceCurrents.length ? 'Stop' : 'Start' }
+				>
+					{ 0 == timeSlotsSliceCurrents.length && <Icon type='play'/> }
+					{ timeSlotsSliceCurrents.length > 0 && <Icon type='stop'/> }
+				</button>
 			</div>
 
 		</> }
@@ -201,14 +240,12 @@ const GroupHeader = ( {
 const DateGroup = ( {
 	timeSlotsSlice,
 } ) => {
-	const {
-		timeSlotSchema,
-	} = useContext( Context );
-
-	const [expanded, setExpanded] = useState( true );
+	const timeSlotsSliceCurrents = timeSlotsSlice.filter( ts => ! ts.dateStop );
+	const [expanded, setExpanded] = useState( !! timeSlotsSliceCurrents.length );
 
 	return <>
 		{ timeSlotsSlice.length > 1 && <GroupHeader
+			timeSlotsSliceCurrents={ timeSlotsSliceCurrents }
 			expanded={ expanded }
 			setExpanded={ setExpanded }
 			timeSlotsSlice={ timeSlotsSlice }
