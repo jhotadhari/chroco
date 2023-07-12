@@ -153,17 +153,15 @@ const GroupHeader = ( {
 		'row',
 		! expanded && timeSlotsSliceCurrents.length > 0 ? 'highlight' : '',
 	] ) }>
-		<div className="col-1 d-flex align-items-center" >
-
-			<span>
-				{ timeSlotsSlice.length }
-			</span>
-
+		<div className="col-1" >
 			 <button
-				className="btn border-0 ps-1"
+				className="btn border-0 d-flex align-items-center"
 				onClick={ () => setExpanded( ! expanded ) }
 				title={ expanded ? 'Collapse' : 'Expand' }
 			>
+				<span className="group-count">
+					{ timeSlotsSlice.length }
+				</span>
 				{ expanded && <Icon type='caret-right'/> }
 				{ ! expanded && <Icon type='caret-down'/> }
 			</button>
@@ -250,7 +248,7 @@ const DateGroup = ( {
 			setExpanded={ setExpanded }
 			timeSlotsSlice={ timeSlotsSlice }
 		/> }
-		{ expanded && [...timeSlotsSlice].map( ( timeSlot, index ) => (
+		{ ( timeSlotsSlice.length === 1 || expanded ) && [...timeSlotsSlice].map( ( timeSlot, index ) => (
 			<TimeSlot
 				key={ timeSlot._id }
 				timeSlot={ timeSlot }
