@@ -2,8 +2,9 @@ const {
     ipcMain,
     nativeTheme,
 } = require('electron');
-const db = require('./nedb/db');
 const dayjs = require('dayjs');
+const { exec } = require('child_process');
+const db = require('./nedb/db');
 
 const api = {
     db: {},
@@ -25,33 +26,48 @@ api.db.compact = () => new Promise( ( resolve, reject ) => {
 } );
 
 // return   promise resolve object timeSlot schema
+let schema = false;
 api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
-    resolve( {
-        _id: {
-            type: 'text',
-            title: '',
-        },
-        title: {
-            type: 'text',
-            title: 'Title',
-        },
-        project: {
-            type: 'text',
-            title: 'Project',
-        },
-        client: {
-            type: 'text',
-            title: 'Client',
-        },
-        dateStart: {
-            type: 'date',
-            title: 'Start',
-        },
-        dateStop: {
-            type: 'date',
-            title: 'Stop',
-        },
-    } );
+    if ( ! schema ) {
+        schema = {
+            _id: {
+                type: 'text',
+                title: '',
+            },
+            title: {
+                type: 'text',
+                title: 'Title',
+            },
+            project: {
+                type: 'text',
+                title: 'Project',
+            },
+            client: {
+                type: 'text',
+                title: 'Client',
+            },
+            user: {
+                type: 'text',
+                title: 'User',
+            },
+            dateStart: {
+                type: 'date',
+                title: 'Start',
+            },
+            dateStop: {
+                type: 'date',
+                title: 'Stop',
+            },
+        }
+        exec( 'git config --global user.name', { encoding: 'utf-8' }, (error, stdout) => {
+            if ( ! error && stdout.length ) {
+                schema.user.default = stdout;
+            }
+            resolve( schema )
+        } );
+    } else {
+        resolve( schema );
+    }
 } );
 
 // return   promise resolve array   timeSlots

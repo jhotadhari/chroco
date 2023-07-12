@@ -50,10 +50,11 @@ export const CreateTimeSlot = () => {
 					key={ key }
 					className={ classnames( [
 					'timeSlot--' + key,
-					'title' === key ? 'col-9' : 'col-4'
+					'title' === key ? 'col-9' : 'col'
 					] ) }
 				><Input
 					field={ key }
+					useDefault={ true }
 					timeSlot={ timeSlot }
 					timeSlots={ timeSlots }
 					setTimeSlots={ setTimeSlots }
@@ -69,7 +70,7 @@ export const CreateTimeSlot = () => {
 				/></div>
 			} ) : '' }
 
-			<div className="col-4">
+			<div className="col">
 				{ timeSlot && <DateInput
 					field={ 'dateStart' }
 					timeSlot={ timeSlot }
@@ -87,7 +88,7 @@ export const CreateTimeSlot = () => {
 				/> }
 			</div>
 
-			<div className="col-4"></div>
+			<div className="col"></div>
 
 			{ timeSlot && <Duration
 				start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : timeSlot.dateStart }

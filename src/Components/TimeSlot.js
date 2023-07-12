@@ -136,6 +136,7 @@ export const DateInput = ( {
 
 export const Input = ( {
   field,
+  useDefault,
   timeSlot,
   timeSlots,
   setTimeSlots,
@@ -145,6 +146,7 @@ export const Input = ( {
 } ) => {
 	const { timeSlotSchema } = useContext( Context );
   const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
+  const defaultVal = useDefault && timeSlotSchema[field] && timeSlotSchema[field].default ? timeSlotSchema[field].default : '';
   const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
 
   return <input
@@ -179,7 +181,7 @@ export const Input = ( {
       } }
       value={ undefined !== editTimeSlot[field]
         ? editTimeSlot[field]
-        : ( timeSlot[field] ? timeSlot[field] : '' ) }
+        : ( timeSlot[field] ? timeSlot[field] : defaultVal ) }
       title={ title }
       placeholder={ title }
     />;
@@ -318,7 +320,7 @@ export const TimeSlot = ( {
               key={ key }
               className={ classnames( [
                 'timeSlot--' + key,
-                'title' === key ? 'col-9' : 'col-4'
+                'title' === key ? 'col-9' : 'col'
               ] ) }
             ><Input
               field={ key }
@@ -337,7 +339,7 @@ export const TimeSlot = ( {
             /></div>;
         case 'date':
           return <div
-            className={ "col-4 timeSlot--" + key }
+            className={ "col timeSlot--" + key }
             key={ key }
           ><DateInput
             field={ key }

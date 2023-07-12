@@ -172,12 +172,13 @@ const GroupHeader = ( {
 				'title',
 				'project',
 				'client',
+				'user',
 			].map( key => {
 				return <div
 				key={ key }
 				className={ classnames( [
 					'timeSlot--' + key,
-					'title' === key ? 'col-9' : 'col-4'
+					'title' === key ? 'col-9' : 'col'
 				] ) }
 			><GroupInput
 				field={ key }
@@ -188,8 +189,8 @@ const GroupHeader = ( {
 			/></div>;
 			} ) }
 
-			<div className="col-4"></div>
-			<div className="col-4"></div>
+			<div className="col"></div>
+			<div className="col"></div>
 			<GroupDuration
 				timeSlotsSlice={ timeSlotsSlice }
 			/>
@@ -281,6 +282,7 @@ export const TimeSlotsTable = () => {
 			'title',
 			'project',
 			'client',
+			'user',
 		].map( key => timeSlot[key] ).join( '#####' );
 		if ( timeSlotsGrouped[groupDateId][groupId] ) {
 			timeSlotsGrouped[groupDateId][groupId] = [
