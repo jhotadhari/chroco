@@ -7,9 +7,8 @@ import {
   // useRef
 } from "react";
 import Context from '../Context';
+import { formatSeconds } from '../utils';
 const { api } = window;
-
-
 
 const isValidDateInput = dateInputString => {
   const regex = /([0-9]{4})-([0-9]{2})-([0-9]{2})\s([0-2][0-9]):([0-5][0-9]):([0-5][0-9])/;
@@ -30,22 +29,10 @@ const isValidDateInput = dateInputString => {
   return true;
 };
 
-const formatSeconds = seconds => {
-  let isNeg = false;
-  if ( seconds < 0 ) {
-    isNeg = true;
-    seconds = seconds * ( -1 );
-  }
-  let d = Number( seconds );
-  let h = Math.floor( d / 3600 );
-  let m = Math.floor( d % 3600 / 60 );
-  // let s = Math.floor( d % 3600 % 60 );
-  return ( isNeg ? '- ' : '' ) + ( h ? h + ' h ' : '' ) + m + ' m';
-};
-
 const Duration = ( {
   start,
   stop,
+  isDirty,
 } ) => {
   stop = stop ? stop : dayjs();
   const seconds = start && stop
@@ -59,11 +46,12 @@ const Duration = ( {
       'align-middle': true,
       'bg-transparent': true,
     } ) }
-  >
+    >
     <span
       className={ classnames( {
         invalid: seconds < 0,
         'p-2': true,
+        'dirty': isDirty,
       } ) }
     >
       { false !== seconds
@@ -273,6 +261,9 @@ export const TimeSlot = ( {
       <Duration
         start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : timeSlot.dateStart }
         stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
+        isDirty={ ( editTimeSlot.dateStart && editTimeSlot.dateStart !== timeSlot.dateStart )
+          || ( editTimeSlot.dateStop && editTimeSlot.dateStop !== timeSlot.dateStop )
+        }
       />
 
       <td

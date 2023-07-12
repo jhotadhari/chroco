@@ -208,9 +208,14 @@
 
 .timeSlot--duration {
   white-space: nowrap;
-  .invalid {
+  span {
     border: $btn-border-width solid transparent;
     border-radius: $btn-border-radius;
+  }
+  .dirty {
+    border-color: var(--bssuccess) !important;
+  }
+  .invalid {
     border-color: var(--bsdanger) !important;
   }
 }

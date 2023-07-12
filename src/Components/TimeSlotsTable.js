@@ -3,7 +3,10 @@ import dayjs from "dayjs";
 import { useState, useContext, Fragment } from "react";
 import Context from '../Context';
 import { TimeSlot } from "./TimeSlot";
-import { sortTimeSlotsCompare } from "../utils";
+import {
+	sortTimeSlotsCompare,
+	formatSeconds,
+} from "../utils";
 const { api } = window;
 
 const GroupInput = ( {
@@ -31,6 +34,38 @@ const GroupInput = ( {
 	/>;
 };
 
+const GroupDuration = ( {
+	timeSlotsSlice,
+  } ) => {
+	const seconds = [...timeSlotsSlice].reduce( ( acc, timeSlot ) => {
+		const start = timeSlot.dateStart;
+		const stop = timeSlot.dateStop ? timeSlot.dateStop : dayjs();
+		return start && stop
+			? acc + dayjs( stop ).diff( dayjs( start ), 'second' )
+			: acc;
+	}, 0 );
+
+	return <td
+	  colSpan="1"
+	  className={ classnames( {
+		"timeSlot--duration": true,
+		"text-end": true,
+		'align-middle': true,
+		'bg-transparent': true,
+	  } ) }
+	>
+	  <span
+		className={ classnames( {
+		  invalid: seconds < 0,
+		  'p-2': true,
+		} ) }
+	  >
+		{ false !== seconds
+		  ? formatSeconds( seconds )
+		  : '- m' }
+	  </span>
+	</td>;
+  };
 
 const GroupHeader = ( {
 	timeSlotsSlice,
@@ -116,7 +151,9 @@ const GroupHeader = ( {
 
 			<td className="bg-transparent"></td>
 			<td className="bg-transparent"></td>
-			<td className="bg-transparent text-end">dur???</td>
+			<GroupDuration
+				timeSlotsSlice={ timeSlotsSlice }
+			/>
 
 			<td className={ "bg-transparent timeSlot--actions d-flex" }>
 				<button
