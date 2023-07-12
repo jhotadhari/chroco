@@ -215,6 +215,30 @@
   }
 }
 
-.table > :not(caption) > * > * {
-  border-bottom-width: 0;
+.table  > * > * > td:first-child {
+  width: 1rem;
+}
+// .table > :not(caption) > * > * {
+//   border-bottom-width: 0;
+// }
+
+.spacer {
+
+}
+
+.timeSlot {
+  &--duration {
+    width: 6rem;
+  }
+  &--project,
+  &--client {
+    width: 12rem;
+  }
+  &--dateStart,
+  &--dateStop {
+    max-width: 8rem;
+  }
+  &--actions {
+    width: 8rem;
+  }
 }

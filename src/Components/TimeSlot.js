@@ -52,6 +52,7 @@ const Duration = ( {
     ? dayjs( stop ).diff( dayjs( start ), 'second' )
     : false;
   return <td
+    colSpan="1"
     className={ classnames( {
       "timeSlot--duration": true,
       "text-end": true,
@@ -256,6 +257,7 @@ export const TimeSlot = ( {
           return <td
             className={ "bg-transparent timeSlot--" + key }
             key={ key }
+            colSpan="1"
           ><DateInput
             field={ key }
             timeSlot={ timeSlot }
@@ -273,7 +275,10 @@ export const TimeSlot = ( {
         stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
       />
 
-      <td className={ "bg-transparent timeSlot--actions d-flex" }>
+      <td
+        colSpan="1"
+        className={ "bg-transparent timeSlot--actions d-flex" }
+      >
         <button
           className="btn me-2 save"
           onClick={ updateTimeSlot }

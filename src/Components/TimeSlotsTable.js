@@ -209,6 +209,7 @@ export const TimeSlotsTable = () => {
 			className={ classnames( {
 				"py-4": true,
 				"table": true,
+				"table-borderless": true,
 				"table-sm": true,
 				"table-dark": 'dark' === themeSource,
 			} ) }
