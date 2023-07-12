@@ -19,9 +19,22 @@ const GroupInput = ( {
 	const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
 
 	return <input
-		onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlots( {
-			// includeFields: [field],	// ??? TODO Bug: other dirty fields loose their changes.
-		 } ) }
+		onKeyDown={ e => {
+			if ( isDirty ) {
+				switch( e.key ) {
+					case 'Enter':
+						updateTimeSlots( {
+							// includeFields: [field],	// ??? TODO Bug: other dirty fields loose their changes.
+						} );
+						break;
+					case 'Escape':
+						const newEditTimeSlot = {...editTimeSlot}
+						delete newEditTimeSlot[field];
+						setEditTimeSlot(newEditTimeSlot );
+						break;
+				}
+			}
+		} }
 		className={ classnames( {
 			'form-control': true,
 			'dirty': isDirty,

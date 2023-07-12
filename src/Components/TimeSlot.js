@@ -75,7 +75,22 @@ const DateInput = ( {
   const isDirty = tempVal || ( undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] );
 
   return <input
-      onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( { includeFields: [field] } ) }
+      onKeyDown={ e => {
+        if ( isDirty ) {
+          switch( e.key ) {
+            case 'Enter':
+              updateTimeSlot( {
+                // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
+              } );
+              break;
+            case 'Escape':
+              const newEditTimeSlot = {...editTimeSlot}
+              delete newEditTimeSlot[field];
+              setEditTimeSlot(newEditTimeSlot );
+              break;
+          }
+        }
+      } }
       className={ classnames( {
         'form-control': true,
         'dirty': isDirty,
@@ -114,9 +129,22 @@ const Input = ( {
   const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
 
   return <input
-      onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( {
-			  // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
-      } ) }
+      onKeyDown={ e => {
+        if ( isDirty ) {
+          switch( e.key ) {
+            case 'Enter':
+              updateTimeSlot( {
+                // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
+              } );
+              break;
+            case 'Escape':
+              const newEditTimeSlot = {...editTimeSlot}
+              delete newEditTimeSlot[field];
+              setEditTimeSlot(newEditTimeSlot );
+              break;
+          }
+        }
+      } }
       className={ classnames( {
         'form-control': true,
         'dirty': isDirty,
