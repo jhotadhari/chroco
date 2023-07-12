@@ -7,7 +7,6 @@ import {
   // useRef
 } from "react";
 import Context from '../Context';
-import { sortTimeSlotsCompare } from "../utils";
 const { api } = window;
 
 
@@ -82,9 +81,9 @@ const DateInput = ( {
 } ) => {
   const [tempVal, setTempVal] = useState( false );
   const val = timeSlot[field]
-    ? dayjs( editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format('YYYY-MM-DD HH:mm:ss')
+    ? dayjs( undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format( 'YYYY-MM-DD HH:mm:ss' )
     : '';
-  const isDirty = tempVal || ( editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] );
+  const isDirty = tempVal || ( undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] );
 
   return <input
       onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( { includeFields: [field] } ) }
@@ -123,10 +122,12 @@ const Input = ( {
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
-  const isDirty = editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
+  const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
 
   return <input
-      onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( { includeFields: [field] } ) }
+      onKeyDown={ e => e.key === 'Enter' && isDirty && updateTimeSlot( {
+			  // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
+      } ) }
       className={ classnames( {
         'form-control': true,
         'dirty': isDirty,
@@ -135,11 +136,13 @@ const Input = ( {
       onChange={ ( e ) => {
         setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
       } }
-      value={ editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
+      value={ undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
     />;
 };
 
-export const TimeSlot = ( { timeSlot, idx } ) => {
+export const TimeSlot = ( {
+  timeSlot,
+} ) => {
 
   const [editTimeSlot, setEditTimeSlot] = useState( {} );
 
@@ -153,8 +156,8 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
     api.timeSlots.delete( timeSlot._id ).then( numberDeleted => {
       if ( numberDeleted ) {
         const newTimeSlots = [...timeSlots];
+        const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
         newTimeSlots.splice( idx, 1 );
-        newTimeSlots.sort( sortTimeSlotsCompare );
         setTimeSlots( newTimeSlots );
       }
     } );
@@ -164,16 +167,16 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
     api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
       if ( updatedTimeSlot ) {
         const newTimeSlots = [...timeSlots];
+        const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
         newTimeSlots.splice( idx, 1, updatedTimeSlot );
-        newTimeSlots.sort( sortTimeSlotsCompare );
         setTimeSlots( newTimeSlots );
       }
     } );
   };
 
-  const updateTimeSlot = ( { includeFields } ) => {
+	const updateTimeSlot = ( { includeFields, ts } ) => {
     let newEditTimeSlot = {};
-    let newTimeSlot = {...timeSlot};
+    let newTimeSlot = {...( ts ? ts : timeSlot )};
     if ( includeFields ) {
       Object.keys( editTimeSlot ).map( key => {
         if ( includeFields.includes( key ) ) {
@@ -191,8 +194,8 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
     api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
       if ( numberUpdated ) {
         const newTimeSlots = [...timeSlots];
+        const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
         newTimeSlots.splice( idx, 1, newTimeSlot );
-        newTimeSlots.sort( sortTimeSlotsCompare );
         setTimeSlots( newTimeSlots );
         setEditTimeSlot( newEditTimeSlot );
       }
@@ -224,12 +227,13 @@ export const TimeSlot = ( { timeSlot, idx } ) => {
           newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
         }
       }
-      newTimeSlots.sort( sortTimeSlotsCompare );
       setTimeSlots( newTimeSlots );
   } );
   };
 
   return <tr>
+
+    <td className="bg-transparent"></td>
 
     { !! timeSlotSchema ? Object.keys( timeSlotSchema ).map( key => {
       if ( '_id' === key ) {

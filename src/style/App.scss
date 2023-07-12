@@ -207,6 +207,7 @@
 }
 
 .timeSlot--duration {
+  white-space: nowrap;
   .invalid {
     border: $btn-border-width solid transparent;
     border-radius: $btn-border-radius;
