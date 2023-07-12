@@ -175,6 +175,11 @@
       --#{$prefix}btn-border-color: #{$gray-500};
       --#{$prefix}btn-hover-border-color: #{$white};
   }
+  .form-control {
+    &::placeholder {
+      color: $input-placeholder-color-dark;
+    }
+  }
 }
 
 .form-control {

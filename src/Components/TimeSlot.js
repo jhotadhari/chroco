@@ -6,6 +6,7 @@ import {
   // useEffect,
   // useRef
 } from "react";
+import Icon from "./Icon";
 import Context from '../Context';
 import { formatSeconds } from '../utils';
 const { api } = window;
@@ -68,11 +69,14 @@ const DateInput = ( {
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
+  const { timeSlotSchema } = useContext( Context );
   const [tempVal, setTempVal] = useState( false );
+  const format = 'YYYY-MM-DD HH:mm:ss';
   const val = timeSlot[field]
-    ? dayjs( undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format( 'YYYY-MM-DD HH:mm:ss' )
+    ? dayjs( undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format( format )
     : '';
   const isDirty = tempVal || ( undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] );
+  const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
 
   return <input
       onKeyDown={ e => {
@@ -116,6 +120,8 @@ const DateInput = ( {
         ? tempVal
         : val
       }
+      title={ title }
+      placeholder={ format }
     />;
 };
 
@@ -126,6 +132,8 @@ const Input = ( {
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
+	const { timeSlotSchema } = useContext( Context );
+  const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
   const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
 
   return <input
@@ -154,6 +162,8 @@ const Input = ( {
         setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
       } }
       value={ undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
+      title={ title }
+      placeholder={ title }
     />;
 };
 
@@ -302,24 +312,28 @@ export const TimeSlot = ( {
           className="btn me-2 save"
           onClick={ updateTimeSlot }
           disabled={ ! Object.keys( editTimeSlot ).length }
+					title="Save"
         >
-          save
+          <Icon type='save'/>
         </button>
 
         <button
           type='button'
           className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
           onClick={ timeSlot.dateStop ? startTimeSlot : stopTimeSlot }
+					title={ timeSlot.dateStop ? 'Start' : 'Stop' }
         >
-          { timeSlot.dateStop ? 'Start' : 'Stop' }
+          { timeSlot.dateStop && <Icon type='play'/> }
+          { ! timeSlot.dateStop && <Icon type='stop'/> }
         </button>
 
         <button
           type='button'
           className="btn delete"
           onClick={ deleteTimeSlot }
+					title="Delete"
         >
-          delete
+          <Icon type='trash'/>
         </button>
 
       </div>

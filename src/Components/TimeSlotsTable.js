@@ -3,11 +3,19 @@ import dayjs from "dayjs";
 import { useState, useContext, Fragment } from "react";
 import Context from '../Context';
 import { TimeSlot } from "./TimeSlot";
+import Icon from "./Icon";
 import {
 	sortTimeSlotsCompare,
 	formatSeconds,
 } from "../utils";
 const { api } = window;
+
+// console.log( 'debug circle', circle ); // debug
+
+
+
+
+
 
 const GroupInput = ( {
 	field,
@@ -16,6 +24,8 @@ const GroupInput = ( {
 	editTimeSlot,
 	setEditTimeSlot,
   } ) => {
+	const { timeSlotSchema } = useContext( Context );
+	const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
 	const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
 
 	return <input
@@ -44,6 +54,8 @@ const GroupInput = ( {
 		  	setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
 		} }
 		value={ undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
+		title={ title }
+		placeholder={ title }
 	/>;
 };
 
@@ -135,8 +147,10 @@ const GroupHeader = ( {
 			 <button
 				className="btn border-0"
 				onClick={ () => setExpanded( ! expanded ) }
+				title={ expanded ? 'Collapse' : 'Expand' }
 			>
-				{ expanded ? '-' : '+' }
+				{ expanded && <Icon type='caret-right'/> }
+				{ ! expanded && <Icon type='caret-down'/> }
 			</button>
 		</div>
 
@@ -172,8 +186,9 @@ const GroupHeader = ( {
 					className="btn me-2 save"
 					onClick={ updateTimeSlots }
 					disabled={ ! Object.keys( editTimeSlot ).length }
+					title="Save"
 				>
-					save
+					<Icon type='save'/>
 				</button>
 			</div>
 

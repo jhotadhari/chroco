@@ -26,3 +26,6 @@ $btn-link-disabled-color:     $gray-300;
 $grid-columns:                33;
 $grid-gutter-width:           1rem;
 // $grid-row-columns:            6 !default;
+
+$input-placeholder-color:               var(--#{$prefix}gray-400);
+$input-placeholder-color-dark:          var(--#{$prefix}gray-700);
