@@ -205,7 +205,8 @@
   }
 }
 
-.timeSlots-table {
+.timeSlots-table,
+.create-timeSlot {
   & > .row {
     margin-bottom: map-get($spacers, 2 );
     &.spacer {

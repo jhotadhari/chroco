@@ -63,7 +63,7 @@ function App() {
       timeSlotCurrent,
       themeSource,
     } }>
-      <div className="settings container-fluid py-4">
+      <div className="settings container-fluid mb-3">
 
         <button
           className='btn me-3'

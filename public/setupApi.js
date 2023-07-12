@@ -63,11 +63,50 @@ api.timeSlots.get = () => new Promise( ( resolve, reject ) => {
 
 // return   promise resolve object   timeSlot
 api.timeSlots.getCurrent = () => new Promise( ( resolve, reject ) => {
-    db.current.find( { type: 'timeSlot' } ).limit( 1 ).exec( ( err, currents ) => {
+    db.current.find( { type: 'timeSlot' } ).exec( ( err, currents ) => {
+
         if ( currents.length ) {
-            db.timeSlots.find( { _id: currents[0].connectedId } ).limit( 1 ).exec( ( err, timeSlots ) => {
-                resolve( timeSlots.length ? timeSlots[0] : null );
-            } );
+
+            resolve( [...currents].reduce( ( accumulatorPromise, current, index ) => {
+                return accumulatorPromise.then( () => {
+
+
+                    return new Promise( ( res, reject ) => {
+
+                        db.timeSlots.find( { _id: current.connectedId } ).limit( 1 ).exec( ( err, timeSlots ) => {
+                            if ( timeSlots.length ) {
+                                res( timeSlots[0] );
+                            } else {
+                                // This should actually not happen. Just delete that zombie.
+                                console.log( 'debug no timeSlot found current', current ); // debug
+
+                                db.current.remove( { type: 'timeSlot', _id: current._id }, ( err, numberDeleted ) => {
+                                    // db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
+                                    //     if ( numberUpdated ) {
+                                    //         resolve( newTimeSlot );
+                                    //     }
+                                    //     reject();
+                                    // } );
+
+                                    console.log( 'debug numberDeleted', numberDeleted ); // debug
+                                    console.log( 'debug err', err ); // debug
+                                    res( true );
+                                } );
+
+
+                            }
+
+                        } );
+
+                    } );
+
+
+                } ).catch( err => console.log( err ) );
+            }, Promise.resolve() ) );
+
+
+
+
         } else {
             resolve( null );
         }

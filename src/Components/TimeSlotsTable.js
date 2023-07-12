@@ -77,6 +77,8 @@ const GroupDuration = ( {
 		'align-middle': true,
 		'bg-transparent': true,
 		'col-3': true,
+		'd-flex': true,
+		'justify-content-end': true,
 	  } ) }
 	>
 	  <span
@@ -263,8 +265,8 @@ export const TimeSlotsTable = () => {
 		} );
 	} );
 
-  	return <div className='container-fluid py-4' >
-		<div className="py-4 timeSlots-table" >
+  	return <div className='container-fluid mb-3' >
+		<div className="timeSlots-table" >
 			{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
 				<div className="row">
 					<div className="col" >

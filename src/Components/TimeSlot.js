@@ -30,7 +30,7 @@ const isValidDateInput = dateInputString => {
   return true;
 };
 
-const Duration = ( {
+export const Duration = ( {
   start,
   stop,
   isDirty,
@@ -46,6 +46,8 @@ const Duration = ( {
       'align-middle': true,
       'bg-transparent': true,
       'col-3': true,
+      'd-flex': true,
+      'justify-content-end': true,
     } ) }
     >
     <span
@@ -62,9 +64,11 @@ const Duration = ( {
   </div>;
 };
 
-const DateInput = ( {
+export const DateInput = ( {
   field,
   timeSlot,
+  timeSlots,
+  setTimeSlots,
   updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
@@ -84,13 +88,18 @@ const DateInput = ( {
           switch( e.key ) {
             case 'Enter':
               updateTimeSlot( {
+                timeSlot,
+                timeSlots,
+                setTimeSlots,
+                editTimeSlot,
+                setEditTimeSlot,
                 // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
               } );
               break;
             case 'Escape':
               const newEditTimeSlot = {...editTimeSlot}
               delete newEditTimeSlot[field];
-              setEditTimeSlot(newEditTimeSlot );
+              setEditTimeSlot( newEditTimeSlot );
               break;
           }
         }
@@ -125,9 +134,11 @@ const DateInput = ( {
     />;
 };
 
-const Input = ( {
+export const Input = ( {
   field,
   timeSlot,
+  timeSlots,
+  setTimeSlots,
   updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
@@ -142,7 +153,12 @@ const Input = ( {
           switch( e.key ) {
             case 'Enter':
               updateTimeSlot( {
-                // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
+                  timeSlot,
+                  timeSlots,
+                  setTimeSlots,
+                  editTimeSlot,
+                  setEditTimeSlot,
+                  // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
               } );
               break;
             case 'Escape':
@@ -161,10 +177,116 @@ const Input = ( {
       onChange={ ( e ) => {
         setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
       } }
-      value={ undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
+      value={ undefined !== editTimeSlot[field]
+        ? editTimeSlot[field]
+        : ( timeSlot[field] ? timeSlot[field] : '' ) }
       title={ title }
       placeholder={ title }
     />;
+};
+
+
+
+
+
+export const deleteTimeSlot = ( {
+  deleteId,
+  timeSlots,
+  setTimeSlots,
+} ) => {
+  api.timeSlots.delete( deleteId ).then( numberDeleted => {
+    if ( numberDeleted ) {
+      const newTimeSlots = [...timeSlots];
+      const idx = newTimeSlots.findIndex( ts => ts._id === deleteId );
+      newTimeSlots.splice( idx, 1 );
+      setTimeSlots( newTimeSlots );
+    }
+  } );
+};
+
+export const stopTimeSlot = ( {
+  timeSlot,
+  timeSlots,
+  setTimeSlots,
+} ) => {
+  api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
+    if ( updatedTimeSlot ) {
+      const newTimeSlots = [...timeSlots];
+      const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
+      newTimeSlots.splice( idx, 1, updatedTimeSlot );
+      setTimeSlots( newTimeSlots );
+    }
+  } );
+};
+
+export const updateTimeSlot = ( {
+  timeSlot,
+  timeSlots,
+  includeFields,
+  setTimeSlots,
+  editTimeSlot,
+  setEditTimeSlot,
+} ) => {
+  if ( ! timeSlot || ! timeSlot._id ) {
+    return;
+  }
+  let newEditTimeSlot = {};
+  let newTimeSlot = {...timeSlot};
+  if ( includeFields ) {
+    Object.keys( editTimeSlot ).map( key => {
+      if ( includeFields.includes( key ) ) {
+        newTimeSlot[key] = editTimeSlot[key];
+      } else {
+        newEditTimeSlot[key] = editTimeSlot[key];
+      }
+    } );
+  } else {
+    newTimeSlot = {
+      ...newTimeSlot,
+      ...editTimeSlot,
+    };
+  }
+  api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
+    if ( numberUpdated ) {
+      const newTimeSlots = [...timeSlots];
+      const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
+      newTimeSlots.splice( idx, 1, newTimeSlot );
+      setTimeSlots( newTimeSlots );
+      setEditTimeSlot( newEditTimeSlot );
+    }
+  } );
+};
+
+export const startTimeSlot = ( {
+  timeSlot,
+  timeSlots,
+  setTimeSlots,
+} ) => {
+  const newTimeSlot = {
+    ...timeSlot,
+    dateStart: dayjs().valueOf(),
+    dateStop: false,
+  };
+  [
+    '_id',
+    'createdAt',
+    'updatedAt',
+  ].map( key => {
+    delete newTimeSlot[key];
+  } );
+  api.timeSlots.add( newTimeSlot ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
+    const newTimeSlots = [
+      addedTimeSlot,
+      ...timeSlots,
+    ];
+    if ( stoppedTimeSlot ) {
+    const idxStopped = newTimeSlots.findIndex( ts => ts._id === stoppedTimeSlot._id );
+      if ( idxStopped ) {
+        newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
+      }
+    }
+    setTimeSlots( newTimeSlots );
+  } );
 };
 
 export const TimeSlot = ( {
@@ -178,85 +300,6 @@ export const TimeSlot = ( {
 		timeSlots,
 		setTimeSlots,
 	} = useContext( Context );
-
-  const deleteTimeSlot = () => {
-    api.timeSlots.delete( timeSlot._id ).then( numberDeleted => {
-      if ( numberDeleted ) {
-        const newTimeSlots = [...timeSlots];
-        const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
-        newTimeSlots.splice( idx, 1 );
-        setTimeSlots( newTimeSlots );
-      }
-    } );
-  };
-
-  const stopTimeSlot = () => {
-    api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
-      if ( updatedTimeSlot ) {
-        const newTimeSlots = [...timeSlots];
-        const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
-        newTimeSlots.splice( idx, 1, updatedTimeSlot );
-        setTimeSlots( newTimeSlots );
-      }
-    } );
-  };
-
-	const updateTimeSlot = ( { includeFields, ts } ) => {
-    let newEditTimeSlot = {};
-    let newTimeSlot = {...( ts ? ts : timeSlot )};
-    if ( includeFields ) {
-      Object.keys( editTimeSlot ).map( key => {
-        if ( includeFields.includes( key ) ) {
-          newTimeSlot[key] = editTimeSlot[key];
-        } else {
-          newEditTimeSlot[key] = editTimeSlot[key];
-        }
-      } );
-    } else {
-      newTimeSlot = {
-        ...newTimeSlot,
-        ...editTimeSlot,
-      };
-    }
-    api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
-      if ( numberUpdated ) {
-        const newTimeSlots = [...timeSlots];
-        const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
-        newTimeSlots.splice( idx, 1, newTimeSlot );
-        setTimeSlots( newTimeSlots );
-        setEditTimeSlot( newEditTimeSlot );
-      }
-    } );
-  };
-
-  const startTimeSlot = () => {
-    const newTimeSlot = {
-      ...timeSlot,
-      dateStart: dayjs().valueOf(),
-      dateStop: false,
-    };
-    [
-      '_id',
-      'createdAt',
-      'updatedAt',
-    ].map( key => {
-      delete newTimeSlot[key];
-      return null;
-    } );
-    api.timeSlots.add( newTimeSlot ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
-      const newTimeSlots = [
-        addedTimeSlot,
-        ...timeSlots,
-      ];
-      if ( stoppedTimeSlot ) {
-      const idxStopped = newTimeSlots.findIndex( ts => ts._id === stoppedTimeSlot._id );
-        if ( idxStopped ) {
-          newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
-        }
-      }
-      setTimeSlots( newTimeSlots );
-  } );
-  };
 
   return <div className="row">
 
@@ -277,7 +320,15 @@ export const TimeSlot = ( {
             ><Input
               field={ key }
               timeSlot={ timeSlot }
-              updateTimeSlot={ updateTimeSlot }
+              timeSlots={ timeSlots }
+              setTimeSlots={ setTimeSlots }
+              updateTimeSlot={ () => updateTimeSlot( {
+                timeSlot,
+                timeSlots,
+                setTimeSlots,
+                editTimeSlot,
+                setEditTimeSlot,
+              } ) }
               editTimeSlot={ editTimeSlot }
               setEditTimeSlot={ setEditTimeSlot }
             /></div>;
@@ -288,7 +339,15 @@ export const TimeSlot = ( {
           ><DateInput
             field={ key }
             timeSlot={ timeSlot }
-            updateTimeSlot={ updateTimeSlot }
+            timeSlots={ timeSlots }
+            setTimeSlots={ setTimeSlots }
+            updateTimeSlot={ () => updateTimeSlot( {
+              timeSlot,
+              timeSlots,
+              setTimeSlots,
+              editTimeSlot,
+              setEditTimeSlot,
+            } ) }
             editTimeSlot={ editTimeSlot }
             setEditTimeSlot={ setEditTimeSlot }
           /></div>;
@@ -310,7 +369,13 @@ export const TimeSlot = ( {
       >
         <button
           className="btn me-2 save"
-          onClick={ updateTimeSlot }
+          onClick={ () => updateTimeSlot( {
+            timeSlot,
+            timeSlots,
+            setTimeSlots,
+            editTimeSlot,
+            setEditTimeSlot,
+          } ) }
           disabled={ ! Object.keys( editTimeSlot ).length }
 					title="Save"
         >
@@ -320,7 +385,15 @@ export const TimeSlot = ( {
         <button
           type='button'
           className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
-          onClick={ timeSlot.dateStop ? startTimeSlot : stopTimeSlot }
+          onClick={ () => timeSlot.dateStop ? startTimeSlot( {
+            timeSlot,
+            timeSlots,
+            setTimeSlots,
+          } ) : stopTimeSlot( {
+            timeSlot,
+            timeSlots,
+            setTimeSlots,
+          } ) }
 					title={ timeSlot.dateStop ? 'Start' : 'Stop' }
         >
           { timeSlot.dateStop && <Icon type='play'/> }
@@ -330,7 +403,11 @@ export const TimeSlot = ( {
         <button
           type='button'
           className="btn delete"
-          onClick={ deleteTimeSlot }
+          onClick={ () => deleteTimeSlot( {
+            deleteId: timeSlot._id,
+            timeSlots,
+            setTimeSlots,
+          } ) }
 					title="Delete"
         >
           <Icon type='trash'/>
