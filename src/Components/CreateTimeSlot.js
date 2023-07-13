@@ -35,7 +35,10 @@ export const CreateTimeSlot = () => {
 			</div>
 		</div>
 
-		<div className="row">
+		<div className={ classnames( [
+			'row',
+			timeSlotCurrent ? 'highlight' : '',
+		] ) }>
 
 			<div className="col-1"></div>
 
