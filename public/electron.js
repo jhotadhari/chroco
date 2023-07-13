@@ -10,7 +10,6 @@ const isDev = require('electron-is-dev');
 const path = require('path')
 const { setupApi, api } = require('./setupApi');
 
-let tray = null;    // has to be defined here!
 function createWindow() {
 
     // Create the browser window.
@@ -25,6 +24,7 @@ function createWindow() {
         },
     } );
 
+
     // and load the index.html of the app.
     // win.loadFile("index.html");
     win.loadURL( isDev
@@ -37,17 +37,9 @@ function createWindow() {
         win.webContents.openDevTools();
     }
 
-    // const icon = nativeImage.createFromPath( 'assets/tray.png' );
-    // let tray = new Tray(icon);
-    // tray.setToolTip( '???This is my application' )
-    // tray.setTitle( '???This is my title' )
-    // const contextMenu = Menu.buildFromTemplate( [
-    //     { label: 'Item1', type: 'radio' },
-    //     { label: 'Item2', type: 'radio' },
-    //     { label: 'Item3', type: 'radio', checked: true },
-    //     { label: 'Item4', type: 'radio' }
-    // ] );
-    // tray.setContextMenu( contextMenu );
+    win.webContents.on( 'did-stop-loading', () => {
+        win.setTitle( app.getName() );
+    } );
 
     setupApi();
 };
