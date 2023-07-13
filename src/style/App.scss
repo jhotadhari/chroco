@@ -227,3 +227,27 @@
   margin-left: - map-get($spacers, 3 ) + map-get($spacers, 1 );
   margin-right: map-get($spacers, 2 );
 }
+
+
+
+
+.rmsc {
+  .dropdown-content,
+  .dropdown-container,
+  .dropdown-heading {
+
+    color: var(--bsbody-color);
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+  }
+}
+
+.rmsc.dark {
+  --rmsc-main: $input-focus-border-color;
+  --rmsc-hover: var(--bsbody-bg);
+  --rmsc-selected: #1d1915;
+  --rmsc-border: $input-border-color;
+  --rmsc-gray: var(--bsbody-color);
+  --rmsc-bg: var(--bsbody-bg);
+  color: var(--bsbody-color);
+}

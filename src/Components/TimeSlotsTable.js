@@ -108,6 +108,7 @@ const GroupHeader = ( {
 	const {
 		setTimeSlots,
 		timeSlots,
+		getSetting,
 	} = useContext( Context );
 
 	const [editTimeSlot, setEditTimeSlot] = useState( {} );
@@ -173,7 +174,10 @@ const GroupHeader = ( {
 				'project',
 				'client',
 				'user',
-			].map( key => {
+			].filter( key => ! [
+				...getSetting( 'hideFields' ),
+				'_id',
+			].includes( key ) ).map( key => {
 				return <div
 				key={ key }
 				className={ classnames( [

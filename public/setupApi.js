@@ -190,6 +190,36 @@ api.timeSlots.update = newTimeSlot => new Promise( ( resolve, reject ) => {
     }
 } );
 
+
+
+
+// return   promise resolve array   settings
+api.settings.get = () => new Promise( ( resolve, reject ) => {
+    db.settings.find( {}, ( err, settings ) => {
+        resolve( settings );
+    } );
+} );
+
+// return   promise resolve object  addedTimeSlot
+api.settings.add = newSetting => new Promise( ( resolve, reject ) => {
+    db.settings.insert( newSetting, ( err, addedSetting ) => {
+        resolve( addedSetting );
+    } );
+} );
+
+// return   promise resolve number  numberUpdated
+api.settings.update = newSetting => new Promise( ( resolve, reject ) => {
+    if ( ! newSetting._id ) {
+        reject( '??? err no _id' );
+    } else {
+        db.settings.update( { _id: newSetting._id }, newSetting, {}, (err, numberUpdated ) => {
+            resolve( numberUpdated );
+        } );
+    }
+} );
+
+
+
 const setupApi = () => {
 
     ipcMain.handle( 'api:db:compact', (_) =>                        api.db.compact() );
@@ -210,30 +240,19 @@ const setupApi = () => {
      * settings
      *
      */
-    ipcMain.handle('api:settings:ui:darkMode:toogle', () => {
-        if ( nativeTheme.shouldUseDarkColors ) {
-            nativeTheme.themeSource = 'light'
-        } else {
-            nativeTheme.themeSource = 'dark'
-        }
+    ipcMain.handle( 'api:settings:get', (_) =>                      api.settings.get() );
+    ipcMain.handle( 'api:settings:add', (_, newSetting) =>          api.settings.add( newSetting ) );
+    ipcMain.handle( 'api:settings:update', (_, newSetting) =>       api.settings.update( newSetting ) );
 
-        console.log( 'debug nativeTheme.shouldUseDarkColors', nativeTheme.shouldUseDarkColors ); // debug
+    /**
+     * darkMode
+     *
+     */
+    ipcMain.handle('api:darkMode:setThemeSource', (_, themeSource) => {
+        nativeTheme.themeSource = themeSource
         return nativeTheme.shouldUseDarkColors;
     } );
-
-    ipcMain.handle('api:settings:ui:darkMode:system', () => {
-        nativeTheme.themeSource = 'system'
-
-        console.log( 'debug nativeTheme.shouldUseDarkColors', nativeTheme.shouldUseDarkColors ); // debug
-    } );
-
-    ipcMain.handle('api:settings:ui:darkMode:getThemeSource', () => {
-        if ( nativeTheme.shouldUseDarkColors ) {
-            return 'dark'
-        } else {
-            return 'light'
-        }
-    } );
+    ipcMain.handle('api:darkMode:getThemeSource', () => nativeTheme.shouldUseDarkColors ? 'dark' : 'light' );
 
 }
 module.exports = {

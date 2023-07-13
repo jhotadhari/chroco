@@ -1,10 +1,7 @@
 import { useState, useContext } from "react";
-import dayjs from "dayjs";
 import classnames from "classnames";
 import Icon from "./Icon";
 import Context from '../Context';
-import { sortTimeSlotsCompare } from "../utils";
-const { api } = window;
 
 import {
 	Input,
@@ -18,13 +15,13 @@ import {
 
 export const CreateTimeSlot = () => {
 
-	const [title, setTitle] = useState( '' );
 	const [editTimeSlot, setEditTimeSlot] = useState( {} );
 
 	const {
 		timeSlotSchema,
 		timeSlots,
 		setTimeSlots,
+		getSetting,
 		timeSlotCurrent,
 	} = useContext( Context );
 
@@ -42,10 +39,15 @@ export const CreateTimeSlot = () => {
 
 			<div className="col-1"></div>
 
-			{ !! timeSlotSchema ? Object.keys( timeSlotSchema ).map( key => {
-				if ( '_id' === key || 'date' === timeSlotSchema[key].type ) {
-					return null;
+			{ !! timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
+				if ( 'date' === timeSlotSchema[key].type ) {
+					return false;
 				}
+				return ! [
+					...getSetting( 'hideFields' ),
+					'_id',
+				].includes( key )
+			} ).map( key => {
 				return <div
 					key={ key }
 					className={ classnames( [

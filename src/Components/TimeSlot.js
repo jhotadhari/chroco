@@ -301,6 +301,7 @@ export const TimeSlot = ( {
 		timeSlotSchema,
 		timeSlots,
 		setTimeSlots,
+		getSetting,
 	} = useContext( Context );
 
   return <div className={ classnames( [
@@ -310,10 +311,10 @@ export const TimeSlot = ( {
 
     <div className="col-1"></div>
 
-    { !! timeSlotSchema ? Object.keys( timeSlotSchema ).map( key => {
-      if ( '_id' === key ) {
-        return null;
-      }
+    { !! timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => ! [
+      ...getSetting( 'hideFields' ),
+      '_id',
+    ].includes( key ) ).map( key => {
       switch( timeSlotSchema[key].type ) {
         case 'text':
             return <div

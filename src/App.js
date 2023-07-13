@@ -1,59 +1,72 @@
-// import logo from './logo.svg';
 import './style/App.scss';
 import {
   useEffect,
   useState,
-  useContext,
-} from "react";
-// import db from "./nedb/db";
-// import db from "db";
-
-
+} from 'react';
 import Context from './Context';
-
-
-import { CreateTimeSlot } from "./Components/CreateTimeSlot";
-import { TimeSlotsTable } from "./Components/TimeSlotsTable";
-import { sortTimeSlotsCompare } from "./utils";
+import Settings from './Components/Settings';
+import { CreateTimeSlot } from './Components/CreateTimeSlot';
+import { TimeSlotsTable } from './Components/TimeSlotsTable';
+import { sortTimeSlotsCompare } from './utils';
 const { api } = window;
 
-
+const settingsDefaults = {
+  themeSource: 'system',
+  hideFields: [],
+};
 
 function App() {
+  const [settings, setSettings] = useState( [] );
   const [timeSlotSchema, setTimeSlotSchema] = useState( null );
   const [timeSlots, setTimeSlots] = useState( [] );
   const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
   const [themeSource, setThemeSource] = useState( false );
 
-  useEffect(() => {
+  // Helper function to retrieve one setting value.
+  const getSetting = ( key, _settings ) => {
+    let setting = ( _settings ? _settings : settings ).find( sett => sett.key && sett.key === key );
+    return undefined !== setting && setting.value
+      ? setting.value
+      : ( settingsDefaults[key] ? settingsDefaults[key] : undefined )
+  }
+
+  // Initially set settings.
+  useEffect( () => {
+    api.settings.get().then( settings => {
+      setSettings( settings );
+      // Apply theme colors.
+      api.darkMode.setThemeSource( getSetting( 'themeSource', settings ) ).then( () => {
+        api.darkMode.getThemeSource().then( src => {
+          setThemeSource( src );
+        } );
+      } );
+    } );
+  }, [] );
+
+  // Initially set timeSlotSchema.
+  useEffect( () => {
     api.timeSlots.schema().then( schema => {
       setTimeSlotSchema( schema );
     } );
   }, [] );
 
-  useEffect(() => {
+  // Initially load timeSlots.
+  useEffect( () => {
     api.timeSlots.get().then( timeSlots => {
       timeSlots.sort( sortTimeSlotsCompare );
       setTimeSlots( timeSlots );
     } );
   }, [] );
 
-  useEffect(() => {
+  // Set timeSlotCurrent when timeSlots change.
+  useEffect( () => {
     api.timeSlots.getCurrent().then( timeSlotCurrent => {
       setTimeSlotCurrent( timeSlotCurrent );
     } );
   }, [timeSlots] );
 
-  useEffect(() => {
-    if ( ! themeSource ) {
-      api.settings.ui.darkMode.getThemeSource().then( src => {
-        setThemeSource( src );
-      } );
-    }
-  }, [themeSource] );
-
   return <div
-    className=""
+    className=''
     data-bs-theme={ themeSource }
   >
     <Context.Provider value={ {
@@ -62,37 +75,13 @@ function App() {
       setTimeSlots,
       timeSlotCurrent,
       themeSource,
+      setThemeSource,
+      settings,
+      getSetting,
+      setSettings,
+      settingsDefaults,
     } }>
-      <div className="settings container-fluid mb-3">
-
-        <button
-          className='btn me-3'
-          type='button'
-          onClick={ e => {
-            e.preventDefault();
-            api.settings.ui.darkMode.toggle().then( isDarkMode => setThemeSource( false ) );
-          } }
-        >Toggle Dark Mode</button>
-
-        <button
-          className='btn me-3'
-          type='button'
-          onClick={ e => {
-            e.preventDefault();
-            api.settings.ui.darkMode.system().then( () => setThemeSource( false ) );
-          } }
-        >Reset to System Theme</button>
-
-        <button
-          className='btn'
-          type='button'
-          onClick={ e => {
-            e.preventDefault();
-            api.db.compact();
-          } }
-        >Compact db</button>
-
-      </div>
+      <Settings/>
 
       <CreateTimeSlot/>
 

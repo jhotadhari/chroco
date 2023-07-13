@@ -33,11 +33,12 @@ const db = {
     timestampData: true,
   } ),
 
-  // settings: new Datastore( {
-  //   autoload: true,
-  //   filename: path.join( app.getPath("userData"), "/settings.db"),
-  //   timestampData: true,
-  // } ),
+
+  settings: new Datastore( {
+    autoload: true,
+    filename: path.join( app.getPath("userData"), "/settings.db"),
+    timestampData: true,
+  } ),
 
 
 };
