@@ -2,6 +2,7 @@ import classnames from "classnames";
 import dayjs from "dayjs";
 import {
   get,
+  isObject,
 } from "lodash";
 import {
   useState,
@@ -155,14 +156,7 @@ export const Input = ( {
   const title = get( timeSlotSchema, [field,'title'], '' );
   const defaultVal = useDefault ? get( timeSlotSchema, [field, 'default'], '' ) : '';
   const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
-
-  console.log( 'debug timeSlot', timeSlot ); // debug
-  console.log( 'debug editTimeSlot', editTimeSlot ); // debug
-
   const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
-
-  console.log( 'debug value', value ); // debug
-
 
   return <input
       onKeyDown={ e => {
@@ -181,7 +175,7 @@ export const Input = ( {
             case 'Escape':
               const newEditTimeSlot = {...editTimeSlot}
               delete newEditTimeSlot[field];
-              setEditTimeSlot(newEditTimeSlot );
+              setEditTimeSlot( newEditTimeSlot );
               break;
           }
         }
@@ -315,7 +309,14 @@ export const TimeSlot = ( {
 		timeSlots,
 		setTimeSlots,
 		getSetting,
+    timeSlotCurrent,
+    timeSlotCurrentEdit,
+    setTimeSlotCurrentEdit,
 	} = useContext( Context );
+
+  const isCurrent = !! timeSlotCurrent && timeSlotCurrent._id === timeSlot._id;
+  const _editTimeSlot = isCurrent ? timeSlotCurrentEdit : editTimeSlot;
+  const _setEditTimeSlot = isCurrent ? setTimeSlotCurrentEdit : setEditTimeSlot;
 
   return <div className={ classnames( [
 		'row',
@@ -343,11 +344,11 @@ export const TimeSlot = ( {
                 timeSlot,
                 timeSlots,
                 setTimeSlots,
-                editTimeSlot,
-                setEditTimeSlot,
+                editTimeSlot: _editTimeSlot,
+                setEditTimeSlot: _setEditTimeSlot,
               } ) }
-              editTimeSlot={ editTimeSlot }
-              setEditTimeSlot={ setEditTimeSlot }
+              editTimeSlot={ _editTimeSlot }
+              setEditTimeSlot={ _setEditTimeSlot }
             /></div>;
         case 'date':
           return <div
@@ -360,11 +361,11 @@ export const TimeSlot = ( {
               timeSlot,
               timeSlots,
               setTimeSlots,
-              editTimeSlot,
-              setEditTimeSlot,
+              editTimeSlot: _editTimeSlot,
+              setEditTimeSlot: _setEditTimeSlot,
             } ) }
-            editTimeSlot={ editTimeSlot }
-            setEditTimeSlot={ setEditTimeSlot }
+            editTimeSlot={ _editTimeSlot }
+            setEditTimeSlot={ _setEditTimeSlot }
           /></div>;
         default:
             return null;
@@ -372,10 +373,10 @@ export const TimeSlot = ( {
     } ) : '' }
 
       <Duration
-        start={ get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) }
-        stop={ get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) }
-        isDirty={ ( get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
-          || ( get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) )
+        start={ get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) }
+        stop={ get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) }
+        isDirty={ ( get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
+          || ( get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) )
         }
       />
 
@@ -388,10 +389,10 @@ export const TimeSlot = ( {
             timeSlot,
             timeSlots,
             setTimeSlots,
-            editTimeSlot,
-            setEditTimeSlot,
+            editTimeSlot: _editTimeSlot,
+            setEditTimeSlot: _setEditTimeSlot,
           } ) }
-          disabled={ ! Object.keys( editTimeSlot ).length }
+          disabled={ ! isObject( _editTimeSlot ) || ! Object.keys( _editTimeSlot ).length }
 					title="Save"
         >
           <Icon type='save'/>

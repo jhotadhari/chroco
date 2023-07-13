@@ -20,6 +20,7 @@ function App() {
   const [timeSlotSchema, setTimeSlotSchema] = useState( null );
   const [timeSlots, setTimeSlots] = useState( [] );
   const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
+  const [timeSlotCurrentEdit, setTimeSlotCurrentEdit] = useState( null );
   const [themeSource, setThemeSource] = useState( false );
 
   // Helper function to retrieve one setting value.
@@ -73,7 +74,11 @@ function App() {
       timeSlotSchema,
       timeSlots,
       setTimeSlots,
+
       timeSlotCurrent,
+      timeSlotCurrentEdit,
+      setTimeSlotCurrentEdit,
+
       themeSource,
       setThemeSource,
       settings,

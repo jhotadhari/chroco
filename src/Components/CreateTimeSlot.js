@@ -1,5 +1,9 @@
 import { useState, useContext } from "react";
 import classnames from "classnames";
+import {
+  get,
+  isObject,
+} from "lodash";
 import Icon from "./Icon";
 import Context from '../Context';
 
@@ -23,9 +27,14 @@ export const CreateTimeSlot = () => {
 		setTimeSlots,
 		getSetting,
 		timeSlotCurrent,
+		timeSlotCurrentEdit,
+    	setTimeSlotCurrentEdit,
 	} = useContext( Context );
 
 	const timeSlot = timeSlotCurrent ? timeSlotCurrent : false;
+	const isCurrent = !! timeSlotCurrent && timeSlotCurrent._id === timeSlot._id;
+	const _editTimeSlot = isCurrent ? timeSlotCurrentEdit : editTimeSlot;
+	const _setEditTimeSlot = isCurrent ? setTimeSlotCurrentEdit : setEditTimeSlot;
 
   	return <div className="container-fluid mb-3 create-timeSlot">
 
@@ -65,11 +74,11 @@ export const CreateTimeSlot = () => {
 					  timeSlot,
 					  timeSlots,
 					  setTimeSlots,
-					  editTimeSlot,
-					  setEditTimeSlot,
+					  editTimeSlot: _editTimeSlot,
+					  setEditTimeSlot: _setEditTimeSlot,
 					} ) }
-					editTimeSlot={ editTimeSlot }
-					setEditTimeSlot={ setEditTimeSlot }
+					editTimeSlot={ _editTimeSlot }
+					setEditTimeSlot={ _setEditTimeSlot }
 				/></div>
 			} ) : '' }
 
@@ -81,21 +90,21 @@ export const CreateTimeSlot = () => {
 						timeSlot,
 						timeSlots,
 						setTimeSlots,
-						editTimeSlot,
-						setEditTimeSlot,
-					} ) }
-					editTimeSlot={ editTimeSlot }
-					setEditTimeSlot={ setEditTimeSlot }
+						editTimeSlot: _editTimeSlot,
+						setEditTimeSlot: _setEditTimeSlot,
+					  } ) }
+					  editTimeSlot={ _editTimeSlot }
+					  setEditTimeSlot={ _setEditTimeSlot }
 				/> }
 			</div>
 
 			<div className="col"></div>
 
 			{ timeSlot && <Duration
-				start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : timeSlot.dateStart }
-				stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
-				isDirty={ ( editTimeSlot.dateStart && editTimeSlot.dateStart !== timeSlot.dateStart )
-				|| ( editTimeSlot.dateStop && editTimeSlot.dateStop !== timeSlot.dateStop )
+				start={ get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) }
+				stop={ get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) }
+				isDirty={ ( get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
+				|| ( get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) )
 				}
 			/> }
 
@@ -110,10 +119,10 @@ export const CreateTimeSlot = () => {
 						timeSlot,
 						timeSlots,
 						setTimeSlots,
-						editTimeSlot,
-						setEditTimeSlot,
+						editTimeSlot: _editTimeSlot,
+						setEditTimeSlot: _setEditTimeSlot,
 					} ) }
-					disabled={ ! timeSlotCurrent || ! Object.keys( editTimeSlot ).length }
+					disabled={ ! timeSlotCurrent || ! isObject( _editTimeSlot ) || ! Object.keys( _editTimeSlot ).length }
 					title="Save"
 				>
 					<Icon type='save'/>
@@ -123,14 +132,14 @@ export const CreateTimeSlot = () => {
 					type='button'
 					className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
 					onClick={ () => ! timeSlotCurrent ? startTimeSlot( {
-						timeSlot: editTimeSlot,
+						timeSlot: _editTimeSlot,
 						timeSlots,
 						setTimeSlots,
 					} ) : ( stopTimeSlot( {
 						timeSlot: timeSlotCurrent,
 						timeSlots,
 						setTimeSlots,
-					} ) && setEditTimeSlot( {} ) ) }
+					} ) && _setEditTimeSlot( {} ) ) }
 					title={ timeSlot.dateStop ? 'Start' : 'Stop' }
 				>
 					{ ! timeSlotCurrent && <Icon type='play'/> }

@@ -2,6 +2,7 @@ import classnames from "classnames";
 import dayjs from "dayjs";
 import {
   get,
+  isObject,
 } from "lodash";
 import { useState, useContext, Fragment } from "react";
 import Context from '../Context';
@@ -31,8 +32,12 @@ const GroupInput = ( {
 	editTimeSlot,
 	setEditTimeSlot,
   } ) => {
-	const { timeSlotSchema } = useContext( Context );
-	const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
+
+	const {
+		timeSlotSchema,
+	} = useContext( Context );
+
+	const title = get( timeSlotSchema, [field,'title'], '' );
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 
 	return <input
@@ -58,7 +63,7 @@ const GroupInput = ( {
 		} ) }
 		type="text"
 		onChange={ ( e ) => {
-		  	setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
+			setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
 		} }
 		value={ get( editTimeSlot, field, get( timeSlot, field ) ) }
 		title={ title }
@@ -206,7 +211,7 @@ const GroupHeader = ( {
 				<button
 					className="btn me-2 save"
 					onClick={ updateTimeSlots }
-					disabled={ ! Object.keys( editTimeSlot ).length }
+					disabled={ ! isObject( editTimeSlot ) || ! Object.keys( editTimeSlot ).length }
 					title="Save"
 				>
 					<Icon type='save'/>
