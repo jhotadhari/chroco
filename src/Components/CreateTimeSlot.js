@@ -61,8 +61,6 @@ export const CreateTimeSlot = () => {
 					field={ key }
 					useDefault={ true }
 					timeSlot={ timeSlot }
-					timeSlots={ timeSlots }
-					setTimeSlots={ setTimeSlots }
 					updateTimeSlot={ () => updateTimeSlot( {
 					  timeSlot,
 					  timeSlots,
@@ -79,8 +77,6 @@ export const CreateTimeSlot = () => {
 				{ timeSlot && <DateInput
 					field={ 'dateStart' }
 					timeSlot={ timeSlot }
-					timeSlots={ timeSlots }
-					setTimeSlots={ setTimeSlots }
 					updateTimeSlot={ () => updateTimeSlot( {
 						timeSlot,
 						timeSlots,

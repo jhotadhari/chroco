@@ -1,6 +1,9 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
 import {
+  get,
+} from "lodash";
+import {
   useState,
   useContext,
   // useEffect,
@@ -67,20 +70,22 @@ export const Duration = ( {
 export const DateInput = ( {
   field,
   timeSlot,
-  timeSlots,
-  setTimeSlots,
   updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
-  const { timeSlotSchema } = useContext( Context );
+  const {
+    timeSlotSchema,
+    timeSlots,
+    setTimeSlots,
+   } = useContext( Context );
   const [tempVal, setTempVal] = useState( false );
   const format = 'YYYY-MM-DD HH:mm:ss';
-  const val = timeSlot[field]
-    ? dayjs( undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] ).format( format )
+  const val = get( timeSlot, field )
+    ? dayjs( get( editTimeSlot, field, get( timeSlot, field ) ) ).format( format )
     : '';
-  const isDirty = tempVal || ( undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field] );
-  const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
+  const isDirty = tempVal || ( get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field ) );
+  const title = get( timeSlotSchema, [field,'title'], '' );
 
   return <input
       onKeyDown={ e => {
@@ -138,16 +143,26 @@ export const Input = ( {
   field,
   useDefault,
   timeSlot,
-  timeSlots,
-  setTimeSlots,
   updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
-	const { timeSlotSchema } = useContext( Context );
-  const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
-  const defaultVal = useDefault && timeSlotSchema[field] && timeSlotSchema[field].default ? timeSlotSchema[field].default : '';
-  const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
+  const {
+    timeSlotSchema,
+    setTimeSlots,
+    timeSlots,
+   } = useContext( Context );
+  const title = get( timeSlotSchema, [field,'title'], '' );
+  const defaultVal = useDefault ? get( timeSlotSchema, [field, 'default'], '' ) : '';
+  const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
+
+  console.log( 'debug timeSlot', timeSlot ); // debug
+  console.log( 'debug editTimeSlot', editTimeSlot ); // debug
+
+  const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
+
+  console.log( 'debug value', value ); // debug
+
 
   return <input
       onKeyDown={ e => {
@@ -179,9 +194,7 @@ export const Input = ( {
       onChange={ ( e ) => {
         setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
       } }
-      value={ undefined !== editTimeSlot[field]
-        ? editTimeSlot[field]
-        : ( timeSlot[field] ? timeSlot[field] : defaultVal ) }
+      value={ value }
       title={ title }
       placeholder={ title }
     />;
@@ -326,8 +339,6 @@ export const TimeSlot = ( {
             ><Input
               field={ key }
               timeSlot={ timeSlot }
-              timeSlots={ timeSlots }
-              setTimeSlots={ setTimeSlots }
               updateTimeSlot={ () => updateTimeSlot( {
                 timeSlot,
                 timeSlots,
@@ -345,8 +356,6 @@ export const TimeSlot = ( {
           ><DateInput
             field={ key }
             timeSlot={ timeSlot }
-            timeSlots={ timeSlots }
-            setTimeSlots={ setTimeSlots }
             updateTimeSlot={ () => updateTimeSlot( {
               timeSlot,
               timeSlots,
@@ -363,10 +372,10 @@ export const TimeSlot = ( {
     } ) : '' }
 
       <Duration
-        start={ editTimeSlot.dateStart ? editTimeSlot.dateStart : timeSlot.dateStart }
-        stop={ editTimeSlot.dateStop ? editTimeSlot.dateStop : timeSlot.dateStop }
-        isDirty={ ( editTimeSlot.dateStart && editTimeSlot.dateStart !== timeSlot.dateStart )
-          || ( editTimeSlot.dateStop && editTimeSlot.dateStop !== timeSlot.dateStop )
+        start={ get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) }
+        stop={ get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) }
+        isDirty={ ( get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
+          || ( get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) )
         }
       />
 

@@ -1,8 +1,8 @@
 const {
   app,
-} = require('electron');
-const path = require('path');
-const Datastore = require('nedb');
+} = require( 'electron' );
+const path = require( 'path' );
+const Datastore = require( 'nedb' );
 
 const db = {
 

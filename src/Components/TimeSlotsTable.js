@@ -1,5 +1,8 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
+import {
+  get,
+} from "lodash";
 import { useState, useContext, Fragment } from "react";
 import Context from '../Context';
 import {
@@ -30,7 +33,7 @@ const GroupInput = ( {
   } ) => {
 	const { timeSlotSchema } = useContext( Context );
 	const title = timeSlotSchema[field] && timeSlotSchema[field].title ? timeSlotSchema[field].title : '';
-	const isDirty = undefined !== editTimeSlot[field] && editTimeSlot[field] !== timeSlot[field];
+	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 
 	return <input
 		onKeyDown={ e => {
@@ -57,7 +60,7 @@ const GroupInput = ( {
 		onChange={ ( e ) => {
 		  	setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
 		} }
-		value={ undefined !== editTimeSlot[field] ? editTimeSlot[field] : timeSlot[field] }
+		value={ get( editTimeSlot, field, get( timeSlot, field ) ) }
 		title={ title }
 		placeholder={ title }
 	/>;
@@ -68,7 +71,7 @@ const GroupDuration = ( {
   } ) => {
 	const seconds = [...timeSlotsSlice].reduce( ( acc, timeSlot ) => {
 		const start = timeSlot.dateStart;
-		const stop = timeSlot.dateStop ? timeSlot.dateStop : dayjs();
+		const stop = get( timeSlot, 'dateStop', dayjs() );
 		return start && stop
 			? acc + dayjs( stop ).diff( dayjs( start ), 'second' )
 			: acc;
