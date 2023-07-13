@@ -19,7 +19,7 @@ const ThemeControl = () => {
 	} = useContext( Context );
 
 	const settingKey = 'themeSource';
-	const setting = settings.find( sett => sett.key && sett.key === settingKey );
+	const setting = settings && Array.isArray( settings ) ? settings.find( sett => sett.key && sett.key === settingKey ) : undefined;
 
 	const options = [
 		{ value: 'system',	label: 'System' },
@@ -31,12 +31,12 @@ const ThemeControl = () => {
 		value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
 
 	return <div className="mb-3">
-		<label id={ settingKey } className="form-label">Color Theme</label>
+		<label id={ 'setting-label-' + settingKey } className="form-label">Color Theme</label>
 		<div className="row">
 			<div className="col-1"></div>
 			<div className="col-9">
 				<MultiSelect
-					labelledBy={ settingKey }
+					labelledBy={ 'setting-label-' + settingKey }
 					className={ themeSource }
 					hasSelectAll={ false }
 					disableSearch={ true }
@@ -45,7 +45,7 @@ const ThemeControl = () => {
 					onChange={ res => {
 						if ( 2 === res.length ) {
 							// remove old value
-							res = [...res].filter( sett => sett.value !== setting.value )
+							res = [...res].filter( sett => sett.value !== value.value )
 						}
 						if ( res.length < 0 || res.length > 1 ) {
 							return;
@@ -101,7 +101,7 @@ const HideFieldsControl = () => {
 	} = useContext( Context );
 
 	const settingKey = 'hideFields';
-	const setting = settings.find( sett => sett.key && sett.key === settingKey );
+	const setting = settings && Array.isArray( settings ) ? settings.find( sett => sett.key && sett.key === settingKey ) : undefined;
 
 	const value = [...( setting && setting.value ? setting.value : settingsDefaults[settingKey] )].map( key => ( {
 		value: key,
@@ -115,12 +115,12 @@ const HideFieldsControl = () => {
 	} ) ) : [];
 
 	return <div className="mb-3">
-		<label id={ settingKey } className="form-label">Hide Fields</label>
+		<label id={ 'setting-label-' + settingKey } className="form-label">Hide Fields</label>
 		<div className="row">
 			<div className="col-1"></div>
 			<div className="col-9">
 				<MultiSelect
-					labelledBy={ settingKey }
+					labelledBy={ 'setting-label-' + settingKey }
 					className={ themeSource }
 					hasSelectAll={ false }
 					disableSearch={ true }
