@@ -32,10 +32,10 @@ function createWindow() {
         : `file://${path.join(__dirname, '../build/index.html')}`
     );
 
-    // Open the DevTools.
-    if ( isDev ) {
-        win.webContents.openDevTools();
-    }
+    // // Open the DevTools.
+    // if ( isDev ) {
+    //     win.webContents.openDevTools();
+    // }
 
     win.webContents.on( 'did-stop-loading', () => {
         win.setTitle( app.getName() );
