@@ -28,7 +28,7 @@ const ThemeControl = () => {
 	];
 
 	let value = setting && setting.value ? options.find( opt => opt.value === setting.value ) : undefined;
-		value = value ? value : ( options[settingsDefaults[settingKey]] ? options[settingsDefaults[settingKey]] : [] )
+		value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
 
 	return <div className="mb-3">
 		<label id={ settingKey } className="form-label">Color Theme</label>
@@ -41,7 +41,7 @@ const ThemeControl = () => {
 					hasSelectAll={ false }
 					disableSearch={ true }
 					options={ options }
-					value={ [value] }
+					value={ value ? [value] : [] }
 					onChange={ res => {
 						if ( 2 === res.length ) {
 							// remove old value
