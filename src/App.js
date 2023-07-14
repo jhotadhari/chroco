@@ -1,5 +1,8 @@
 import './style/App.scss';
 import {
+  get,
+} from 'lodash';
+import {
   useEffect,
   useState,
 } from 'react';
@@ -10,10 +13,6 @@ import { TimeSlotsTable } from './Components/TimeSlotsTable';
 import { sortTimeSlotsCompare } from './utils';
 const { api } = window;
 
-const settingsDefaults = {
-  themeSource: 'system',
-  hideFields: [],
-};
 
 const eventTick = new Event( 'tick' );
 setInterval( () => {
@@ -22,6 +21,7 @@ setInterval( () => {
 
 function App() {
   const [settings, setSettings] = useState( [] );
+  const [settingsDefaults, setSettingsDefaults] = useState( null );
   const [timeSlotSchema, setTimeSlotSchema] = useState( null );
   const [timeSlots, setTimeSlots] = useState( [] );
   const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
@@ -29,24 +29,39 @@ function App() {
   const [themeSource, setThemeSource] = useState( false );
 
   // Helper function to retrieve one setting value.
-  const getSetting = ( key, _settings ) => {
+  const getSetting = ( key, _settings, _settingsDefaults ) => {
     let setting = ( _settings ? _settings : settings ).find( sett => sett.key && sett.key === key );
-    return undefined !== setting && setting.value
-      ? setting.value
-      : ( settingsDefaults[key] ? settingsDefaults[key] : undefined )
+    return get( setting, 'value', get( _settingsDefaults ? _settingsDefaults : settingsDefaults, key ) );
   }
 
-  // Initially set settings.
+  // Initially set settings, settingsDefaults and apply theme colors.
   useEffect( () => {
-    api.settings.get().then( settings => {
-      setSettings( settings );
-      // Apply theme colors.
-      api.darkMode.setThemeSource( getSetting( 'themeSource', settings ) ).then( () => {
-        api.darkMode.getThemeSource().then( src => {
-          setThemeSource( src );
+    Promise.all( [
+      // Get settings.
+      new Promise( res => {
+        api.settings.get().then( settings => {
+          setSettings( settings );
+          res( settings )
+        } );
+      } ),
+      // Get settingsDefaults.
+      new Promise( res => {
+        api.settings.getDefaults().then( settingsDefaults => {
+          setSettingsDefaults( settingsDefaults );
+          res( settingsDefaults )
+        } );
+      } ),
+      ] ).then( ( [
+        settings,
+        settingsDefaults,
+      ] ) => {
+        // Apply theme colors.
+        api.darkMode.setThemeSource( getSetting( 'themeSource', settings, settingsDefaults ) ).then( () => {
+          api.darkMode.getThemeSource().then( src => {
+            setThemeSource( src );
+          } );
         } );
       } );
-    } );
   }, [] );
 
   // Initially set timeSlotSchema.
@@ -71,7 +86,7 @@ function App() {
     } );
   }, [timeSlots] );
 
-  return <div
+  return ! settingsDefaults ? null : <div
     className=''
     data-bs-theme={ themeSource }
   >

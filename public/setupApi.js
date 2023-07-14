@@ -193,6 +193,14 @@ api.timeSlots.update = newTimeSlot => new Promise( ( resolve, reject ) => {
 
 
 
+// return   promise resolve object   settingsDefaults
+api.settings.getDefaults = () => new Promise( ( resolve, reject ) => {
+    const settingsDefaults = {
+        themeSource: 'system',
+        hideFields: [],
+    };
+    resolve( settingsDefaults );
+} );
 // return   promise resolve array   settings
 api.settings.get = () => new Promise( ( resolve, reject ) => {
     db.settings.find( {}, ( err, settings ) => {
@@ -240,6 +248,7 @@ const setupApi = () => {
      * settings
      *
      */
+    ipcMain.handle( 'api:settings:getDefaults', (_) =>              api.settings.getDefaults() );
     ipcMain.handle( 'api:settings:get', (_) =>                      api.settings.get() );
     ipcMain.handle( 'api:settings:add', (_, newSetting) =>          api.settings.add( newSetting ) );
     ipcMain.handle( 'api:settings:update', (_, newSetting) =>       api.settings.update( newSetting ) );
