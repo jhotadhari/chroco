@@ -7,8 +7,9 @@ import {
 import {
 	useState,
 	useContext,
-	useEffect,
+	// useEffect,
 	Fragment,
+	// useRef,
 } from "react";
 import Context from '../Context';
 import {
@@ -16,13 +17,13 @@ import {
 	stopTimeSlot,
 	startTimeSlot,
 } from "./TimeSlot";
+import useTick from "../hooks/useTick";
 import Icon from "./Icon";
 import {
 	sortTimeSlotsCompare,
 	formatSeconds,
 } from "../utils";
 const { api } = window;
-
 
 const GroupInput = ( {
 	field,
@@ -79,32 +80,10 @@ const GroupDuration = ( {
 		timeSlotCurrentEdit,
 	} = useContext( Context );
 
-	const [intervalID, setIntervalID] = useState( null );
-	const [tick, setTick] = useState( false );
-	const shouldTick = timeSlotCurrent ? !! timeSlotsSlice.find( ts => ts._id === timeSlotCurrent._id ) : undefined;
-	useEffect( () => {
-		let iid = false
-		const clear = () => {
-		  if ( ! shouldTick ) {
-			clearInterval( intervalID );
-			setIntervalID( false );
-		  }
-		  clearInterval( iid );
-		}
-			if ( shouldTick ) {
-				if ( ! intervalID ) {
-					iid = setInterval( () => {
-						setTick( Math.random() );
-					}, 1000 );
-					setIntervalID( iid );
-				}
-			} else {
-		  if ( intervalID ) {
-			clear()
-		  }
-		}
-		return clear;
-	}, [shouldTick] );
+	useTick( timeSlotCurrent
+		? !! timeSlotsSlice.find( ts => ts._id === timeSlotCurrent._id )
+		: undefined
+	);
 
 	let isDirty = false;
 	const seconds = [...timeSlotsSlice].reduce( ( acc, timeSlot ) => {

@@ -7,10 +7,10 @@ import {
 import {
   useState,
   useContext,
-  useEffect,
   // useEffect,
   // useRef
 } from "react";
+import useTick from "../hooks/useTick";
 import Icon from "./Icon";
 import Context from '../Context';
 import { formatSeconds } from '../utils';
@@ -46,32 +46,7 @@ export const Duration = ( {
        ( get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
     || ( get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) );
 
-	const [intervalID, setIntervalID] = useState( null );
-	const [tick, setTick] = useState( false );
-	const shouldTick = ! stop;
-	useEffect( () => {
-    let iid = false
-    const clear = () => {
-      if ( ! shouldTick ) {
-        clearInterval( intervalID );
-        setIntervalID( false );
-      }
-      clearInterval( iid );
-    }
-		if ( shouldTick ) {
-			if ( ! intervalID ) {
-				iid = setInterval( () => {
-					setTick( Math.random() );
-				}, 1000 );
-				setIntervalID( iid );
-			}
-		} else {
-      if ( intervalID ) {
-        clear()
-      }
-		}
-		return clear;
-	}, [shouldTick] );
+  useTick( ! stop );
 
   const _stop = stop ? stop : dayjs();
   const seconds = start && _stop

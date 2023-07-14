@@ -15,6 +15,11 @@ const settingsDefaults = {
   hideFields: [],
 };
 
+const eventTick = new Event( 'tick' );
+setInterval( () => {
+  window.dispatchEvent( eventTick );
+}, 1000 );
+
 function App() {
   const [settings, setSettings] = useState( [] );
   const [timeSlotSchema, setTimeSlotSchema] = useState( null );
