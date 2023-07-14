@@ -208,22 +208,25 @@ const GroupHeader = ( {
 				'_id',
 			].includes( key ) ).map( key => {
 				return <div
-				key={ key }
-				className={ classnames( [
-					'timeSlot--' + key,
-					'title' === key ? 'col-9' : 'col'
-				] ) }
-			><GroupInput
-				field={ key }
-				timeSlot={ timeSlotsSlice[0] }
-				updateTimeSlots={ updateTimeSlots }
-				editTimeSlot={ editTimeSlot }
-				setEditTimeSlot={ setEditTimeSlot }
-			/></div>;
+					key={ key }
+					className={ classnames( [
+						'timeSlot--' + key,
+						'title' === key ? 'col-9' : 'col'
+					] ) }
+				>
+					<GroupInput
+						field={ key }
+						timeSlot={ timeSlotsSlice[0] }
+						updateTimeSlots={ updateTimeSlots }
+						editTimeSlot={ editTimeSlot }
+						setEditTimeSlot={ setEditTimeSlot }
+					/>
+				</div>;
 			} ) }
 
 			<div className="col"></div>
 			<div className="col"></div>
+
 			<GroupDuration
 				timeSlotsSlice={ timeSlotsSlice }
 			/>
@@ -338,16 +341,24 @@ export const TimeSlotsTable = () => {
   	return <div className='container-fluid mb-3' >
 		<div className="timeSlots-table" >
 			{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
-				<div className="row">
-					<div className="col" >
-						{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
+					<div className="row">
+
+						<div className="col">{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }</div>
+
+						{ <GroupDuration
+							timeSlotsSlice={ Object.keys( timeSlotsGrouped[groupDateId] ).reduce(
+								( timeSlotsSlice, groupId ) => [...timeSlotsSlice,...timeSlotsGrouped[groupDateId][groupId]]
+							, [] ) }
+						/> }
+
+						<div className={ "col-4" }></div>
+
 					</div>
-				</div>
-				{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
-					key={ groupId }
-					timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
-				/> ) }
-			</Fragment> ) }
+					{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
+						key={ groupId }
+						timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
+					/> ) }
+				</Fragment> ) }
 		</div>
 	</div> ;
 };
