@@ -1,10 +1,17 @@
 const {
     ipcMain,
     nativeTheme,
-} = require('electron');
-const dayjs = require('dayjs');
-const { exec } = require('child_process');
-const db = require('./nedb/db');
+} = require( 'electron' );
+const {
+    isString,
+    isObject,
+    isArray,
+} = require( 'lodash' );
+const dayjs = require( 'dayjs' );
+const { exec } = require( 'child_process' );
+const getDb = require( './nedb/db' );
+const { settingsDefaults } = require( './constants' );
+const { isPathValid } = require( './utils' );
 
 const api = {
     db: {},
@@ -13,15 +20,17 @@ const api = {
 };
 
 api.db.compact = () => new Promise( ( resolve, reject ) => {
-    Promise.all( Object.keys( db ).map( key => {
-        return new Promise( res => {
-            db[key].persistence.compactDatafile();
-            db[key].on( 'compaction.done', () => {
-                res( true );
+    getDb().then( db => {
+        Promise.all( Object.keys( db ).map( key => {
+            return new Promise( res => {
+                db[key].persistence.compactDatafile();
+                db[key].on( 'compaction.done', () => {
+                    res( true );
+                } );
             } );
+        } ) ).then( () => {
+            resolve( true );
         } );
-    } ) ).then( () => {
-        resolve( true );
     } );
 } );
 
@@ -72,158 +81,230 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 
 // return   promise resolve array   timeSlots
 api.timeSlots.get = () => new Promise( ( resolve, reject ) => {
-    db.timeSlots.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
-        resolve( timeSlots );
+    getDb().then( db => {
+        // console.log( 'debug db', db ); // debug
+        db.timeSlots.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
+
+
+
+            resolve( timeSlots );
+        } );
     } );
 } );
 
 // return   promise resolve object   timeSlot
 api.timeSlots.getCurrent = () => new Promise( ( resolve, reject ) => {
-    db.current.find( { type: 'timeSlot' } ).exec( ( err, currents ) => {
+    getDb().then( db => {
+        db.current.find( { type: 'timeSlot' } ).exec( ( err, currents ) => {
 
-        if ( currents.length ) {
-            // Should be length 1,
+            if ( currents.length ) {
+                // Should be length 1,
 
-            let timeSlot = null;
-            resolve( [...currents].reduce( ( accumulatorPromise, current, index ) => {
-                return accumulatorPromise.then( () => {
-                    return new Promise( ( res, reject ) => {
-                        db.timeSlots.find( { _id: current.connectedId } ).limit( 1 ).exec( ( err, timeSlots ) => {
-                            if ( timeSlots.length ) {
-                                timeSlot = timeSlots[0];
-                                res( timeSlots[0] );
-                            } else {
-                                // This should actually not happen. Just delete that zombie.
-                                db.current.remove( { type: 'timeSlot', _id: current._id }, ( err, numberDeleted ) => {
-                                    res( timeSlot );
-                                } );
-                            }
+                let timeSlot = null;
+                resolve( [...currents].reduce( ( accumulatorPromise, current, index ) => {
+                    return accumulatorPromise.then( () => {
+                        return new Promise( ( res, reject ) => {
+                            db.timeSlots.find( { _id: current.connectedId } ).limit( 1 ).exec( ( err, timeSlots ) => {
+                                if ( timeSlots.length ) {
+                                    timeSlot = timeSlots[0];
+                                    res( timeSlots[0] );
+                                } else {
+                                    // This should actually not happen. Just delete that zombie.
+                                    db.current.remove( { type: 'timeSlot', _id: current._id }, ( err, numberDeleted ) => {
+                                        res( timeSlot );
+                                    } );
+                                }
+                            } );
                         } );
-                    } );
-                } ).catch( err => console.log( err ) );
-            }, Promise.resolve() ) );
+                    } ).catch( err => console.log( err ) );
+                }, Promise.resolve() ) );
 
 
 
 
-        } else {
-            resolve( null );
-        }
+            } else {
+                resolve( null );
+            }
+        } );
     } );
 } );
 
 // return   promise resolve object  updatedTimeSlot
 api.timeSlots.stop = timeSlot => new Promise( ( resolve, reject ) => {
-    if ( ! timeSlot._id ) {
-        reject( '??? err no _id' );
-    } else {
-        const newTimeSlot = {
-            ...timeSlot,
-            dateStop: dayjs().valueOf(),
-        };
-        db.current.remove( { type: 'timeSlot', connectedId: newTimeSlot._id }, ( err, numberDeleted ) => {
-            db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
-                if ( numberUpdated ) {
-                    resolve( newTimeSlot );
-                }
-                reject();
+    getDb().then( db => {
+        if ( ! timeSlot._id ) {
+            reject( '??? err no _id' );
+        } else {
+            const newTimeSlot = {
+                ...timeSlot,
+                dateStop: dayjs().valueOf(),
+            };
+            db.current.remove( { type: 'timeSlot', connectedId: newTimeSlot._id }, ( err, numberDeleted ) => {
+                db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
+                    if ( numberUpdated ) {
+                        resolve( newTimeSlot );
+                    }
+                    reject();
+                } );
             } );
-        } );
-    }
+        }
+    } );
 } );
 
 // return   promise resolve number  numberDeleted
 api.timeSlots.delete = id => new Promise( ( resolve, reject ) => {
-    Promise.all( [
-        // Try to remove current.
-        new Promise( res => {
-            db.current.remove( { type: 'timeSlot', _id: id }, ( err, numberDeleted ) => {
-                res( true );
-            } );
-        } ),
-        // Remove timeSlot.
-        new Promise( res => {
-            db.timeSlots.remove( { _id: id }, ( err, numberDeleted ) => {
-                res( true );
-            } );
-        } ),
-    ] ).then( () => {
-        resolve( true );
+    getDb().then( db => {
+        Promise.all( [
+            // Try to remove current.
+            new Promise( res => {
+                db.current.remove( { type: 'timeSlot', _id: id }, ( err, numberDeleted ) => {
+                    res( true );
+                } );
+            } ),
+            // Remove timeSlot.
+            new Promise( res => {
+                db.timeSlots.remove( { _id: id }, ( err, numberDeleted ) => {
+                    res( true );
+                } );
+            } ),
+        ] ).then( () => {
+            resolve( true );
+        } );
     } );
 } );
 
 // return   promise resolve object  addedTimeSlot, stoppedTimeSlot
 api.timeSlots.add = newTimeSlot => new Promise( ( resolve, reject ) => {
-    const add = stoppedTimeSlot => {
-        db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
-            db.current.insert( { type: 'timeSlot', connectedId: addedTimeSlot._id }, ( err, addedCurrent ) => {
-                const result = {
-                    addedTimeSlot,
-                    stoppedTimeSlot,
-                };
-                resolve( result );
+    getDb().then( db => {
+        const add = stoppedTimeSlot => {
+            db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
+                db.current.insert( { type: 'timeSlot', connectedId: addedTimeSlot._id }, ( err, addedCurrent ) => {
+                    const result = {
+                        addedTimeSlot,
+                        stoppedTimeSlot,
+                    };
+                    resolve( result );
+                } );
             } );
-        } );
-    };
-    // Maybe stop current one first, before adding a new one.
-    api.timeSlots.getCurrent().then( currentTimeSlot => {
-        if ( currentTimeSlot ) {
-            api.timeSlots.stop( currentTimeSlot ).then( stoppedTimeSlot => {
-                if ( stoppedTimeSlot ) {
-                    add( stoppedTimeSlot );
-                }
-            } )
-        } else {
-            add();
-        }
-    } )
+        };
+        // Maybe stop current one first, before adding a new one.
+        api.timeSlots.getCurrent().then( currentTimeSlot => {
+            if ( currentTimeSlot ) {
+                api.timeSlots.stop( currentTimeSlot ).then( stoppedTimeSlot => {
+                    if ( stoppedTimeSlot ) {
+                        add( stoppedTimeSlot );
+                    }
+                } )
+            } else {
+                add();
+            }
+        } )
+    } );
 } );
 
 // return   promise resolve number  numberUpdated
 api.timeSlots.update = newTimeSlot => new Promise( ( resolve, reject ) => {
-    if ( ! newTimeSlot._id ) {
-        reject( '??? err no _id' );
-    } else {
-        db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
-            resolve( numberUpdated );
-        } );
-    }
+    getDb().then( db => {
+        if ( ! newTimeSlot._id ) {
+            reject( '??? err no _id' );
+        } else {
+            db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
+                resolve( numberUpdated );
+            } );
+        }
+    } );
 } );
 
 
 
+const validateSetting = setting => {
+    let errors = [];
+    switch( setting.key ) {
+        case 'dbPath':
+            if ( ! isObject( setting.value ) ) {
+                return ['dbPath must be type of object'];
+            }
+            ['current','settings','timeSlots'].map( key => {
+                if ( ! Object.keys( setting.value ).includes( key ) ) {
+                    errors = [...errors, 'dbPath requires key "' + key + '".' ];
+                }
+            } );
+            Object.keys( setting.value ).map( p => {
+                if ( ! isString( p ) ) {
+                    errors = [...errors, 'Path should be a string.' ];
+                } else {
+                    if ( ! isPathValid( setting.value[p] ) ) {
+                        errors = [...errors, 'Path ' + setting.value[p] + ' is not writable.' ];
+                    }
+                }
+            } );
+            return errors.length ? errors : true;
+        case 'hideFields':
+            if ( ! isArray( setting.value ) ) {
+                return ['hideFields must be type of array'];
+            }
+            [...setting.value].map( val => {
+                if ( ! isString( val ) ) {
+                    errors = [...errors, 'hideFields array can only hold strings.' ];
+                }
+            } );
+            return errors.length ? errors : true;
+        case 'themeSource':
+            if ( ! isString( setting.value ) ) {
+                return ['themeSource must be type of string.'];
+            }
+            const valid = ['system','dark','light'];
+            if ( valid.includes( setting.value ) ) {
+                return true;
+            } else {
+                return ['themeSource must be one of "' + valid.join( '|' ) + '".'];
+            }
+        default:
+            return ['"' + setting.key + '" is not a valid settings key.'];
+    }
+}
 
 // return   promise resolve object   settingsDefaults
 api.settings.getDefaults = () => new Promise( ( resolve, reject ) => {
-    const settingsDefaults = {
-        themeSource: 'system',
-        hideFields: [],
-    };
     resolve( settingsDefaults );
 } );
 // return   promise resolve array   settings
 api.settings.get = () => new Promise( ( resolve, reject ) => {
-    db.settings.find( {}, ( err, settings ) => {
-        resolve( settings );
+    getDb().then( db => {
+        db.settings.find( {}, ( err, settings ) => {
+            resolve( settings );
+        } );
     } );
 } );
 
 // return   promise resolve object  addedTimeSlot
 api.settings.add = newSetting => new Promise( ( resolve, reject ) => {
-    db.settings.insert( newSetting, ( err, addedSetting ) => {
-        resolve( addedSetting );
+    const valid = validateSetting( newSetting );
+    if ( true !== valid ) {
+        return reject( valid.join( '#####' ) )
+    }
+    getDb().then( db => {
+        db.settings.insert( newSetting, ( err, addedSetting ) => {
+            resolve( addedSetting );
+        } );
     } );
 } );
 
 // return   promise resolve number  numberUpdated
 api.settings.update = newSetting => new Promise( ( resolve, reject ) => {
-    if ( ! newSetting._id ) {
-        reject( '??? err no _id' );
-    } else {
-        db.settings.update( { _id: newSetting._id }, newSetting, {}, (err, numberUpdated ) => {
-            resolve( numberUpdated );
-        } );
+    const valid = validateSetting( newSetting );
+    if ( true !== valid ) {
+        return reject( valid.join( '#####' ) )
     }
+    getDb().then( db => {
+        if ( ! newSetting._id ) {
+            reject( '??? err no _id' );
+        } else {
+            db.settings.update( { _id: newSetting._id }, newSetting, {}, (err, numberUpdated ) => {
+                resolve( numberUpdated );
+            } );
+        }
+    } );
 } );
 
 
@@ -264,7 +345,9 @@ const setupApi = () => {
     ipcMain.handle('api:darkMode:getThemeSource', () => nativeTheme.shouldUseDarkColors ? 'dark' : 'light' );
 
 }
+
 module.exports = {
     setupApi,
-    api
+    api,
+    settingsDefaults,
 };

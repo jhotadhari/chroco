@@ -22,11 +22,12 @@ setInterval( () => {
 function App() {
   const [settings, setSettings] = useState( [] );
   const [settingsDefaults, setSettingsDefaults] = useState( null );
+  const [themeSource, setThemeSource] = useState( false );
+
   const [timeSlotSchema, setTimeSlotSchema] = useState( null );
   const [timeSlots, setTimeSlots] = useState( [] );
   const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
   const [timeSlotCurrentEdit, setTimeSlotCurrentEdit] = useState( null );
-  const [themeSource, setThemeSource] = useState( false );
 
   // Helper function to retrieve one setting value.
   const getSetting = ( key, _settings, _settingsDefaults ) => {
@@ -78,6 +79,14 @@ function App() {
       setTimeSlots( timeSlots );
     } );
   }, [] );
+
+  // Load timeSlots when dbPath settings got changed.
+  useEffect( () => {
+    api.timeSlots.get().then( timeSlots => {
+      timeSlots.sort( sortTimeSlotsCompare );
+      setTimeSlots( timeSlots );
+    } );
+  }, [getSetting( 'dbPath' )] );
 
   // Set timeSlotCurrent when timeSlots change.
   useEffect( () => {
