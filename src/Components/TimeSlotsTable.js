@@ -343,7 +343,16 @@ export const TimeSlotsTable = () => {
 			{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
 					<div className="row">
 
-						<div className="col">{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }</div>
+						<div className="col position-relative">
+							<span className="bg-body-bg bg-body z-1 pe-4">
+								{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
+							</span>
+							<div className="border-bottom position-absolute" style={ {
+								width: '95%',
+								right: '1rem',
+							} }
+							></div>
+						</div>
 
 						{ <GroupDuration
 							timeSlotsSlice={ Object.keys( timeSlotsGrouped[groupDateId] ).reduce(

@@ -36,9 +36,9 @@ export const CreateTimeSlot = () => {
 	const _editTimeSlot = isCurrent ? timeSlotCurrentEdit : editTimeSlot;
 	const _setEditTimeSlot = isCurrent ? setTimeSlotCurrentEdit : setEditTimeSlot;
 
-  	return <div className="container-fluid mb-3 create-timeSlot">
+  	return <div className="container-fluid mb-5 create-timeSlot">
 
-		<div className="row">
+		<div className="row mb-2">
 			<div className="col">
 				{ timeSlotCurrent ? 'Current' : 'Add new' }
 			</div>

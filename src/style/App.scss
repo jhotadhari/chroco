@@ -38,60 +38,6 @@
 } */
 
 
-// // Load font_faces
-// @import "~bootstrap/scss/ruem_frontend/fonts/fonts_master";
-
-// // Load and overwrite Bootstrap variables
-// @import "~bootstrap/scss/ruem_frontend/variables_site/variables_site";
-
-// // Loads Bootstrap4 base
-// @import "~bootstrap/scss/~bootstrap/scss/functions";
-// @import "~bootstrap/scss/~bootstrap/scss/variables";
-// @import "~bootstrap/scss/~bootstrap/scss/mixins";
-// @import "~bootstrap/scss/~bootstrap/scss/root";
-// @import "~bootstrap/scss/~bootstrap/scss/reboot";
-// @import "~bootstrap/scss/~bootstrap/scss/print";
-// @import "~bootstrap/scss/~bootstrap/scss/code";
-// @import "~bootstrap/scss/~bootstrap/scss/type";
-// @import "~bootstrap/scss/~bootstrap/scss/images";
-// @import "~bootstrap/scss/~bootstrap/scss/grid";
-// @import "~bootstrap/scss/~bootstrap/scss/tables";
-// @import "~bootstrap/scss/~bootstrap/scss/forms";
-// @import "~bootstrap/scss/~bootstrap/scss/buttons";
-// @import "~bootstrap/scss/~bootstrap/scss/transitions";
-// @import "~bootstrap/scss/~bootstrap/scss/dropdown";
-// @import "~bootstrap/scss/~bootstrap/scss/button-group";
-// @import "~bootstrap/scss/~bootstrap/scss/input-group";
-// @import "~bootstrap/scss/~bootstrap/scss/custom-forms";
-// @import "~bootstrap/scss/~bootstrap/scss/nav";
-// @import "~bootstrap/scss/~bootstrap/scss/navbar";
-// @import "~bootstrap/scss/~bootstrap/scss/card";
-// @import "~bootstrap/scss/~bootstrap/scss/breadcrumb";
-// @import "~bootstrap/scss/~bootstrap/scss/pagination";
-// @import "~bootstrap/scss/~bootstrap/scss/badge";
-// @import "~bootstrap/scss/~bootstrap/scss/jumbotron";
-// @import "~bootstrap/scss/~bootstrap/scss/alert";
-// @import "~bootstrap/scss/~bootstrap/scss/progress";
-// @import "~bootstrap/scss/~bootstrap/scss/media";
-// @import "~bootstrap/scss/~bootstrap/scss/list-group";
-// @import "~bootstrap/scss/~bootstrap/scss/close";
-// @import "~bootstrap/scss/~bootstrap/scss/toasts";
-// @import "~bootstrap/scss/~bootstrap/scss/modal";
-// @import "~bootstrap/scss/~bootstrap/scss/tooltip";
-// @import "~bootstrap/scss/~bootstrap/scss/popover";
-// @import "~bootstrap/scss/~bootstrap/scss/carousel";
-// @import "~bootstrap/scss/~bootstrap/scss/spinners";
-// @import "~bootstrap/scss/~bootstrap/scss/utilities";
-
-
-// @import "~bootstrap/scss/./mixins/**/*.scss";
-// @import './generic.scss';
-// @import './hamburgers.scss';
-// @import './understrap.scss';
-// @import './site.scss';
-// @import "~bootstrap/scss/./components/**/*.scss";
-
-
 @import "~bootstrap/scss/mixins/banner";
 @include bsBanner("");
 
@@ -148,17 +94,22 @@
 // scss-docs-end import-stack
 
 
-
 :root {
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  body { background: #333; color: white; }
+  body {
+    background: $body-bg-dark;
+    color: $body-color-dark;
+  }
 }
 
 @media (prefers-color-scheme: light) {
-  body { background: #ddd; color: black; }
+  body {
+    background: $body-bg;
+    color: $body-color;
+  }
 }
 
 
