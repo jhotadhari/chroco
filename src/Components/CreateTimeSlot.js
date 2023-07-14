@@ -101,11 +101,8 @@ export const CreateTimeSlot = () => {
 			<div className="col"></div>
 
 			{ timeSlot && <Duration
-				start={ get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) }
-				stop={ get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) }
-				isDirty={ ( get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
-				|| ( get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) )
-				}
+				timeSlot={ timeSlot }
+				editTimeSlot={ _editTimeSlot }
 			/> }
 
 			{ ! timeSlot && <div className="col-3 timeSlot--duration"></div> }

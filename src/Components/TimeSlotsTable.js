@@ -4,7 +4,12 @@ import {
   get,
   isObject,
 } from "lodash";
-import { useState, useContext, Fragment } from "react";
+import {
+	useState,
+	useContext,
+	useEffect,
+	Fragment,
+} from "react";
 import Context from '../Context';
 import {
 	TimeSlot,
@@ -17,12 +22,6 @@ import {
 	formatSeconds,
 } from "../utils";
 const { api } = window;
-
-// console.log( 'debug circle', circle ); // debug
-
-
-
-
 
 
 const GroupInput = ( {
@@ -74,9 +73,51 @@ const GroupInput = ( {
 const GroupDuration = ( {
 	timeSlotsSlice,
   } ) => {
+
+	const {
+		timeSlotCurrent,
+		timeSlotCurrentEdit,
+	} = useContext( Context );
+
+	const [intervalID, setIntervalID] = useState( null );
+	const [tick, setTick] = useState( false );
+	const shouldTick = timeSlotCurrent ? !! timeSlotsSlice.find( ts => ts._id === timeSlotCurrent._id ) : undefined;
+	useEffect( () => {
+		let iid = false
+		const clear = () => {
+		  if ( ! shouldTick ) {
+			clearInterval( intervalID );
+			setIntervalID( false );
+		  }
+		  clearInterval( iid );
+		}
+			if ( shouldTick ) {
+				if ( ! intervalID ) {
+					iid = setInterval( () => {
+						setTick( Math.random() );
+					}, 1000 );
+					setIntervalID( iid );
+				}
+			} else {
+		  if ( intervalID ) {
+			clear()
+		  }
+		}
+		return clear;
+	}, [shouldTick] );
+
+	let isDirty = false;
 	const seconds = [...timeSlotsSlice].reduce( ( acc, timeSlot ) => {
-		const start = timeSlot.dateStart;
-		const stop = get( timeSlot, 'dateStop', dayjs() );
+		const isCurrent = timeSlotCurrent && timeSlot._id === timeSlotCurrent._id;
+		if ( isCurrent ) {
+			isDirty = get( timeSlotCurrentEdit, 'dateStart', get( timeSlotCurrent, 'dateStart' ) ) !== get( timeSlotCurrent, 'dateStart' );
+		}
+		const start = isCurrent
+			? get( timeSlotCurrentEdit, 'dateStart', get( timeSlotCurrent, 'dateStart' ), timeSlot.dateStart )
+			: timeSlot.dateStart;
+		const stop = isCurrent
+			? dayjs()
+			: get( timeSlot, 'dateStop', dayjs() );
 		return start && stop
 			? acc + dayjs( stop ).diff( dayjs( start ), 'second' )
 			: acc;
@@ -97,6 +138,7 @@ const GroupDuration = ( {
 		className={ classnames( {
 		  invalid: seconds < 0,
 		  'p-2': true,
+		  'dirty': isDirty,
 		} ) }
 	  >
 		{ false !== seconds

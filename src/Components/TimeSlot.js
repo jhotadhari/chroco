@@ -7,6 +7,7 @@ import {
 import {
   useState,
   useContext,
+  useEffect,
   // useEffect,
   // useRef
 } from "react";
@@ -35,14 +36,48 @@ const isValidDateInput = dateInputString => {
 };
 
 export const Duration = ( {
-  start,
-  stop,
-  isDirty,
+  timeSlot,
+  editTimeSlot,
 } ) => {
-  stop = stop ? stop : dayjs();
-  const seconds = start && stop
-    ? dayjs( stop ).diff( dayjs( start ), 'second' )
+
+  const start = get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) );
+  const stop = get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) );
+  const isDirty =
+       ( get( editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
+    || ( get( editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) );
+
+	const [intervalID, setIntervalID] = useState( null );
+	const [tick, setTick] = useState( false );
+	const shouldTick = ! stop;
+	useEffect( () => {
+    let iid = false
+    const clear = () => {
+      if ( ! shouldTick ) {
+        clearInterval( intervalID );
+        setIntervalID( false );
+      }
+      clearInterval( iid );
+    }
+		if ( shouldTick ) {
+			if ( ! intervalID ) {
+				iid = setInterval( () => {
+					setTick( Math.random() );
+				}, 1000 );
+				setIntervalID( iid );
+			}
+		} else {
+      if ( intervalID ) {
+        clear()
+      }
+		}
+		return clear;
+	}, [shouldTick] );
+
+  const _stop = stop ? stop : dayjs();
+  const seconds = start && _stop
+    ? dayjs( _stop ).diff( dayjs( start ), 'second' )
     : false;
+
   return <div
     className={ classnames( {
       "timeSlot--duration": true,
@@ -274,7 +309,7 @@ export const startTimeSlot = ( {
   const newTimeSlot = {
     ...timeSlot,
     dateStart: dayjs().valueOf(),
-    dateStop: false,
+    dateStop: undefined,
   };
   [
     '_id',
@@ -373,11 +408,8 @@ export const TimeSlot = ( {
     } ) : '' }
 
       <Duration
-        start={ get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) }
-        stop={ get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) }
-        isDirty={ ( get( _editTimeSlot, 'dateStart', get( timeSlot, 'dateStart' ) ) !== get( timeSlot, 'dateStart' ) )
-          || ( get( _editTimeSlot, 'dateStop', get( timeSlot, 'dateStop' ) ) !== get( timeSlot, 'dateStop' ) )
-        }
+				timeSlot={ timeSlot }
+				editTimeSlot={ _editTimeSlot }
       />
 
       <div

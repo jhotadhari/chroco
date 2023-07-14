@@ -18,6 +18,6 @@ export const formatSeconds = seconds => {
     let d = Number( seconds );
     let h = Math.floor( d / 3600 );
     let m = Math.floor( d % 3600 / 60 );
-    // let s = Math.floor( d % 3600 % 60 );
-    return ( isNeg ? '- ' : '' ) + ( h ? h + ' h ' : '' ) + m + ' m';
+    let s = Math.floor( d % 3600 % 60 );
+    return ( isNeg ? '- ' : '' ) + ( h ? h + ' h ' : '' ) + m + ' m ' + s + ' s';
 };
