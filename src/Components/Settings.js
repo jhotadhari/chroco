@@ -5,6 +5,7 @@ import {
 import {
 	omit,
 	get,
+	difference,
 } from "lodash";
 import classnames from "classnames";
 import { MultiSelect } from "react-multi-select-component";
@@ -33,6 +34,42 @@ const ThemeControl = () => {
 	let value = setting && setting.value ? options.find( opt => opt.value === setting.value ) : undefined;
 		value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
 
+	const doUpdate = newVal => {
+		const updateFrontend = () => api.darkMode.setThemeSource( newVal ).then( () => {
+			api.darkMode.getThemeSource().then( src => {
+				setThemeSource( src );
+			} );
+		} );
+
+		if ( undefined === setting ) {
+			// add new setting
+			const newSetting = {
+				key: settingKey,
+				value: newVal,
+			};
+			api.settings.add( newSetting ).then( ( { addedSetting } ) => {
+				setSettings( [...settings, addedSetting] );
+				updateFrontend();
+
+			} );
+		} else {
+			// update setting
+			const newSetting = {
+				...setting,
+				value: newVal,
+			};
+			api.settings.update( newSetting ).then( numberUpdated => {
+				if ( numberUpdated ) {
+					const newSettings = [...settings];
+					const idx = newSettings.findIndex( sett => sett._id === setting._id );
+					newSettings.splice( idx, 1, newSetting );
+					setSettings( newSettings );
+					updateFrontend();
+				}
+			} );
+		}
+	};
+
 	return <div className="mb-3">
 		<label id={ 'setting-label-' + settingKey } className="form-label">Color Theme</label>
 		<div className="row">
@@ -53,43 +90,19 @@ const ThemeControl = () => {
 						if ( res.length < 0 || res.length > 1 ) {
 							return;
 						}
-
-						const updateFrontend = () => api.darkMode.setThemeSource( res[0].value ).then( () => {
-							api.darkMode.getThemeSource().then( src => {
-								setThemeSource( src );
-							} );
-						} );
-
-						if ( undefined === setting ) {
-							// add new setting
-							const newSetting = {
-								key: settingKey,
-								value: res[0].value,
-							};
-							api.settings.add( newSetting ).then( ( { addedSetting } ) => {
-								setSettings( [...settings, addedSetting] );
-								updateFrontend();
-
-							} );
-						} else {
-							// update setting
-							const newSetting = {
-								...setting,
-								value: res[0].value,
-							};
-							api.settings.update( newSetting ).then( numberUpdated => {
-								if ( numberUpdated ) {
-									const newSettings = [...settings];
-									const idx = newSettings.findIndex( sett => sett._id === setting._id );
-									newSettings.splice( idx, 1, newSetting );
-									setSettings( newSettings );
-									updateFrontend();
-								}
-							} );
-						}
+						doUpdate( res[0].value )
 					} }
 				/>
 			</div>
+
+			{ value.value !== settingsDefaults[settingKey] && <div className="col">
+				<button
+					onClick={ () => doUpdate( settingsDefaults[settingKey] ) }
+					type="button"
+					className="btn btn-link border-0"
+				>Reset</button>
+			</div> }
+
 		</div>
 	</div>;
 }
@@ -117,6 +130,36 @@ const HideFieldsControl = () => {
 		disabled: ['title','dateStart','dateStop'].includes( key ),
 	} ) ) : [];
 
+	console.log( 'debug setting.value', setting.value ); // debug
+	console.log( 'debug settingsDefaults[settingKey]', settingsDefaults[settingKey] ); // debug
+
+	const doUpdate = newVal => {
+		if ( undefined === setting ) {
+			// add new setting
+			const newSetting = {
+				key: settingKey,
+				value: [...newVal].map( opt => opt.value ),
+			};
+			api.settings.add( newSetting ).then( ( { addedSetting } ) => {
+				setSettings( [...settings, addedSetting] );
+			} );
+		} else {
+			// update setting
+			const newSetting = {
+				...setting,
+				value: [...newVal].map( opt => opt.value ),
+			};
+			api.settings.update( newSetting ).then( numberUpdated => {
+				if ( numberUpdated ) {
+					const newSettings = [...settings];
+					const idx = newSettings.findIndex( sett => sett._id === setting._id );
+					newSettings.splice( idx, 1, newSetting );
+					setSettings( newSettings );
+				}
+			} );
+		}
+	};
+
 	return <div className="mb-3">
 		<label id={ 'setting-label-' + settingKey } className="form-label">Hide Fields</label>
 		<div className="row">
@@ -129,40 +172,24 @@ const HideFieldsControl = () => {
 					disableSearch={ true }
 					options={ options }
 					value={ value }
-					onChange={ res => {
-						if ( undefined === setting ) {
-							// add new setting
-							const newSetting = {
-								key: settingKey,
-								value: [...res].map( opt => opt.value ),
-							};
-							api.settings.add( newSetting ).then( ( { addedSetting } ) => {
-								setSettings( [...settings, addedSetting] );
-							} );
-						} else {
-							// update setting
-							const newSetting = {
-								...setting,
-								value: [...res].map( opt => opt.value ),
-							};
-							api.settings.update( newSetting ).then( numberUpdated => {
-								if ( numberUpdated ) {
-									const newSettings = [...settings];
-									const idx = newSettings.findIndex( sett => sett._id === setting._id );
-									newSettings.splice( idx, 1, newSetting );
-									setSettings( newSettings );
-								}
-							} );
-						}
-					} }
+					onChange={ doUpdate }
 				/>
 			</div>
+
+			{ difference( setting.value, settingsDefaults[settingKey] ).length > 0 && <div className="col">
+				<button
+					onClick={ () => doUpdate( settingsDefaults[settingKey] ) }
+					type="button"
+					className="btn btn-link border-0"
+				>Reset</button>
+			</div> }
 		</div>
 	</div>;
 }
 
 const DbPathControl = () => {
 	const {
+		settingsDefaults,
 		settings,
 		setSettings,
 	} = useContext( Context );
@@ -180,6 +207,15 @@ const DbPathControl = () => {
 		{ Object.keys( setting.value ).sort().sort( ( a, b ) => 'settings' === a ? -1 : 1 ).map( key => {
 			const value = get( dbPathEdit, key, setting.value[key] )
 			const isDirty = value !== get( setting.value, key );
+
+			const doUpdate = newVal => {
+				if ( setting[key] === newVal ) {
+					setDbPathEdit( omit( dbPathEdit, key ) );
+				} else {
+					setDbPathEdit( { ...dbPathEdit, [key]: newVal } );
+				}
+			};
+
 			return <div key={ key } className="row mb-2">
 				<div className="col-1"></div>
 				<div className="col-3 d-flex align-items-center">
@@ -201,15 +237,18 @@ const DbPathControl = () => {
 						] ) }
 						disabled={ key === 'settings' }
 						value={ value }
-						onChange={ e => {
-							if ( setting[key] === e.target.value ) {
-								setDbPathEdit( omit( dbPathEdit, key ) );
-							} else {
-								setDbPathEdit( { ...dbPathEdit, [key]: e.target.value } );
-							}
-						} }
+						onChange={ e => doUpdate( e.target.value ) }
 					/>
 				</div>
+
+				{ value !== settingsDefaults[settingKey][key] && <div className="col">
+					<button
+						onClick={ () => doUpdate( settingsDefaults[settingKey][key] ) }
+						type="button"
+						className="btn btn-link border-0"
+					>Reset</button>
+				</div> }
+
 			</div>;
 		} ) }
 
