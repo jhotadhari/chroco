@@ -8,14 +8,15 @@ import Icon from "./Icon";
 import Context from '../Context';
 
 import {
-	Input,
-	Duration,
-	DateInput,
 	deleteTimeSlot,
 	stopTimeSlot,
 	updateTimeSlot,
 	startTimeSlot,
 } from "./TimeSlot";
+
+import DateInput from "./DateInput";
+import Duration from "./Duration";
+import Input from "./Input";
 
 export const CreateTimeSlot = () => {
 
@@ -128,15 +129,23 @@ export const CreateTimeSlot = () => {
 				<button
 					type='button'
 					className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
-					onClick={ () => ! timeSlotCurrent ? startTimeSlot( {
-						timeSlot: _editTimeSlot,
-						timeSlots,
-						setTimeSlots,
-					} ) : ( stopTimeSlot( {
-						timeSlot: timeSlotCurrent,
-						timeSlots,
-						setTimeSlots,
-					} ) && _setEditTimeSlot( {} ) ) }
+					onClick={ () => {
+						if ( ! timeSlotCurrent ) {
+							startTimeSlot( {
+								timeSlot: _editTimeSlot,
+								timeSlots,
+								setTimeSlots,
+							} );
+							setEditTimeSlot( {} );
+						} else {
+							stopTimeSlot( {
+								timeSlot: timeSlotCurrent,
+								timeSlots,
+								setTimeSlots,
+							} );
+							_setEditTimeSlot( {} );
+						}
+					} }
 					title={ timeSlot.dateStop ? 'Start' : 'Stop' }
 				>
 					{ ! timeSlotCurrent && <Icon type='play'/> }
