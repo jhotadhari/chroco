@@ -48,6 +48,7 @@ const DateInput = ( {
     timeSlots,
     setTimeSlots,
     getSetting,
+    themeSource,
    } = useContext( Context );
   const [tempVal, setTempVal] = useState( false );
   const format = 'YYYY-MM-DD HH:mm:ss';
@@ -109,7 +110,11 @@ const DateInput = ( {
         placeholder={ format }
       />
 
-      { tzs && tzs.length > 0 && <Tooltip variant="dark" id={ tooltipId } className="rounded shadow border border-1 bg-body-tertiary">
+      { tzs && tzs.length > 0 && <Tooltip
+        variant={ themeSource }
+        id={ tooltipId }
+        className="rounded shadow border border-1 bg-body-tertiary"
+      >
         <div className="d-flex flex-column align-items-end">
           { [...tzs].map( ( tz, idx ) => {
             return isValidTimezones( tz ) ? <span key={idx}>
