@@ -85,11 +85,7 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 // return   promise resolve array   timeSlots
 api.timeSlots.get = () => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-        // console.log( 'debug db', db ); // debug
         db.timeSlots.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
-
-
-
             resolve( timeSlots );
         } );
     } );
@@ -98,36 +94,8 @@ api.timeSlots.get = () => new Promise( ( resolve, reject ) => {
 // return   promise resolve object   timeSlot
 api.timeSlots.getCurrent = () => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-        db.current.find( { type: 'timeSlot' } ).exec( ( err, currents ) => {
-
-            if ( currents.length ) {
-                // Should be length 1,
-
-                let timeSlot = null;
-                resolve( [...currents].reduce( ( accumulatorPromise, current, index ) => {
-                    return accumulatorPromise.then( () => {
-                        return new Promise( ( res, reject ) => {
-                            db.timeSlots.find( { _id: current.connectedId } ).limit( 1 ).exec( ( err, timeSlots ) => {
-                                if ( timeSlots.length ) {
-                                    timeSlot = timeSlots[0];
-                                    res( timeSlots[0] );
-                                } else {
-                                    // This should actually not happen. Just delete that zombie.
-                                    db.current.remove( { type: 'timeSlot', _id: current._id }, ( err, numberDeleted ) => {
-                                        res( timeSlot );
-                                    } );
-                                }
-                            } );
-                        } );
-                    } ).catch( err => console.log( err ) );
-                }, Promise.resolve() ) );
-
-
-
-
-            } else {
-                resolve( null );
-            }
+        db.timeSlots.find( { dateStop: { $exists: false } } ).sort( { dateStart: -1 } ).limit( 1 ).exec( ( err, timeSlots ) => {
+            resolve( timeSlots.length ? timeSlots[0] : null );
         } );
     } );
 } );
@@ -142,13 +110,11 @@ api.timeSlots.stop = timeSlot => new Promise( ( resolve, reject ) => {
                 ...timeSlot,
                 dateStop: dayjs().valueOf(),
             };
-            db.current.remove( { type: 'timeSlot', connectedId: newTimeSlot._id }, ( err, numberDeleted ) => {
-                db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
-                    if ( numberUpdated ) {
-                        resolve( newTimeSlot );
-                    }
-                    reject();
-                } );
+            db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, (err, numberUpdated ) => {
+                if ( numberUpdated ) {
+                    resolve( newTimeSlot );
+                }
+                reject();
             } );
         }
     } );
@@ -157,21 +123,8 @@ api.timeSlots.stop = timeSlot => new Promise( ( resolve, reject ) => {
 // return   promise resolve number  numberDeleted
 api.timeSlots.delete = id => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-        Promise.all( [
-            // Try to remove current.
-            new Promise( res => {
-                db.current.remove( { type: 'timeSlot', _id: id }, ( err, numberDeleted ) => {
-                    res( true );
-                } );
-            } ),
-            // Remove timeSlot.
-            new Promise( res => {
-                db.timeSlots.remove( { _id: id }, ( err, numberDeleted ) => {
-                    res( true );
-                } );
-            } ),
-        ] ).then( () => {
-            resolve( true );
+        db.timeSlots.remove( { _id: id }, ( err, numberDeleted ) => {
+            resolve( numberDeleted );
         } );
     } );
 } );
@@ -181,13 +134,11 @@ api.timeSlots.add = newTimeSlot => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
         const add = stoppedTimeSlot => {
             db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
-                db.current.insert( { type: 'timeSlot', connectedId: addedTimeSlot._id }, ( err, addedCurrent ) => {
-                    const result = {
-                        addedTimeSlot,
-                        stoppedTimeSlot,
-                    };
-                    resolve( result );
-                } );
+                const result = {
+                    addedTimeSlot,
+                    stoppedTimeSlot,
+                };
+                resolve( result );
             } );
         };
         // Maybe stop current one first, before adding a new one.
@@ -227,7 +178,7 @@ const validateSetting = setting => {
             if ( ! isObject( setting.value ) ) {
                 return [setting.key + ' must be type of object'];
             }
-            ['current','settings','timeSlots'].map( key => {
+            ['settings','timeSlots'].map( key => {
                 if ( ! Object.keys( setting.value ).includes( key ) ) {
                     errors = [...errors, 'dbPath requires key "' + key + '".' ];
                 }
