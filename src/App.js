@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import Context from './Context';
-import Settings from './Components/Settings';
+import Settings from './Components/Settings/Settings';
 import { CreateTimeSlot } from './Components/CreateTimeSlot';
 import { TimeSlotsTable } from './Components/TimeSlotsTable';
 import { sortTimeSlotsCompare } from './utils';

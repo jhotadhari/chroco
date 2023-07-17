@@ -181,8 +181,10 @@
 
 
 
-
 .rmsc {
+  * {
+    transition: none !important;
+  }
   .dropdown-content,
   .dropdown-container,
   .dropdown-heading {
