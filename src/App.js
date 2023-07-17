@@ -31,7 +31,7 @@ function App() {
 
   // Helper function to retrieve one setting value.
   const getSetting = ( key, _settings, _settingsDefaults ) => {
-    let setting = ( _settings ? _settings : settings ).find( sett => sett.key && sett.key === key );
+    let setting = ( _settings ? _settings : settings ).find( sett => get( sett, 'key' ) === key );
     return get( setting, 'value', get( _settingsDefaults ? _settingsDefaults : settingsDefaults, key ) );
   }
 

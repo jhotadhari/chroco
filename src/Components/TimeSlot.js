@@ -13,8 +13,16 @@ import {
 import useTick from "../hooks/useTick";
 import Icon from "./Icon";
 import Context from '../Context';
-import { formatSeconds } from '../utils';
+import {
+  formatSeconds,
+  isValidTimezones,
+} from '../utils';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import { Tooltip } from 'react-tooltip'
 const { api } = window;
+dayjs.extend( utc );
+dayjs.extend( timezone );
 
 const isValidDateInput = dateInputString => {
   const regex = /([0-9]{4})-([0-9]{2})-([0-9]{2})\s([0-2][0-9]):([0-5][0-9]):([0-5][0-9])/;
@@ -89,6 +97,7 @@ export const DateInput = ( {
     timeSlotSchema,
     timeSlots,
     setTimeSlots,
+    getSetting,
    } = useContext( Context );
   const [tempVal, setTempVal] = useState( false );
   const format = 'YYYY-MM-DD HH:mm:ss';
@@ -97,57 +106,70 @@ export const DateInput = ( {
     : '';
   const isDirty = tempVal || ( get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field ) );
   const title = get( timeSlotSchema, [field,'title'], '' );
+  const tzs = getSetting( 'timezones' ).filter( tz => tz.length );
+  const tooltipId = get( timeSlot, '_id' ) + '-' + field + '-' + Math.round( Math.random() * 100000 );
 
-  return <input
-      onKeyDown={ e => {
-        if ( isDirty ) {
-          switch( e.key ) {
-            case 'Enter':
-              updateTimeSlot( {
-                timeSlot,
-                timeSlots,
-                setTimeSlots,
-                editTimeSlot,
-                setEditTimeSlot,
-                // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
-              } );
-              break;
-            case 'Escape':
-              const newEditTimeSlot = {...editTimeSlot}
-              delete newEditTimeSlot[field];
-              setEditTimeSlot( newEditTimeSlot );
-              break;
+  return <>
+    <input
+        data-tooltip-id={ tooltipId }
+        onKeyDown={ e => {
+          if ( isDirty ) {
+            switch( e.key ) {
+              case 'Enter':
+                updateTimeSlot( {
+                  timeSlot,
+                  timeSlots,
+                  setTimeSlots,
+                  editTimeSlot,
+                  setEditTimeSlot,
+                  // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
+                } );
+                break;
+              case 'Escape':
+                const newEditTimeSlot = {...editTimeSlot}
+                delete newEditTimeSlot[field];
+                setEditTimeSlot( newEditTimeSlot );
+                break;
+            }
           }
-        }
-      } }
-      className={ classnames( {
-        'form-control': true,
-        'dirty': isDirty,
-        'invalid': tempVal && ! isValidDateInput( tempVal ),
-      } ) }
-      type="text"
-      disabled={ ! timeSlot[field] }
-      onBlur={ () => {
-        if ( tempVal && isValidDateInput( tempVal ) ) {
-          setTempVal( false );
-        }
-      } }
-      onChange={ ( e ) => {
-        setTempVal( e.target.value );
-        if ( isValidDateInput( e.target.value ) ) {
-          setEditTimeSlot( {
-            ...editTimeSlot,
-            [field]: dayjs( e.target.value ).valueOf(),
-          } );
-        }
-      } }
-      value={ tempVal
-        ? tempVal
-        : val
-      }
-      title={ title }
-      placeholder={ format }
-    />;
+        } }
+        className={ classnames( {
+          'form-control': true,
+          'dirty': isDirty,
+          'invalid': tempVal && ! isValidDateInput( tempVal ),
+        } ) }
+        type="text"
+        disabled={ ! timeSlot[field] }
+        onBlur={ () => {
+          if ( tempVal && isValidDateInput( tempVal ) ) {
+            setTempVal( false );
+          }
+        } }
+        onChange={ ( e ) => {
+          setTempVal( e.target.value );
+          if ( isValidDateInput( e.target.value ) ) {
+            setEditTimeSlot( {
+              ...editTimeSlot,
+              [field]: dayjs( e.target.value ).valueOf(),
+            } );
+          }
+        } }
+        value={ tempVal ? tempVal : val }
+        title={ title }
+        placeholder={ format }
+      />
+
+      { tzs && tzs.length > 0 && <Tooltip variant="dark" id={ tooltipId } className="rounded shadow border border-1 bg-body-tertiary">
+        <div className="d-flex flex-column align-items-end">
+          { [...tzs].map( ( tz, idx ) => {
+            return isValidTimezones( tz ) ? <span key={idx}>
+              { tz }: { dayjs( tempVal ? tempVal : val ).tz( tz ).format( 'YYYY-MM-DD HH:mm:ss' ) }
+            </span> : null;
+          } ) }
+        </div>
+      </Tooltip> }
+
+    </>;
 };
 
 export const Input = ( {

@@ -11,7 +11,10 @@ const dayjs = require( 'dayjs' );
 const { exec } = require( 'child_process' );
 const getDb = require( './nedb/db' );
 const { settingsDefaults } = require( './constants' );
-const { isPathValid } = require( './utils' );
+const {
+    isPathValid,
+    isValidTimezones,
+} = require( './utils' );
 
 const api = {
     db: {},
@@ -222,7 +225,7 @@ const validateSetting = setting => {
     switch( setting.key ) {
         case 'dbPath':
             if ( ! isObject( setting.value ) ) {
-                return ['dbPath must be type of object'];
+                return [setting.key + ' must be type of object'];
             }
             ['current','settings','timeSlots'].map( key => {
                 if ( ! Object.keys( setting.value ).includes( key ) ) {
@@ -241,7 +244,7 @@ const validateSetting = setting => {
             return errors.length ? errors : true;
         case 'hideFields':
             if ( ! isArray( setting.value ) ) {
-                return ['hideFields must be type of array'];
+                return [setting.key + ' must be type of array'];
             }
             [...setting.value].map( val => {
                 if ( ! isString( val ) ) {
@@ -251,7 +254,7 @@ const validateSetting = setting => {
             return errors.length ? errors : true;
         case 'themeSource':
             if ( ! isString( setting.value ) ) {
-                return ['themeSource must be type of string.'];
+                return [setting.key + ' must be type of string.'];
             }
             const valid = ['system','dark','light'];
             if ( valid.includes( setting.value ) ) {
@@ -259,6 +262,14 @@ const validateSetting = setting => {
             } else {
                 return ['themeSource must be one of "' + valid.join( '|' ) + '".'];
             }
+        case 'timezones':
+            if ( ! isArray( setting.value ) ) {
+                return [setting.key + ' must be type of array.'];
+            }
+            if ( ! isValidTimezones( setting.value ) ) {
+                return ['Timezone not valid.'];
+            }
+            return true;
         default:
             return ['"' + setting.key + '" is not a valid settings key.'];
     }

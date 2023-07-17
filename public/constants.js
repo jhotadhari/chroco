@@ -14,6 +14,8 @@ const settingsDefaults = {
         timeSlots: path.join( app.getPath( 'userData' ), '/timeSlots.db'),
         current: path.join( app.getPath( 'userData' ), '/current.db'),
     },
+
+    timezones: [],
 };
 
 module.exports = {
