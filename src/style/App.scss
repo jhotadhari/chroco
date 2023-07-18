@@ -244,3 +244,10 @@
     }
   }
 }
+
+// Remove root outline on focus. It is outlined because it has tabIndex attribute to be able to always listen for keyDown events.
+#root > * {
+  &, &:focus {
+    outline: none !important;
+  }
+}

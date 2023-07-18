@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import {
   get,
   isObject,
+  omit,
 } from "lodash";
 import {
 	useState,
@@ -62,12 +63,12 @@ const GroupInput = ( {
 					updateTimeSlots( {
 						// includeFields: [field],	// ??? TODO Bug: other dirty fields loose their changes.
 					} );
-					addFieldSuggestion( editTimeSlot[field] );
+					if ( hasSuggestions ) {
+						addFieldSuggestion( editTimeSlot[field] );
+					}
 					break;
 				case 'Escape':
-					const newEditTimeSlot = {...editTimeSlot}
-					delete newEditTimeSlot[field];
-					setEditTimeSlot(newEditTimeSlot );
+					setEditTimeSlot( omit( editTimeSlot, field ) );
 					break;
 			}
 		}
@@ -193,6 +194,7 @@ const GroupHeader = ( {
 
 	const {
 		setTimeSlots,
+		setTimeSlotCurrentEdit,
 		timeSlots,
 		getSetting,
 	} = useContext( Context );
@@ -310,6 +312,7 @@ const GroupHeader = ( {
 								timeSlots,
 								setTimeSlots,
 							} ) );
+							setTimeSlotCurrentEdit( {} );
 						} else {
 							// start new one
 							startTimeSlot( {

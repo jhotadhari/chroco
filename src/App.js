@@ -11,6 +11,10 @@ import Settings from './Components/Settings/Settings';
 import { CreateTimeSlot } from './Components/CreateTimeSlot';
 import { TimeSlotsTable } from './Components/TimeSlotsTable';
 import { sortTimeSlotsCompare } from './utils';
+import {
+	stopTimeSlot,
+} from "./Components/TimeSlot";
+
 const { api } = window;
 
 
@@ -134,8 +138,22 @@ function App() {
   }, [timeSlots] );
 
   return ! settingsDefaults ? null : <div
-    className=''
     data-bs-theme={ themeSource }
+		onKeyDown={ e => {
+      if (
+        'Escape' === e.key
+        && e.ctrlKey
+        && get( timeSlotCurrent, '_id' )
+      ) {
+        stopTimeSlot( {
+          timeSlot: timeSlotCurrent,
+          timeSlots,
+          setTimeSlots,
+        } );
+        setTimeSlotCurrentEdit( {} );
+      }
+    } }
+    tabIndex="0"
   >
     <Context.Provider value={ {
       timeSlotSchema,

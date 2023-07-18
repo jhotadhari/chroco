@@ -2,6 +2,7 @@ import classnames from "classnames";
 import dayjs from "dayjs";
 import {
   get,
+  omit,
 } from "lodash";
 import {
   useState,
@@ -77,9 +78,8 @@ const DateInput = ( {
                 } );
                 break;
               case 'Escape':
-                const newEditTimeSlot = {...editTimeSlot}
-                delete newEditTimeSlot[field];
-                setEditTimeSlot( newEditTimeSlot );
+                setEditTimeSlot( omit( editTimeSlot, field ) );
+                setTempVal( false )
                 break;
             }
           }

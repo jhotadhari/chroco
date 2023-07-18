@@ -1,6 +1,7 @@
 import classnames from "classnames";
 import {
   	get,
+  	omit,
 } from "lodash";
 import {
   	useContext,
@@ -64,12 +65,12 @@ const Input = ( {
 						setEditTimeSlot,
 						// includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.
 					} );
-					addFieldSuggestion( editTimeSlot[field] );
+					if ( hasSuggestions ) {
+						addFieldSuggestion( editTimeSlot[field] );
+					}
 					break;
 				case 'Escape':
-					const newEditTimeSlot = {...editTimeSlot}
-					delete newEditTimeSlot[field];
-					setEditTimeSlot( newEditTimeSlot );
+					setEditTimeSlot( omit( editTimeSlot, field ) );
 					break;
 			}
 		}

@@ -1,7 +1,7 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
 import {
-  get,
+  omit,
   isObject,
 } from "lodash";
 import {
@@ -93,18 +93,16 @@ export const startTimeSlot = ( {
   timeSlots,
   setTimeSlots,
 } ) => {
-  const newTimeSlot = {
+  const newTimeSlot = omit( {
     ...timeSlot,
     dateStart: dayjs().valueOf(),
     dateStop: undefined,
-  };
-  [
+  }, [
     '_id',
     'createdAt',
     'updatedAt',
-  ].map( key => {
-    delete newTimeSlot[key];
-  } );
+  ] );
+
   api.timeSlots.add( newTimeSlot ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
     const newTimeSlots = [
       addedTimeSlot,

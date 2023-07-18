@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import classnames from "classnames";
 import {
   get,
@@ -21,6 +21,8 @@ import Input from "./Input";
 export const CreateTimeSlot = () => {
 
 	const [editTimeSlot, setEditTimeSlot] = useState( {} );
+	const [random, setRandom] = useState( 0 );
+	const ref = useRef( null );
 
 	const {
 		timeSlotSchema,
@@ -37,11 +39,41 @@ export const CreateTimeSlot = () => {
 	const _editTimeSlot = isCurrent ? timeSlotCurrentEdit : editTimeSlot;
 	const _setEditTimeSlot = isCurrent ? setTimeSlotCurrentEdit : setEditTimeSlot;
 
-  	return <div className="container-fluid mb-5 create-timeSlot">
+  	return <div
+		ref={ ref }
+		// tabIndex="0"
+		onFocus={ () => setRandom( Math.random() ) }
+		onBlur={ () => setRandom( Math.random() ) }
+		className="container-fluid mb-5 create-timeSlot"
+		onKeyDown={ e => {
+			  switch( e.key ) {
+				case 'Enter':
+					if ( e.ctrlKey && ! get( timeSlot, '_id' ) ) {
+						startTimeSlot( {
+							timeSlot: editTimeSlot,
+							timeSlots,
+							setTimeSlots,
+						} );
+						_setEditTimeSlot( {} );
+					}
+				  break;
+		} } }
+	>
 
 		<div className="row mb-2">
 			<div className="col">
 				{ timeSlotCurrent ? 'Current' : 'Add new' }
+
+				{ ! get( timeSlot, '_id' )
+					&& ref
+					&& ref.current
+					&& ref.current.contains( document.activeElement )
+					&& <span className="ms-5">Press <span className="font-style-italic"> "ctrl + Enter" </span> to start time tracking</span>
+				}
+				{ timeSlotCurrent
+					&& timeSlotCurrent._id
+					&& <span className="ms-5">Press <span className="font-style-italic"> "ctrl + Escape" </span> to stop time tracking</span>
+				}
 			</div>
 		</div>
 
