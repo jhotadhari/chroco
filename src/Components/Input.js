@@ -10,6 +10,19 @@ import Autosuggest from 'react-autosuggest';
 
 import Context from '../Context';
 
+export const getFilteredSuggestions = ( value, suggestions ) => {
+	const inputValue = value.trim().toLowerCase();
+	const inputLength = inputValue.length;
+	const regex = new RegExp( '.*?' + inputValue + '.*?', 'g' );
+	return inputLength === 0
+		? suggestions
+		: suggestions.filter( suggestion => {
+			const result = regex.test( suggestion.toLowerCase() )
+			return result
+
+		} );
+};
+
 const Input = ( {
 	field,
 	useDefault,
@@ -64,23 +77,10 @@ const Input = ( {
 
 	if ( hasSuggestions ) {
 
-		const getSuggestions = value => {
-			// ??? TODO use regex .*value.*
-			const inputValue = value.trim().toLowerCase();
-			const inputLength = inputValue.length;
-			const suggestions = get( fieldSuggestions, field, [] );
-
-			return inputLength === 0
-				? suggestions
-				: suggestions.filter( suggestion =>
-					suggestion.toLowerCase().slice( 0, inputLength ) === inputValue
-				);
-		};
-
 		return <Autosuggest
 			getSuggestionValue={ suggestion => suggestion }
 			suggestions={ suggestions }
-			onSuggestionsFetchRequested={ ( { value } ) => setSuggestions( getSuggestions( value ) ) }
+			onSuggestionsFetchRequested={ ( { value } ) => setSuggestions( getFilteredSuggestions( value, get( fieldSuggestions, field, [] ) ) ) }
 			onSuggestionsClearRequested={ () => setSuggestions( [] ) }
 			renderSuggestion={ suggestion => <span>{ suggestion }</span> }
 			renderSuggestionsContainer={ ( { containerProps, children, query } ) => {

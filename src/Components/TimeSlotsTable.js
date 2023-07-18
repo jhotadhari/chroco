@@ -19,6 +19,7 @@ import {
 	startTimeSlot,
 } from "./TimeSlot";
 import useTick from "../hooks/useTick";
+import { getFilteredSuggestions } from "./Input";
 import Icon from "./Icon";
 import {
 	sortTimeSlotsCompare,
@@ -74,23 +75,10 @@ const GroupInput = ( {
 
 	if ( hasSuggestions ) {
 
-		const getSuggestions = value => {
-			// ??? TODO use regex .*value.*
-			const inputValue = value.trim().toLowerCase();
-			const inputLength = inputValue.length;
-			const suggestions = get( fieldSuggestions, field, [] );
-
-			return inputLength === 0
-				? suggestions
-				: suggestions.filter( suggestion =>
-					suggestion.toLowerCase().slice( 0, inputLength ) === inputValue
-				);
-		};
-
 		return <Autosuggest
 			getSuggestionValue={ suggestion => suggestion }
 			suggestions={ suggestions }
-			onSuggestionsFetchRequested={ ( { value } ) => setSuggestions( getSuggestions( value ) ) }
+			onSuggestionsFetchRequested={ ( { value } ) => setSuggestions( getFilteredSuggestions( value, get( fieldSuggestions, field, [] ) ) ) }
 			onSuggestionsClearRequested={ () => setSuggestions( [] ) }
 			renderSuggestion={ suggestion => <span>{ suggestion }</span> }
 			renderSuggestionsContainer={ ( { containerProps, children, query } ) => {
