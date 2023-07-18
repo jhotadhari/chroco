@@ -157,7 +157,8 @@ export const TimeSlot = ( {
               key={ key }
               className={ classnames( [
                 'timeSlot--' + key,
-                'title' === key ? 'col-9' : 'col'
+                'title' === key ? 'col-9' : 'col',
+                'position-relative',
               ] ) }
             ><Input
               field={ key }

@@ -29,6 +29,8 @@ function App() {
   const [timeSlotCurrent, setTimeSlotCurrent] = useState( null );
   const [timeSlotCurrentEdit, setTimeSlotCurrentEdit] = useState( null );
 
+  const [fieldSuggestions, setFieldSuggestions] = useState( {} );
+
   // Helper function to retrieve one setting value.
   const getSetting = ( key, _settings, _settingsDefaults ) => {
     let setting = ( _settings ? _settings : settings ).find( sett => get( sett, 'key' ) === key );
@@ -95,6 +97,42 @@ function App() {
     } );
   }, [timeSlots] );
 
+
+  const addFieldSuggestion = ( timeSlot, newFieldSuggestions, shouldSet ) => {
+    newFieldSuggestions = newFieldSuggestions ? newFieldSuggestions : {...fieldSuggestions};
+    shouldSet = undefined === shouldSet ? true : shouldSet;
+
+    Object.keys( timeSlotSchema ).filter( field => get( timeSlotSchema[field], 'hasSuggestions' ) ).map( field => {
+      const val = get( timeSlot, field );
+      if ( val && val.length ) {
+        if ( newFieldSuggestions[field] ) {
+          if ( ! newFieldSuggestions[field].includes( val ) ) {
+            newFieldSuggestions[field] = [
+              ...newFieldSuggestions[field],
+              val,
+            ];
+          }
+        } else {
+          newFieldSuggestions[field] = [val];
+        }
+      };
+    } );
+    if ( shouldSet ) {
+      Object.keys( newFieldSuggestions ).map( key => newFieldSuggestions[key].sort() )
+      setFieldSuggestions( newFieldSuggestions );
+    }
+    return newFieldSuggestions;
+  }
+
+  useEffect( () => {
+    const newFieldSuggestions = { ...fieldSuggestions };
+    [...timeSlots].map( timeSlot => {
+      addFieldSuggestion( timeSlot, newFieldSuggestions, false );
+    } );
+    Object.keys( newFieldSuggestions ).map( key => newFieldSuggestions[key].sort() )
+    setFieldSuggestions( newFieldSuggestions );
+  }, [timeSlots] );
+
   return ! settingsDefaults ? null : <div
     className=''
     data-bs-theme={ themeSource }
@@ -114,6 +152,9 @@ function App() {
       getSetting,
       setSettings,
       settingsDefaults,
+
+      fieldSuggestions,
+      addFieldSuggestion,
     } }>
       <Settings/>
 

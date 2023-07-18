@@ -53,14 +53,17 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
             project: {
                 type: 'text',
                 title: 'Project',
+                hasSuggestions: true,
             },
             client: {
                 type: 'text',
                 title: 'Client',
+                hasSuggestions: true,
             },
             user: {
                 type: 'text',
                 title: 'User',
+                hasSuggestions: true,
             },
             dateStart: {
                 type: 'date',

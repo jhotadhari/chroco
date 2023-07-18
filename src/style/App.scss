@@ -208,3 +208,39 @@
 .font-style-italic {
   font-style: italic;
 }
+
+
+
+.react-autosuggest {
+  &__container {
+    &[aria-expanded="false"] {
+      .react-autosuggest__suggestions-container {
+        display: none;
+      }
+    }
+  }
+  &__suggestions-container {
+    width: calc(100% - var(--bsgutter-x) * 1);
+  }
+
+  &__suggestions-list {
+    list-style: none;
+  }
+  &__suggestion {
+    cursor: pointer;
+    padding-left: 1rem;
+    padding-top: 0.25rem;
+    margin-left: -2rem;
+    &:last-child {
+      margin-bottom: -1rem;
+    }
+    &--highlighted {
+      @media (prefers-color-scheme: dark) {
+        background-color: var(--bshighlight-bg-dark);
+      }
+      @media (prefers-color-scheme: light) {
+        background-color: var(--bshighlight-bg);
+      }
+    }
+  }
+}

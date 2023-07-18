@@ -23,14 +23,7 @@ const DbPathControl = () => {
 
 	const settingKey = 'dbPath';
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => get( sett, 'key' ) === settingKey ) : undefined;
-
-
 	const val = get( setting, 'value', settingsDefaults[settingKey] )
-
-
-	console.log( 'debug val', val ); // debug
-	console.log( 'debug dbPathEdit', dbPathEdit ); // debug
-
 
 	return <div className="mb-3">
 		<label>Database paths</label>
