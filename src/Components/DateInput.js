@@ -9,6 +9,7 @@ import {
   useContext,
 } from "react";
 import Context from '../Context';
+import { dateFormat } from '../constants';
 import {
   isValidTimezones,
 } from '../utils';
@@ -37,6 +38,7 @@ const isValidDateInput = dateInputString => {
   return true;
 };
 
+
 const DateInput = ( {
   field,
   timeSlot,
@@ -52,9 +54,8 @@ const DateInput = ( {
     themeSource,
    } = useContext( Context );
   const [tempVal, setTempVal] = useState( false );
-  const format = 'YYYY-MM-DD HH:mm:ss';
   const val = get( timeSlot, field )
-    ? dayjs( get( editTimeSlot, field, get( timeSlot, field ) ) ).format( format )
+    ? dayjs( get( editTimeSlot, field, get( timeSlot, field ) ) ).format( dateFormat )
     : '';
   const isDirty = tempVal || ( get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field ) );
   const title = get( timeSlotSchema, [field,'title'], '' );
@@ -107,7 +108,7 @@ const DateInput = ( {
         } }
         value={ tempVal ? tempVal : val }
         title={ title }
-        placeholder={ format }
+        placeholder={ dateFormat }
       />
 
       { tzs && tzs.length > 0 && <Tooltip
@@ -118,7 +119,7 @@ const DateInput = ( {
         <div className="d-flex flex-column align-items-end">
           { [...tzs].map( ( tz, idx ) => {
             return isValidTimezones( tz ) ? <span key={idx}>
-              { tz }: { dayjs( tempVal ? tempVal : val ).tz( tz ).format( 'YYYY-MM-DD HH:mm:ss' ) }
+              { tz }: { dayjs( tempVal ? tempVal : val ).tz( tz ).format( dateFormat ) }
             </span> : null;
           } ) }
         </div>

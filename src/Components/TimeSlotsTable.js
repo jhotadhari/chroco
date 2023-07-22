@@ -14,6 +14,7 @@ import {
 } from "react";
 import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
+import { dateFormat } from '../constants';
 import {
 	TimeSlot,
 	stopTimeSlot,
@@ -251,8 +252,8 @@ const GroupHeader = ( {
 				<span className="group-count">
 					{ timeSlotsSlice.length }
 				</span>
-				{ expanded && <Icon type='caret-right'/> }
-				{ ! expanded && <Icon type='caret-down'/> }
+				{ expanded && <Icon type='caret-down'/> }
+				{ ! expanded && <Icon type='caret-right'/> }
 			</button>
 		</div>
 
@@ -284,8 +285,8 @@ const GroupHeader = ( {
 				</div>;
 			} ) }
 
-			<div className="col"></div>
-			<div className="col"></div>
+			<div className="col-4"></div>
+			<div className="col-4"></div>
 
 			<GroupDuration
 				timeSlotsSlice={ timeSlotsSlice }
@@ -367,7 +368,7 @@ export const TimeSlotsTable = () => {
 
 	const timeSlotsGrouped = {};
 	[...timeSlots].map( ( timeSlot ) => {
-		let groupDateId = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format('YYYY-MM-DD HH:mm:ss') );
+		let groupDateId = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat) );
 		if ( ! groupDateId || ! groupDateId.length ) {
 			return;
 		}

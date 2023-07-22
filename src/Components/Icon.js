@@ -24,13 +24,15 @@ const Icon = ( {
             return <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className={ classnames( className, "bi bi-stop" ) } viewBox="0 0 16 16">
                 <path d="M3.5 5A1.5 1.5 0 0 1 5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5zM5 4.5a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5V5a.5.5 0 0 0-.5-.5H5z"/>
             </svg>;
-        case 'expand':
-        case 'caret-right':
+        case 'caret-down':
             return <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className={ classnames( className, "bi bi-caret-down" ) } viewBox="0 0 16 16">
                 <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
             </svg>;
-        case 'collapse':
-        case 'caret-down':
+        case 'caret-left':
+            return <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className={ classnames( className, "bi bi-caret-left" ) } viewBox="0 0 16 16">
+                    <path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/>
+                </svg>;
+        case 'caret-right':
             return <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className={ classnames( className, "bi bi-caret-right" ) } viewBox="0 0 16 16">
                 <path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>
             </svg>;

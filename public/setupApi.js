@@ -21,7 +21,9 @@ const {
     isPathValid,
     isValidTimezones,
     isValidRegex,
+    getDateValuesForFilter,
 } = require( './utils' );
+const { debug } = require('console');
 
 const api = {
     app: {},
@@ -73,27 +75,63 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 // return   promise resolve array   timeSlots
 api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
+
+
+
         let query = {};
         if ( filters && Array.isArray( filters ) ) {
             [...filters].map( filter => {
-                if ( filter.value.length && isValidRegex( filter.value ) ) {
-                    // query['$and'] = query['$and'] ? query['$and'] : {};
-                    switch( filter.type ) {
-                        case 'include':
-                            set( query, [filter.field,'$regex'], new RegExp( filter.value ) );
-                            break;
-                        case 'exclude':
-                            set( query, ['$not','$or'], [
-                                ...get( query, ['$not','$or'], [] ),
-                                {
-                                    [filter.field]: new RegExp( filter.value ),
-                                }
-                            ] );
-                            break;
-                    }
+
+                switch( timeSlotsSchemaBase[filter.field].type ) {
+                    case 'text':
+                        if ( filter.value.length && isValidRegex( filter.value ) ) {
+                            // query['$and'] = query['$and'] ? query['$and'] : {};
+                            switch( filter.type ) {
+                                case 'include':
+                                    set( query, [filter.field,'$regex'], new RegExp( filter.value ) );
+                                    break;
+                                case 'exclude':
+                                    set( query, ['$not','$or'], [
+                                        ...get( query, ['$not','$or'], [] ),
+                                        {
+                                            [filter.field]: new RegExp( filter.value ),
+                                        }
+                                    ] );
+                                    break;
+                            }
+                        }
+                        break;
+                    case 'date':
+                        if ( 'dateStart' === filter.field ) {
+                            if ( 'custom' === filter.type ) {
+                                // ??? TODO
+                            } else {
+
+                                const values = getDateValuesForFilter( { timeFrame: filter.type, value: filter.value } );
+
+                                // console.log( ' ' ); // debug
+                                // console.log( 'debug from', dayjs( bla.from ).format( 'YYYY-MM-DD HH:mm:ss' ) ); // debug
+                                // console.log( 'debug to', dayjs( bla.to ).format( 'YYYY-MM-DD HH:mm:ss' ) ); // debug
+
+
+                                set( query, ['dateStart','$gte'], values.from );
+                                set( query, ['dateStop','$lte'], values.to );
+
+                            }
+                        }
+                        break;
                 }
+
+
             } );
         }
+
+
+
+
+        console.log( 'debug query', query ); // debug
+
+
         db.timeSlots.find( query ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
             resolve( timeSlots );
         } );

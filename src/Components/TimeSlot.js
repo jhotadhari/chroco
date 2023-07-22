@@ -173,7 +173,7 @@ export const TimeSlot = ( {
             /></div>;
         case 'date':
           return <div
-            className={ "col timeSlot--" + key }
+            className={ "col-4 timeSlot--" + key }
             key={ key }
           ><DateInput
             field={ key }

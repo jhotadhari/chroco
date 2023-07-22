@@ -5,9 +5,10 @@ import {
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import dayOfYear from 'dayjs/plugin/dayOfYear';
 dayjs.extend( utc );
 dayjs.extend( timezone );
-
+dayjs.extend( dayOfYear );
 
 export const sortTimeSlotsCompare = ( timeSlotA, timeSlotB ) => {
     if ( timeSlotA.dateStart > timeSlotB.dateStart ) {
@@ -63,4 +64,31 @@ export const isValidRegex = input => {
 		valid = false;
 	}
 	return valid;
+}
+
+// same in fucking-simple-time-tracker/public/utils.js
+export const getDateValuesForFilter = ( { timeFrame, value } ) => {
+	const startOfWeek = 1;	// ??? TODO add setting
+	let inputValue;
+	switch( timeFrame ) {
+		case 'week':
+			inputValue = dayjs().day( startOfWeek );
+			break;
+		case 'month':
+			inputValue = dayjs().date( 1 );
+			break;
+		case 'year':
+			inputValue = dayjs().dayOfYear( 1 );
+			break;
+	}
+	inputValue = {
+		from: inputValue.set( 'second', 0 ).set( 'minute', 0 ).set( 'hour', 0 )
+			.add( value, timeFrame )
+			.valueOf(),
+		to: inputValue.set( 'second', 59 ).set( 'minute', 59 ).set( 'hour', 23 )
+			.add( value + 1, timeFrame )
+			.add( -1, 'day' )
+			.valueOf(),
+	};
+	return inputValue;
 }

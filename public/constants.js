@@ -55,11 +55,11 @@ const settingsDefaults = {
     timezones: [],
 
     filters: [
-        // {
-        //     field: 'client',
-        //     type: 'include',
-        //     value: 'cr',
-        // }
+        {
+            field: 'dateStart',
+            type: 'week',
+            value: 0,
+        }
     ],
 };
 

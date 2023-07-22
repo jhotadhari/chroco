@@ -303,6 +303,38 @@
     display: block;
   }
 
+
+  &--dateStart {
+    // flex-grow: 2;
+
+
+    & > .row {
+
+
+      &.actions {
+        & > .col {
+
+          display: flex;
+          justify-content: flex-start;
+          flex-grow: 1;
+
+          &:first-child,
+          &:last-child {
+              flex-grow: 0;
+          }
+          &:last-child {
+            justify-content: flex-end;
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+
+
   &.unfiltered {
     .dropdown-search-clear-icon {
       display: none;
@@ -328,5 +360,4 @@
     }
   }
 }
-
 

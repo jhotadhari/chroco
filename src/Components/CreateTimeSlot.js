@@ -116,7 +116,7 @@ export const CreateTimeSlot = () => {
 				/></div>
 			} ) : '' }
 
-			<div className="col">
+			<div className="col-4">
 				{ timeSlot && <DateInput
 					field={ 'dateStart' }
 					timeSlot={ timeSlot }
@@ -132,7 +132,7 @@ export const CreateTimeSlot = () => {
 				/> }
 			</div>
 
-			<div className="col"></div>
+			<div className="col-4"></div>
 
 			{ timeSlot && <Duration
 				timeSlot={ timeSlot }

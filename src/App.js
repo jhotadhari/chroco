@@ -92,7 +92,6 @@ function App() {
     if ( getSetting( 'filters' ) ) {
       api.timeSlots.get( getSetting( 'filters' ) ).then( timeSlots => {
         if ( timeSlots ) {
-          console.log( 'debug timeSlots', timeSlots ); // debug
           timeSlots.sort( sortTimeSlotsCompare );
           setTimeSlots( timeSlots );
         }
