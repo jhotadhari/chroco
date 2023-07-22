@@ -25,6 +25,7 @@ setInterval( () => {
 }, 1000 );
 
 function App() {
+  const [appInfo,setAppInfo ] = useState( {} );
   const [settings, setSettings] = useState( [] );
   const [settingsDefaults, setSettingsDefaults] = useState( null );
   const [themeSource, setThemeSource] = useState( false );
@@ -76,6 +77,13 @@ function App() {
   useEffect( () => {
     api.timeSlots.schema().then( schema => {
       setTimeSlotSchema( schema );
+    } );
+  }, [] );
+
+  // Initially set appInfo.
+  useEffect( () => {
+    api.app.getInfo().then( newAppInfo => {
+      setAppInfo( newAppInfo );
     } );
   }, [] );
 
@@ -158,6 +166,8 @@ function App() {
     tabIndex="0"
   >
     <Context.Provider value={ {
+      appInfo,
+
       timeSlotSchema,
       timeSlots,
       setTimeSlots,

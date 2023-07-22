@@ -9,6 +9,10 @@ contextBridge.exposeInMainWorld( 'api', {
         compact: () => ipcRenderer.invoke( 'api:db:compact' ),
     },
 
+    app: {
+        getInfo: () => ipcRenderer.invoke( 'api:app:getInfo' ),
+    },
+
     timeSlots: {
         schema: () => ipcRenderer.invoke( 'api:timeSlots:schema' ),
         get: filters => ipcRenderer.invoke( 'api:timeSlots:get', filters ),

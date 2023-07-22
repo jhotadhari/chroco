@@ -1,6 +1,7 @@
 const {
     ipcMain,
     nativeTheme,
+    app,
 } = require( 'electron' );
 const {
     isString,
@@ -23,6 +24,7 @@ const {
 } = require( './utils' );
 
 const api = {
+    app: {},
     db: {},
     timeSlots: {},
     settings: {},
@@ -41,6 +43,15 @@ api.db.compact = () => new Promise( ( resolve, reject ) => {
             resolve( true );
         } );
     } );
+} );
+
+// return   promise resolve object appInfo
+api.app.getInfo = () => new Promise( ( resolve, reject ) => {
+    const appInfo = {
+        name: app.getName(),
+        version: app.getVersion(),
+    };
+    resolve( appInfo );
 } );
 
 // return   promise resolve object timeSlot schema
@@ -278,6 +289,7 @@ api.settings.update = newSetting => new Promise( ( resolve, reject ) => {
 const setupApi = () => {
 
     ipcMain.handle( 'api:db:compact', (_) =>                        api.db.compact() );
+    ipcMain.handle( 'api:app:getInfo', (_) =>                       api.app.getInfo() );
 
     /**
      * timeSlots
