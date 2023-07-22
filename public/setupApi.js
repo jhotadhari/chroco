@@ -6,14 +6,20 @@ const {
     isString,
     isObject,
     isArray,
+    set,
+    get,
 } = require( 'lodash' );
 const dayjs = require( 'dayjs' );
 const { exec } = require( 'child_process' );
 const getDb = require( './nedb/db' );
-const { settingsDefaults } = require( './constants' );
+const {
+    timeSlotsSchemaBase,
+    settingsDefaults,
+} = require( './constants' );
 const {
     isPathValid,
     isValidTimezones,
+    isValidRegex,
 } = require( './utils' );
 
 const api = {
@@ -41,39 +47,7 @@ api.db.compact = () => new Promise( ( resolve, reject ) => {
 let schema = false;
 api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
     if ( ! schema ) {
-        schema = {
-            _id: {
-                type: 'text',
-                title: '',
-            },
-            title: {
-                type: 'text',
-                title: 'Title',
-            },
-            project: {
-                type: 'text',
-                title: 'Project',
-                hasSuggestions: true,
-            },
-            client: {
-                type: 'text',
-                title: 'Client',
-                hasSuggestions: true,
-            },
-            user: {
-                type: 'text',
-                title: 'User',
-                hasSuggestions: true,
-            },
-            dateStart: {
-                type: 'date',
-                title: 'Start',
-            },
-            dateStop: {
-                type: 'date',
-                title: 'Stop',
-            },
-        }
+        schema = {...timeSlotsSchemaBase};
         exec( 'git config --global user.name', { encoding: 'utf-8' }, (error, stdout) => {
             if ( ! error && stdout.length ) {
                 schema.user.default = stdout;
@@ -86,9 +60,30 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 } );
 
 // return   promise resolve array   timeSlots
-api.timeSlots.get = () => new Promise( ( resolve, reject ) => {
+api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-        db.timeSlots.find( {} ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
+        let query = {};
+        if ( filters && Array.isArray( filters ) ) {
+            [...filters].map( filter => {
+                if ( filter.value.length && isValidRegex( filter.value ) ) {
+                    // query['$and'] = query['$and'] ? query['$and'] : {};
+                    switch( filter.type ) {
+                        case 'include':
+                            set( query, [filter.field,'$regex'], new RegExp( filter.value ) );
+                            break;
+                        case 'exclude':
+                            set( query, ['$not','$or'], [
+                                ...get( query, ['$not','$or'], [] ),
+                                {
+                                    [filter.field]: new RegExp( filter.value ),
+                                }
+                            ] );
+                            break;
+                    }
+                }
+            } );
+        }
+        db.timeSlots.find( query ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
             resolve( timeSlots );
         } );
     } );
@@ -224,6 +219,12 @@ const validateSetting = setting => {
                 return ['Timezone not valid.'];
             }
             return true;
+        case 'filters':
+            if ( ! isArray( setting.value ) ) {
+                return [setting.key + ' must be type of array.'];
+            }
+            // ??? TODO validate filters
+            return true;
         default:
             return ['"' + setting.key + '" is not a valid settings key.'];
     }
@@ -283,7 +284,7 @@ const setupApi = () => {
      *
      */
     ipcMain.handle( 'api:timeSlots:schema', (_) =>                  api.timeSlots.schema() );
-    ipcMain.handle( 'api:timeSlots:get', (_) =>                     api.timeSlots.get() );
+    ipcMain.handle( 'api:timeSlots:get', (_, filters) =>            api.timeSlots.get( filters ) );
     ipcMain.handle( 'api:timeSlots:getCurrent', (_) =>              api.timeSlots.getCurrent() );
     ipcMain.handle( 'api:timeSlots:stop', ( _, timeSlot ) =>        api.timeSlots.stop( timeSlot ) );
     ipcMain.handle( 'api:timeSlots:delete', ( _, id ) =>            api.timeSlots.delete( id ) );

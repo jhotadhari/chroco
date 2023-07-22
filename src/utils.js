@@ -53,3 +53,14 @@ export const isValidTimezones = input => {
 	}, true )
 	return valid;
 }
+
+// same in fucking-simple-time-tracker/public/utils.js
+export const isValidRegex = input => {
+	let valid = true;
+	try {
+		new RegExp( input );
+	} catch( e ) {
+		valid = false;
+	}
+	return valid;
+}

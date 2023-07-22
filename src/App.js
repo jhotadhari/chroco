@@ -10,6 +10,7 @@ import Context from './Context';
 import Settings from './Components/Settings/Settings';
 import { CreateTimeSlot } from './Components/CreateTimeSlot';
 import { TimeSlotsTable } from './Components/TimeSlotsTable';
+import TimeSlotsFilters from './Components/TimeSlotsFilters';
 import { sortTimeSlotsCompare } from './utils';
 import {
 	stopTimeSlot,
@@ -78,21 +79,22 @@ function App() {
     } );
   }, [] );
 
-  // Initially load timeSlots.
+  // Load timeSlots when dbPath of filters settings got changed.
   useEffect( () => {
-    api.timeSlots.get().then( timeSlots => {
-      timeSlots.sort( sortTimeSlotsCompare );
-      setTimeSlots( timeSlots );
-    } );
-  }, [] );
+    if ( getSetting( 'filters' ) ) {
+      api.timeSlots.get( getSetting( 'filters' ) ).then( timeSlots => {
+        if ( timeSlots ) {
+          console.log( 'debug timeSlots', timeSlots ); // debug
+          timeSlots.sort( sortTimeSlotsCompare );
+          setTimeSlots( timeSlots );
+        }
+      } ).catch( err => {
 
-  // Load timeSlots when dbPath settings got changed.
-  useEffect( () => {
-    api.timeSlots.get().then( timeSlots => {
-      timeSlots.sort( sortTimeSlotsCompare );
-      setTimeSlots( timeSlots );
-    } );
-  }, [getSetting( 'dbPath' )] );
+        console.log( 'debug err', err ); // debug
+
+      } );
+    }
+  }, [getSetting( 'dbPath' ), getSetting( 'filters' )] );
 
   // Set timeSlotCurrent when timeSlots change.
   useEffect( () => {
@@ -177,6 +179,8 @@ function App() {
       <Settings/>
 
       <CreateTimeSlot/>
+
+      <TimeSlotsFilters/>
 
       <TimeSlotsTable/>
 

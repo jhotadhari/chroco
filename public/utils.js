@@ -60,7 +60,19 @@ const isValidTimezones = input => {
 	return valid;
 }
 
+// same in fucking-simple-time-tracker/src/utils.js
+const isValidRegex = input => {
+	let valid = true;
+	try {
+		new RegExp( input );
+	} catch( e ) {
+		valid = false;
+	}
+	return valid;
+}
+
 module.exports = {
-    isPathValid,
+	isPathValid,
     isValidTimezones,
+    isValidRegex,
 };

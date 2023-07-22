@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld( 'api', {
 
     timeSlots: {
         schema: () => ipcRenderer.invoke( 'api:timeSlots:schema' ),
-        get: () => ipcRenderer.invoke( 'api:timeSlots:get' ),
+        get: filters => ipcRenderer.invoke( 'api:timeSlots:get', filters ),
         getCurrent: () => ipcRenderer.invoke( 'api:timeSlots:getCurrent' ),
         stop: timeSlot => ipcRenderer.invoke( 'api:timeSlots:stop', timeSlot ),
         delete: id => ipcRenderer.invoke( 'api:timeSlots:delete', id ),
