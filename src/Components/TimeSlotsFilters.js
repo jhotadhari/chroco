@@ -225,7 +225,7 @@ const InputFilter = ( {
 				} }
 				value={ get( filter, 'value', '' ) }
 				title={ 'Filter ' + timeSlotSchema[field].title + ' by RegExp' }
-				placeholder={ 'regex' }
+				placeholder={ 'RegExp' }
 			/> }
 		</div>
 	</div>
