@@ -75,9 +75,6 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 // return   promise resolve array   timeSlots
 api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-
-        console.log( 'debug filters', filters ); // debug
-
         let query = {};
         if ( filters && Array.isArray( filters ) ) {
             [...filters].map( filter => {
@@ -116,9 +113,6 @@ api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
                 }
             } );
         }
-
-        console.log( 'debug query', query ); // debug
-
         db.timeSlots.find( query ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
             resolve( timeSlots );
         } );

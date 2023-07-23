@@ -1,45 +1,25 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
-// import dayOfYear from 'dayjs/plugin/dayOfYear';
 import {
 	isInteger,
 	set,
   	get,
-//   isObject,
-//   omit,
-//   difference,
 } from "lodash";
 import {
 	useState,
 	useContext,
-	// useEffect,
 	Fragment,
-	// useRef,
 } from "react";
 import { MultiSelect } from "react-multi-select-component";
-// import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
 import { dateFormat } from '../constants';
 import Icon from "./Icon";
-// import {
-// 	TimeSlot,
-// 	stopTimeSlot,
-// 	startTimeSlot,
-// } from "./TimeSlot";
-// import useTick from "../hooks/useTick";
-// import { getFilteredSuggestions } from "./Input";
 import {
-	// sortTimeSlotsCompare,
-	// formatSeconds,
 	isValidDateInput,
 	getDateValuesForFilter,
 	isValidRegex,
 } from "../utils";
-
-// dayjs.extend( dayOfYear )
-
 const { api } = window;
-
 
 export const useDoUpdate = ( {
 	settingKey
@@ -80,7 +60,6 @@ export const useDoUpdate = ( {
 
 	return doUpdate;
 }
-
 
 const DateStartFilter = ( {
 	field,
@@ -171,21 +150,118 @@ const DateStartFilter = ( {
 		};
 	} );
 
-	const changeDate = direction => {
+	/**
+	 * Value for input fields. In unix timestamps.
+	 *
+	 * return {
+	 * 	from: Unix Timestamp (milliseconds),
+	 * 	to: Unix Timestamp (milliseconds),
+	 * }
+	 */
+	let inputValue;
+	const filterType = get( filter, 'type', selectedOption.value );
+	if ( filterType === 'custom' ) {
+		inputValue = {
+			from: dayjs( get( filter, ['value','from'] ) ).valueOf(),
+			to: dayjs( get( filter, ['value','to'] ) ).valueOf(),
+		};
+	} else {
+		inputValue = getDateValuesForFilter( { timeFrame: filterType, value: get( filter, 'value', 0 ) } );
+	}
+
+	/**
+	 * Get the formatted value for input field.
+	 *
+	 * Maybe get editing value or format stored unix timestamp.
+	 *
+	 * @param   string  key     from|to
+	 */
+	const getInputValueEdit = key => {
+		if ( null !== get( editFilter, ['value',key], null ) ) {
+			if ( /^\d+$/.test( get( editFilter, ['value',key], '' ) ) ) {
+				return dayjs( get( editFilter, ['value',key] ) ).format( dateFormat );
+			} else {
+				return get( editFilter, ['value',key] );
+			}
+		} else {
+			return dayjs( inputValue[key] ).format( dateFormat )
+		}
+	};
+
+	/**
+	 * Get className for input field.
+	 *
+	 * @param   string  key     from|to
+	 */
+	const getInputClassName = key => classnames( {
+		'form-control': true,
+		'mt-2': true,
+		'dirty': get( editFilter, ['value',key] ) && ! /^\d+$/.test( get( editFilter, ['value',key] ) ),
+		'invalid': ! isValidDateInput( getInputValueEdit( key ) ),
+	} );
+
+	/**
+	 * callback MultiSelect onChange
+	 *
+	 * @param   array  res     New selected options
+	 */
+	const onChangeMultiSelect = res => {
+		if ( 0 === res.length ) {
+			res = [options[0]]
+		}
+		if ( 2 === res.length ) {
+			// remove old value
+			res = [...res].filter( opt => opt.value !== selectedOption.value );
+		}
+		if ( 1 !== res.length ) {
+			return;
+		}
+		if ( options.find( opt => opt.value === res[0].value ) ) {
+			let newFilter = {};
+			let newFilters = [...filters];
+			if ( 'custom' === res[0].value ) {
+				newFilter = {
+					...filter,
+					type: res[0].value,
+					value: {...inputValue},
+				};
+				if ( filterIdx === -1 ) {
+					newFilters = [
+						...newFilters,
+						newFilter
+					];
+				} else {
+					newFilters[filterIdx] = newFilter;
+				}
+			} else {
+				newFilter = {
+					...filter,
+					type: res[0].value,
+					value: 0,
+				};
+				if ( filterIdx === -1 ) {
+					newFilters = [
+						...newFilters,
+						newFilter
+					];
+				} else {
+					newFilters[filterIdx] = newFilter;
+				}
+			}
+			setEditFilter( newFilter );
+			doUpdate( newFilters );
+		}
+	};
+
+	/**
+	 * callback button onClick
+	 *
+	 * @param   string  direction     prev|next
+	 */
+	const onClickNavBtn = direction => {
 		if ( 'custom' !== get( filter, 'value' ) ) {
 			let newFilters = [...filters];
-			if ( filterIdx === -1 ) {
-				// ??? TODO
-				// newFilter = {
-				// 	...filter,
-				// 	type: res[0].value,
-				// 	value: 0,
-				// };
-				// newFilters = [
-				// 	...newFilters,
-				// 	newFilter
-				// ];
-			} else {
+			if ( filterIdx !== -1 ) {
 				let newFilter = {...filter};
 				newFilter.value = get( newFilter, 'value', 0 );
 				newFilter.value = isInteger( newFilter.value ) ? newFilter.value : 0;
@@ -204,41 +280,31 @@ const DateStartFilter = ( {
 		}
 	}
 
-	let inputValue;
-	const filterType = get( filter, 'type', selectedOption.value );
-	if ( filterType === 'custom' ) {
-		inputValue = {
-			from: dayjs( get( filter, ['value','from'] ) ).valueOf(),
-			to: dayjs( get( filter, ['value','to'] ) ).valueOf(),
-		};
-	} else {
-		inputValue = getDateValuesForFilter( { timeFrame: filterType, value: get( filter, 'value', 0 ) } );
-	}
-
-	const getInputValue = key => {
-		if ( null !== get( editFilter, ['value',key], null ) ) {
-			if ( /^\d+$/.test( get( editFilter, ['value',key], '' ) ) ) {
-				return dayjs( get( editFilter, ['value',key] ) ).format( dateFormat );
-			} else {
-				return get( editFilter, ['value',key] );
-			}
-		} else {
-			return dayjs( inputValue[key] ).format( dateFormat )
-		}
-	};
-
+	/**
+	 * callback input onChange
+	 *
+	 * @param   string  newVal  New input value
+	 * @param   string  key     from|to
+	 */
 	const onChangeInput = ( newVal, key ) => {
 		let newEditFilter = {
 			...filter,
 			type: 'custom',
 			value: {
 				...inputValue,
+				...get( editFilter, 'value', {} ),
 				[key]: newVal,
 			},
 		};
 		setEditFilter( newEditFilter );
 	};
 
+	/**
+	 * callback input onKeyDown
+	 *
+	 * @param   object  e  		event
+	 * @param   string  key     from|to
+	 */
 	const onKeyDownInput = ( e, key ) => {
 		if ( get( editFilter, ['value','from'] )
 			|| get( editFilter, ['value','to'] )
@@ -295,24 +361,17 @@ const DateStartFilter = ( {
 		] ) }
 	>
 
-		<div
-			className={ classnames( [
-				'row',
-				'actions',
-			] ) }
-		>
-
+		<div className="row actions" >
 			<div className="col">
 				<button
 					disabled={ 'custom' === get( filter, 'type' ) }
 					type='button'
 					className={ 'btn border-0' }
 					title={ 'One ' + selectedOption.label.singular + ' to the past' }
-					onClick={ () => changeDate( 'prev' ) }
+					onClick={ () => onClickNavBtn( 'prev' ) }
 				>
 					<Icon type='caret-left'/>
 				</button>
-
 			</div>
 
 			<div className="col">
@@ -327,54 +386,7 @@ const DateStartFilter = ( {
 						...selectedOption,
 						label: options.find( opt => opt.value === selectedOption.value ).label,
 					}] }
-					onChange={ res => {
-						if ( 0 === res.length ) {
-							res = [options[0]]
-						}
-						if ( 2 === res.length ) {
-							// remove old value
-							res = [...res].filter( opt => opt.value !== selectedOption.value );
-						}
-						if ( 1 !== res.length ) {
-							return;
-						}
-						if ( options.find( opt => opt.value === res[0].value ) ) {
-							let newFilter = {};
-							let newFilters = [...filters];
-
-							if ( 'custom' === res[0].value ) {
-								newFilter = {
-									...filter,
-									type: res[0].value,
-									value: {...inputValue},
-								};
-								if ( filterIdx === -1 ) {
-									newFilters = [
-										...newFilters,
-										newFilter
-									];
-								} else {
-									newFilters[filterIdx] = newFilter;
-								}
-							} else {
-								newFilter = {
-									...filter,
-									type: res[0].value,
-									value: 0,
-								};
-								if ( filterIdx === -1 ) {
-									newFilters = [
-										...newFilters,
-										newFilter
-									];
-								} else {
-									newFilters[filterIdx] = newFilter;
-								}
-							}
-							setEditFilter( newFilter );
-							doUpdate( newFilters );
-						}
-					} }
+					onChange={ onChangeMultiSelect }
 				/>
 			</div>
 
@@ -384,38 +396,27 @@ const DateStartFilter = ( {
 					title={ 'One ' + selectedOption.label.singular + ' to the future' }
 					disabled={ 'custom' === get( filter, 'type' ) || get( filter, 'value', 0 ) >= 0 }
 					className={ 'btn border-0' }
-					onClick={ () => changeDate( 'next' ) }
+					onClick={ () => onClickNavBtn( 'next' ) }
 				>
 					<Icon type='caret-right'/>
 				</button>
 			</div>
-
 		</div>
 
 		<div className="row">
 			<div className="col">
 				<input
 					onKeyDown={ e => onKeyDownInput( e, 'from' ) }
-					className={ classnames( {
-						'form-control': true,
-						'mt-2': true,
-						'dirty': get( editFilter, ['value','from'] ) && ! /^\d+$/.test( get( editFilter, ['value','from'] ) ),	// ??? TODO looses dirty state if other field is edited
-						'invalid': ! isValidDateInput( getInputValue( 'from' ) ),
-					} ) }
-					value={ getInputValue( 'from' ) }
+					className={ getInputClassName( 'from' ) }
+					value={ getInputValueEdit( 'from' ) }
 					onChange={ e => onChangeInput( e.target.value, 'from' ) }
 				/>
 			</div>
 			<div className="col">
 				<input
 					onKeyDown={ e => onKeyDownInput( e, 'to' ) }
-					className={ classnames( {
-						'form-control': true,
-						'mt-2': true,
-						'dirty': get( editFilter, ['value','to'] ) && ! /^\d+$/.test( get( editFilter, ['value','to'] ) ),	// ??? TODO looses dirty state if other field is edited
-						'invalid': ! isValidDateInput( getInputValue( 'to' ) ),
-					} ) }
-					value={ getInputValue( 'to' ) }
+					className={ getInputClassName( 'to' ) }
+					value={ getInputValueEdit( 'to' ) }
 					onChange={ e => onChangeInput( e.target.value, 'to' ) }
 				/>
 			</div>
@@ -423,8 +424,6 @@ const DateStartFilter = ( {
 
 	</div>;
 };
-
-
 
 const InputFilter = ( {
 	field,
@@ -632,13 +631,9 @@ const TimeSlotsFilters = () => {
 				/>
 			} ) : '' }
 
-			<div className="col-3">
-				{/* spacer??? */}
-			</div>
+			<div className="col-3"></div>
 
-			<div className="col-4">
-				{/* per_page??? */}
-			</div>
+			<div className="col-4"></div>
 
 		</div>
 	</div> ;
