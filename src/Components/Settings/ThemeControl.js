@@ -8,7 +8,9 @@ import { MultiSelect } from "react-multi-select-component";
 import Context from '../../Context';
 const { api } = window;
 
-const ThemeControl = () => {
+const ThemeControl = ( {
+	className,
+} ) => {
 	const {
 		setThemeSource,
 		themeSource,
@@ -65,7 +67,7 @@ const ThemeControl = () => {
 		}
 	};
 
-	return <div className="mb-3">
+	return <div className={ className }>
 		<label id={ 'setting-label-' + settingKey } className="form-label">Color Theme</label>
 		<div className="row">
 			<div className="col-1"></div>

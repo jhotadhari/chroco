@@ -10,7 +10,9 @@ import Context from '../../Context';
 import { isValidTimezones } from '../../utils';
 const { api } = window;
 
-const TimezonesControl = () => {
+const TimezonesControl = ( {
+	className,
+} ) => {
 	const {
 		settings,
 		setSettings,
@@ -51,7 +53,7 @@ const TimezonesControl = () => {
 		}
 	};
 
-	return <div className="mb-3">
+	return <div className={ className }>
 		<label id={ 'setting-label-' + settingKey } className="form-label">Tooltip Timezones</label>
 		<div className="row">
 			<div className="col-1"></div>

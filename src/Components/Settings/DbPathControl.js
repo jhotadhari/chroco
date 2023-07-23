@@ -10,7 +10,9 @@ import classnames from "classnames";
 import Context from '../../Context';
 const { api } = window;
 
-const DbPathControl = () => {
+const DbPathControl = ( {
+	className,
+} ) => {
 	const {
 		settingsDefaults,
 		settings,
@@ -26,7 +28,7 @@ const DbPathControl = () => {
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => get( sett, 'key' ) === settingKey ) : undefined;
 	const val = get( setting, 'value', settingsDefaults[settingKey] )
 
-	return <div className="mb-3">
+	return <div className={ className }>
 		<label>Database paths</label>
 
 

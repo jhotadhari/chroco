@@ -10,7 +10,9 @@ import Context from '../../Context';
 const { api } = window;
 
 
-const HideFieldsControl = () => {
+const HideFieldsControl = ( {
+	className,
+} ) => {
 	const {
 		themeSource,
 		settings,
@@ -60,7 +62,7 @@ const HideFieldsControl = () => {
 		}
 	};
 
-	return <div className="mb-3">
+	return <div className={ className }>
 		<label id={ 'setting-label-' + settingKey } className="form-label">Hide Fields</label>
 		<div className="row">
 			<div className="col-1"></div>

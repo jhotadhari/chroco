@@ -1,3 +1,4 @@
+import classnames from "classnames";
 import Icon from "../Icon";
 import ThemeControl from "./ThemeControl";
 import HideFieldsControl from "./HideFieldsControl";
@@ -9,33 +10,44 @@ const Settings = ( {
 	setShowSettings,
 } ) => {
 
-	return <div className="settings container-fluid mt-2 mb-3">
+	return showSettings ? <div
+		className={ classnames( [
+			'modal',
+			'fade',
+			'modal-xl',
+			'd-block',
+			'bg-black',
+			'bg-opacity-50',
+			'bg-blur',
+			showSettings ? 'show' : ''
+		] ) }
+		tabindex="-1"
+	>
+		<div className="modal-dialog">
+			<div className="modal-content">
+				<div className="modal-header">
+					<h5 className="modal-title">Preferences</h5>
+					<button
+						type="button"
+						className="btn-close"
+						aria-label="Close Preferences"
+						title="Close Preferences"
+						onClick={ () => setShowSettings( false ) }
+					></button>
+				</div>
+				<div className="modal-body">
 
-		<div className="row mb-3">
-			<div className="col">{ showSettings && <h3>Settings</h3> }</div>
-			<div className="col d-flex justify-content-end">
+					<ThemeControl className="mb-5"/>
+					<HideFieldsControl className="mb-5"/>
+					<DbPathControl className="mb-5"/>
+					<TimezonesControl className="mb-5"/>
 
-				<button
-					className='btn float-right'
-					type='button'
-					title={ showSettings ? 'Open Settings' : 'Close Settings' }
-					onClick={ () => {
-						setShowSettings( ! showSettings );
-					} }
-				>
-					<Icon type='gear'/>
-				</button>
+
+				</div>
 			</div>
 		</div>
+	</div> : null;
 
-		{ showSettings && <div className="settings pb-3 mb-4 border-bottom">
-			<ThemeControl/>
-			<HideFieldsControl/>
-			<DbPathControl/>
-			<TimezonesControl/>
-		</div> }
-
-	</div>;
 }
 
 export default Settings;

@@ -42,7 +42,7 @@ const CreateTimeSlot = () => {
 		// tabIndex="0"
 		onFocus={ () => setRandom( Math.random() ) }
 		onBlur={ () => setRandom( Math.random() ) }
-		className="container-fluid mb-5 create-timeSlot"
+		className="container-fluid mb-5 mt-3 create-timeSlot"
 		onKeyDown={ e => {
 			switch( e.key ) {
 				case 'Enter':
