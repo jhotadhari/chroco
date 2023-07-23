@@ -5,6 +5,7 @@ import {
 } from "lodash";
 import {
   	useContext,
+  	useEffect,
   	useState,
 } from "react";
 import Autosuggest from 'react-autosuggest';
@@ -53,6 +54,17 @@ const Input = ( {
 		'form-control': true,
 		'dirty': isDirty,
 	} );
+
+	// Apply defaultVal to editTimeSlot.
+	useEffect( () => {
+		if ( useDefault
+			&& value
+			&& value === defaultVal
+			&& ! ( get( timeSlot, field ) || get( editTimeSlot, field ) )
+		) {
+			setEditTimeSlot( { ...editTimeSlot, [field]: value } );
+		}
+	}, [timeSlot,editTimeSlot] );
 
 	const onKeyDown = e => {
 		if ( isDirty ) {

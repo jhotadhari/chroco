@@ -28,7 +28,6 @@ const { api } = window;
 
 const GroupInput = ( {
 	field,
-	useDefault,
 	timeSlot,
 	updateTimeSlots,
 	editTimeSlot,
@@ -42,8 +41,7 @@ const GroupInput = ( {
 	} = useContext( Context );
 
 	const title = get( timeSlotSchema, [field,'title'], '' );
-	const defaultVal = useDefault ? get( timeSlotSchema, [field, 'default'], '' ) : '';
-	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
+	const value = get( editTimeSlot, field, get( timeSlot, field, '' ) );
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 
 	const hasSuggestions = get( timeSlotSchema, [field,'hasSuggestions'] );
