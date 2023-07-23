@@ -3,6 +3,7 @@ import {
   useContext,
 } from "react";
 import {
+	difference,
 	get,
 } from "lodash";
 import classnames from "classnames";
@@ -27,11 +28,12 @@ const TimezonesControl = ( {
 	const isDirty = !! editState;
 
 	const doUpdate = newVal => {
+		newVal = newVal.split( ',' ).filter( tz => tz.length > 0 );
 		if ( undefined === setting ) {
 			// add new setting
 			const newSetting = {
 				key: settingKey,
-				value: newVal.split( ',' ),
+				value: newVal,
 			};
 			api.settings.add( newSetting ).then( ( addedSetting ) => {
 				setSettings( [...settings, addedSetting] );
@@ -40,7 +42,7 @@ const TimezonesControl = ( {
 			// update setting
 			const newSetting = {
 				...setting,
-				value: newVal.split( ',' ),
+				value: newVal,
 			};
 			api.settings.update( newSetting ).then( numberUpdated => {
 				if ( numberUpdated ) {
@@ -65,13 +67,13 @@ const TimezonesControl = ( {
 					] ) }
 					aria-labelledby={ 'setting-label-' + settingKey }
 					style={ { width: '100%' } }
-					value={ value }
+					value={ Array.isArray( value ) ? value.join( ',' ) : value }
 					onChange={ e => {
 						if ( isValidTimezones( e.target.value ) ) {
 							doUpdate( e.target.value );
 							setEditState( false );
 						} else {
-							setEditState( e.target.value );
+							setEditState( e.target.value.split( ',' ).filter( tz => tz.length > 0 ) );
 						}
 					} }
 				/>
@@ -83,7 +85,7 @@ const TimezonesControl = ( {
 				>Example: UTC,America/Guatemala,Asia/Kolkata.</span>
 			</div>
 
-			{ value !== settingsDefaults[settingKey].join(',') && <div className="col">
+			{ difference( value, settingsDefaults[settingKey] ).length > 0 && <div className="col">
 				<button
 					onClick={ () => {
 						doUpdate( settingsDefaults[settingKey].join(',') );
