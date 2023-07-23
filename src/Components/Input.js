@@ -8,8 +8,8 @@ import {
   	useState,
 } from "react";
 import Autosuggest from 'react-autosuggest';
-
 import Context from '../Context';
+import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 
 export const getFilteredSuggestions = ( value, suggestions ) => {
 	const inputValue = value.trim().toLowerCase();
@@ -28,18 +28,19 @@ const Input = ( {
 	field,
 	useDefault,
 	timeSlot,
-	updateTimeSlot,
 	editTimeSlot,
 	setEditTimeSlot,
-
 } ) => {
 	const {
 		timeSlotSchema,
-		setTimeSlots,
-		timeSlots,
 		fieldSuggestions,
 		addFieldSuggestion,
 	} = useContext( Context );
+
+	const {
+		updateTimeSlot,
+	} = useTimeSlotCrud();
+
 	const title = get( timeSlotSchema, [field,'title'], '' );
 	const defaultVal = useDefault ? get( timeSlotSchema, [field, 'default'], '' ) : '';
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
@@ -59,8 +60,6 @@ const Input = ( {
 				case 'Enter':
 					updateTimeSlot( {
 						timeSlot,
-						timeSlots,
-						setTimeSlots,
 						editTimeSlot,
 						setEditTimeSlot,
 						// includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.

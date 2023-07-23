@@ -16,26 +16,25 @@ import TimezonesTooltip from './TimezonesTooltip';
 import { dateFormat } from '../constants';
 import {
   isValidDateInput,
-  isValidTimezones,
 } from '../utils';
+import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 dayjs.extend( utc );
 dayjs.extend( timezone );
-
 
 const DateInput = ( {
   field,
   timeSlot,
-  updateTimeSlot,
   editTimeSlot,
   setEditTimeSlot,
 } ) => {
   const {
     timeSlotSchema,
-    timeSlots,
-    setTimeSlots,
-    getSetting,
-    themeSource,
-   } = useContext( Context );
+  } = useContext( Context );
+
+  const {
+    updateTimeSlot,
+  } = useTimeSlotCrud();
+
   const [tempVal, setTempVal] = useState( false );
   const val = get( timeSlot, field )
     ? dayjs( get( editTimeSlot, field, get( timeSlot, field ) ) ).format( dateFormat )
@@ -54,8 +53,6 @@ const DateInput = ( {
               case 'Enter':
                 updateTimeSlot( {
                   timeSlot,
-                  timeSlots,
-                  setTimeSlots,
                   editTimeSlot,
                   setEditTimeSlot,
                   // includeFields: [field],	// ??? TODO Bug with group updateTimeSlots: other dirty fields loose their changes. Actually here it works fine, but disabled for now.

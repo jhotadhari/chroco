@@ -4,7 +4,7 @@ import {
 	useEffect,
 } from "react";
 
-export const useTick = shouldTick => {
+const useTick = shouldTick => {
 	const [intervalID, setIntervalID] = useState( null );
 	const [tick, setTick] = useState( false );
   	useEffect( () => {

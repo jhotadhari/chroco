@@ -15,11 +15,8 @@ import {
 import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
 import { dateFormat } from '../constants';
-import {
-	TimeSlot,
-	stopTimeSlot,
-	startTimeSlot,
-} from "./TimeSlot";
+import TimeSlot from "./TimeSlot";
+import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 import useTick from "../hooks/useTick";
 import { getFilteredSuggestions } from "./Input";
 import Icon from "./Icon";
@@ -200,6 +197,11 @@ const GroupHeader = ( {
 		getSetting,
 	} = useContext( Context );
 
+	const {
+		startTimeSlot,
+		stopTimeSlot,
+	} = useTimeSlotCrud();
+
 	const [editTimeSlot, setEditTimeSlot] = useState( {} );
 
 	const updateTimeSlots = ( { includeFields } ) => {
@@ -310,16 +312,12 @@ const GroupHeader = ( {
 							// stop all, should be max one.
 							[...timeSlotsSliceCurrents].map( timeSlot => stopTimeSlot( {
 								timeSlot,
-								timeSlots,
-								setTimeSlots,
 							} ) );
 							setTimeSlotCurrentEdit( {} );
 						} else {
 							// start new one
 							startTimeSlot( {
 								timeSlot: timeSlotsSlice[0],
-								timeSlots,
-								setTimeSlots,
 							} )
 						}
 					} }
@@ -360,7 +358,7 @@ const DateGroup = ( {
 	</>;
 };
 
-export const TimeSlotsTable = () => {
+const TimeSlotsTable = () => {
 
 	const {
 		timeSlots,
@@ -433,3 +431,5 @@ export const TimeSlotsTable = () => {
 		</div>
 	</div> ;
 };
+
+export default TimeSlotsTable;

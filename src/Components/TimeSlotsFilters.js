@@ -22,7 +22,7 @@ import {
 } from "../utils";
 const { api } = window;
 
-export const useDoUpdate = ( {
+const useDoUpdate = ( {
 	settingKey
 } ) => {
 	const {

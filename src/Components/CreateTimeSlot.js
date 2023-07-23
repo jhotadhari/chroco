@@ -4,21 +4,14 @@ import {
   get,
   isObject,
 } from "lodash";
-import Icon from "./Icon";
 import Context from '../Context';
-
-import {
-	deleteTimeSlot,
-	stopTimeSlot,
-	updateTimeSlot,
-	startTimeSlot,
-} from "./TimeSlot";
-
+import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
+import Icon from "./Icon";
 import DateInput from "./DateInput";
 import Duration from "./Duration";
 import Input from "./Input";
 
-export const CreateTimeSlot = () => {
+const CreateTimeSlot = () => {
 
 	const [editTimeSlot, setEditTimeSlot] = useState( {} );
 	const [random, setRandom] = useState( 0 );
@@ -26,13 +19,18 @@ export const CreateTimeSlot = () => {
 
 	const {
 		timeSlotSchema,
-		timeSlots,
-		setTimeSlots,
 		getSetting,
 		timeSlotCurrent,
 		timeSlotCurrentEdit,
     	setTimeSlotCurrentEdit,
 	} = useContext( Context );
+
+	const {
+		startTimeSlot,
+		updateTimeSlot,
+		stopTimeSlot,
+		deleteTimeSlot,
+	} = useTimeSlotCrud();
 
 	const timeSlot = timeSlotCurrent ? timeSlotCurrent : false;
 	const isCurrent = !! timeSlotCurrent && timeSlotCurrent._id === timeSlot._id;
@@ -46,17 +44,15 @@ export const CreateTimeSlot = () => {
 		onBlur={ () => setRandom( Math.random() ) }
 		className="container-fluid mb-5 create-timeSlot"
 		onKeyDown={ e => {
-			  switch( e.key ) {
+			switch( e.key ) {
 				case 'Enter':
-					if ( e.ctrlKey && ! get( timeSlot, '_id' ) ) {
-						startTimeSlot( {
-							timeSlot: editTimeSlot,
-							timeSlots,
-							setTimeSlots,
-						} );
-						_setEditTimeSlot( {} );
-					}
-				  break;
+				if ( e.ctrlKey && ! get( timeSlot, '_id' ) ) {
+					startTimeSlot( {
+						timeSlot: editTimeSlot,
+					} );
+					_setEditTimeSlot( {} );
+				}
+				break;
 		} } }
 	>
 
@@ -104,13 +100,6 @@ export const CreateTimeSlot = () => {
 					field={ key }
 					useDefault={ true }
 					timeSlot={ timeSlot }
-					updateTimeSlot={ () => updateTimeSlot( {
-					  timeSlot,
-					  timeSlots,
-					  setTimeSlots,
-					  editTimeSlot: _editTimeSlot,
-					  setEditTimeSlot: _setEditTimeSlot,
-					} ) }
 					editTimeSlot={ _editTimeSlot }
 					setEditTimeSlot={ _setEditTimeSlot }
 				/></div>
@@ -120,15 +109,8 @@ export const CreateTimeSlot = () => {
 				{ timeSlot && <DateInput
 					field={ 'dateStart' }
 					timeSlot={ timeSlot }
-					updateTimeSlot={ () => updateTimeSlot( {
-						timeSlot,
-						timeSlots,
-						setTimeSlots,
-						editTimeSlot: _editTimeSlot,
-						setEditTimeSlot: _setEditTimeSlot,
-					  } ) }
-					  editTimeSlot={ _editTimeSlot }
-					  setEditTimeSlot={ _setEditTimeSlot }
+					editTimeSlot={ _editTimeSlot }
+					setEditTimeSlot={ _setEditTimeSlot }
 				/> }
 			</div>
 
@@ -148,8 +130,6 @@ export const CreateTimeSlot = () => {
 					className="btn me-2 save"
 					onClick={ () => updateTimeSlot( {
 						timeSlot,
-						timeSlots,
-						setTimeSlots,
 						editTimeSlot: _editTimeSlot,
 						setEditTimeSlot: _setEditTimeSlot,
 					} ) }
@@ -166,15 +146,11 @@ export const CreateTimeSlot = () => {
 						if ( ! timeSlotCurrent ) {
 							startTimeSlot( {
 								timeSlot: _editTimeSlot,
-								timeSlots,
-								setTimeSlots,
 							} );
 							setEditTimeSlot( {} );
 						} else {
 							stopTimeSlot( {
 								timeSlot: timeSlotCurrent,
-								timeSlots,
-								setTimeSlots,
 							} );
 							_setEditTimeSlot( {} );
 						}
@@ -190,8 +166,6 @@ export const CreateTimeSlot = () => {
 					className="btn delete"
 					onClick={ () => deleteTimeSlot( {
 						deleteId: timeSlot._id,
-						timeSlots,
-						setTimeSlots,
 					} ) }
 					title="Delete"
 				>
@@ -202,3 +176,5 @@ export const CreateTimeSlot = () => {
     	</div>
 	</div>;
 };
+
+export default CreateTimeSlot;

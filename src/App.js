@@ -5,24 +5,59 @@ import {
 import {
   useEffect,
   useState,
+  useContext,
 } from 'react';
 import Context from './Context';
+import useTimeSlotCrud from './hooks/useTimeSlotCrud';
 import Settings from './Components/Settings/Settings';
-import { CreateTimeSlot } from './Components/CreateTimeSlot';
-import { TimeSlotsTable } from './Components/TimeSlotsTable';
+import CreateTimeSlot from './Components/CreateTimeSlot';
+import TimeSlotsTable from './Components/TimeSlotsTable';
 import TimeSlotsFilters from './Components/TimeSlotsFilters';
 import { sortTimeSlotsCompare } from './utils';
-import {
-	stopTimeSlot,
-} from "./Components/TimeSlot";
-
 const { api } = window;
-
 
 const eventTick = new Event( 'tick' );
 setInterval( () => {
   window.dispatchEvent( eventTick );
 }, 1000 );
+
+const AppInner = () => {
+
+	const {
+    timeSlotCurrent,
+    setTimeSlotCurrentEdit,
+    themeSource,
+	} = useContext( Context );
+
+  const {
+    stopTimeSlot,
+  } = useTimeSlotCrud();
+
+  return <div
+    data-bs-theme={ themeSource }
+    onKeyDown={ e => {
+      if (
+        'Escape' === e.key
+        && e.ctrlKey
+        && get( timeSlotCurrent, '_id' )
+      ) {
+        stopTimeSlot( {
+          timeSlot: timeSlotCurrent,
+        } );
+        setTimeSlotCurrentEdit( {} );
+      }
+    } }
+    tabIndex="0"
+  >
+    <Settings/>
+
+    <CreateTimeSlot/>
+
+    <TimeSlotsFilters/>
+
+    <TimeSlotsTable/>
+  </div>;
+}
 
 function App() {
   const [appInfo,setAppInfo ] = useState( {} );
@@ -110,7 +145,6 @@ function App() {
     } );
   }, [timeSlots] );
 
-
   const addFieldSuggestion = ( timeSlot, newFieldSuggestions, shouldSet ) => {
     newFieldSuggestions = newFieldSuggestions ? newFieldSuggestions : {...fieldSuggestions};
     shouldSet = undefined === shouldSet ? true : shouldSet;
@@ -146,25 +180,7 @@ function App() {
     setFieldSuggestions( newFieldSuggestions );
   }, [timeSlots] );
 
-  return ! settingsDefaults ? null : <div
-    data-bs-theme={ themeSource }
-		onKeyDown={ e => {
-      if (
-        'Escape' === e.key
-        && e.ctrlKey
-        && get( timeSlotCurrent, '_id' )
-      ) {
-        stopTimeSlot( {
-          timeSlot: timeSlotCurrent,
-          timeSlots,
-          setTimeSlots,
-        } );
-        setTimeSlotCurrentEdit( {} );
-      }
-    } }
-    tabIndex="0"
-  >
-    <Context.Provider value={ {
+  return ! settingsDefaults ? null : <Context.Provider value={ {
       appInfo,
 
       timeSlotSchema,
@@ -184,17 +200,9 @@ function App() {
 
       fieldSuggestions,
       addFieldSuggestion,
-    } }>
-      <Settings/>
-
-      <CreateTimeSlot/>
-
-      <TimeSlotsFilters/>
-
-      <TimeSlotsTable/>
-
-    </Context.Provider>
-  </div>;
+  } }>
+    <AppInner/>
+  </Context.Provider>;
 }
 
 export default App;
