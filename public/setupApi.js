@@ -23,7 +23,6 @@ const {
     isValidRegex,
     getDateValuesForFilter,
 } = require( './utils' );
-const { debug } = require('console');
 
 const api = {
     app: {},
@@ -63,7 +62,7 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
         schema = {...timeSlotsSchemaBase};
         exec( 'git config --global user.name', { encoding: 'utf-8' }, (error, stdout) => {
             if ( ! error && stdout.length ) {
-                schema.user.default = stdout;
+                schema.user.default = stdout.replace( /^[\s\n]+/, '' ).replace( /[\s\n]+$/, '' );
             }
             resolve( schema )
         } );
