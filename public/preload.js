@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld( 'api', {
 
     app: {
         getInfo: () => ipcRenderer.invoke( 'api:app:getInfo' ),
+        onTogglePreferences: callback => ipcRenderer.on( 'toggle-preferences', callback ),
     },
 
     timeSlots: {

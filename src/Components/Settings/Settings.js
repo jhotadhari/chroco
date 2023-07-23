@@ -1,15 +1,13 @@
-import {
-  useState,
-} from "react";
 import Icon from "../Icon";
-
 import ThemeControl from "./ThemeControl";
 import HideFieldsControl from "./HideFieldsControl";
 import DbPathControl from "./DbPathControl";
 import TimezonesControl from "./TimezonesControl";
 
-const Settings = () => {
-	const [showSettings, setShowSettings] = useState( false );
+const Settings = ( {
+	showSettings,
+	setShowSettings,
+} ) => {
 
 	return <div className="settings container-fluid mt-2 mb-3">
 

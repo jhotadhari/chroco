@@ -33,6 +33,14 @@ const AppInner = () => {
     stopTimeSlot,
   } = useTimeSlotCrud();
 
+	const [showSettings, setShowSettings] = useState( false );
+
+  useEffect( () => {
+    api.app.onTogglePreferences( () => {
+      setShowSettings( ! showSettings );
+    } );
+  }, [showSettings] );
+
   return <div
     data-bs-theme={ themeSource }
     onKeyDown={ e => {
@@ -49,7 +57,10 @@ const AppInner = () => {
     } }
     tabIndex="0"
   >
-    <Settings/>
+    { showSettings && <Settings
+      showSettings={ showSettings }
+      setShowSettings={ setShowSettings }
+    /> }
 
     <CreateTimeSlot/>
 

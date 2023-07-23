@@ -9,6 +9,7 @@ const {
 const isDev = require('electron-is-dev');
 const path = require('path')
 const { setupApi, api } = require('./setupApi');
+const setupWindowMenu = require('./setupWindowMenu');
 
 function createWindow() {
 
@@ -41,6 +42,7 @@ function createWindow() {
         win.setTitle( app.getName() );
     } );
 
+    setupWindowMenu( win );
     setupApi();
 };
 
