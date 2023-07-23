@@ -15,6 +15,7 @@ const DbPathControl = () => {
 		settingsDefaults,
 		settings,
 		setSettings,
+		appInfo,
 	} = useContext( Context );
 
 	const [errors,setErrors] = useState( [] );
@@ -27,6 +28,7 @@ const DbPathControl = () => {
 
 	return <div className="mb-3">
 		<label>Database paths</label>
+
 
 		{ Object.keys( val ).sort().sort( ( a, b ) => 'settings' === a ? -1 : 1 ).map( key => {
 			const value = get( dbPathEdit, key, val[key] )
@@ -76,7 +78,7 @@ const DbPathControl = () => {
 			</div>;
 		} ) }
 
-		<div className="row">
+		<div className="row mb-2">
 			<div className="col-1"></div>
 			<div className="col-13">
 				<div className="d-flex justify-content-between">
@@ -128,15 +130,6 @@ const DbPathControl = () => {
 						} }
 						>Apply db changes</button>
 
-						<button
-							className='btn'
-							type='button'
-							disabled={ isCompacting }
-							onClick={ () => {
-								setIsCompacting( true );
-								api.db.compact().then( () => setIsCompacting( false ) ) ;
-							} }
-						>Compact db</button>
 				</div>
 
 				{ errors.length ? [...errors].map( ( err, idx ) => <div key={ idx } className={ classnames(
@@ -147,6 +140,35 @@ const DbPathControl = () => {
 					'rounded',
 				) }>{ err }</div> ) : '' }
 
+
+			</div>
+		</div>
+
+		<div className="row">
+
+			<div className="col-1"></div>
+
+			<div className="col font-style-italic">
+				<div>
+					{ get( appInfo, 'name', '' ) } uses <a
+					href="https://github.com/louischatriot/nedb"
+					target="_blank"
+					title="NeDB"
+					rel="noreferrer"
+				>NeDB</a> as database. It's textbased and stores all entries as JSON.</div>
+
+				<div>If you're using git for the database, always <a
+					href="#"
+					role="button"
+					className=''
+					title='Compact DB'
+					onClick={ () => {
+						if ( ! isCompacting ) {
+							setIsCompacting( true );
+							api.db.compact().then( () => setIsCompacting( false ) ) ;
+						}
+					} }
+				>compact</a> it before doing any git operations and don't write to it while the application is running.</div>
 
 			</div>
 		</div>
