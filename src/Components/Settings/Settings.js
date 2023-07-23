@@ -11,6 +11,7 @@ const Settings = ( {
 } ) => {
 
 	return showSettings ? <div
+		onKeyDown={ e => 'Escape' === e.key && setShowSettings( false ) }
 		className={ classnames( [
 			'modal',
 			'fade',
