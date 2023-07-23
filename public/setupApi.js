@@ -76,7 +76,7 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
 
-
+        console.log( 'debug filters', filters ); // debug
 
         let query = {};
         if ( filters && Array.isArray( filters ) ) {
@@ -104,33 +104,20 @@ api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
                     case 'date':
                         if ( 'dateStart' === filter.field ) {
                             if ( 'custom' === filter.type ) {
-                                // ??? TODO
+                                set( query, ['dateStart','$gte'], filter.value.from );
+                                set( query, ['dateStart','$lte'], filter.value.to );
                             } else {
-
                                 const values = getDateValuesForFilter( { timeFrame: filter.type, value: filter.value } );
-
-                                // console.log( ' ' ); // debug
-                                // console.log( 'debug from', dayjs( bla.from ).format( 'YYYY-MM-DD HH:mm:ss' ) ); // debug
-                                // console.log( 'debug to', dayjs( bla.to ).format( 'YYYY-MM-DD HH:mm:ss' ) ); // debug
-
-
                                 set( query, ['dateStart','$gte'], values.from );
-                                set( query, ['dateStop','$lte'], values.to );
-
+                                set( query, ['dateStart','$lte'], values.to );
                             }
                         }
                         break;
                 }
-
-
             } );
         }
 
-
-
-
         console.log( 'debug query', query ); // debug
-
 
         db.timeSlots.find( query ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
             resolve( timeSlots );

@@ -11,6 +11,7 @@ import {
 import Context from '../Context';
 import { dateFormat } from '../constants';
 import {
+  isValidDateInput,
   isValidTimezones,
 } from '../utils';
 import utc from 'dayjs/plugin/utc';
@@ -18,26 +19,6 @@ import timezone from 'dayjs/plugin/timezone';
 import { Tooltip } from 'react-tooltip'
 dayjs.extend( utc );
 dayjs.extend( timezone );
-
-const isValidDateInput = dateInputString => {
-  const regex = /([0-9]{4})-([0-9]{2})-([0-9]{2})\s([0-2][0-9]):([0-5][0-9]):([0-5][0-9])/;
-  if ( ! regex.test( dateInputString ) ) {
-    return false;
-  }
-  const dateParsed = regex.exec( dateInputString );
-  if (
-    7 !== dateParsed.length
-    || parseInt( dateParsed[2], 10 ) > 12   // month
-    || parseInt( dateParsed[3], 10 ) > 31   // day
-    || parseInt( dateParsed[4], 10 ) > 23   // hour
-    || parseInt( dateParsed[5], 10 ) > 59   // minute
-    || parseInt( dateParsed[6], 10 ) > 59   // second
-  ) {
-    return false;
-  }
-  return true;
-};
-
 
 const DateInput = ( {
   field,
