@@ -1,5 +1,8 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import { Tooltip } from 'react-tooltip'
 import {
   get,
   omit,
@@ -9,16 +12,15 @@ import {
   useContext,
 } from "react";
 import Context from '../Context';
+import TimezonesTooltip from './TimezonesTooltip';
 import { dateFormat } from '../constants';
 import {
   isValidDateInput,
   isValidTimezones,
 } from '../utils';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import { Tooltip } from 'react-tooltip'
 dayjs.extend( utc );
 dayjs.extend( timezone );
+
 
 const DateInput = ( {
   field,
@@ -40,7 +42,7 @@ const DateInput = ( {
     : '';
   const isDirty = tempVal || ( get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field ) );
   const title = get( timeSlotSchema, [field,'title'], '' );
-  const tzs = getSetting( 'timezones' ).filter( tz => tz.length );
+
   const tooltipId = get( timeSlot, '_id' ) + '-' + field + '-' + Math.round( Math.random() * 100000 );
 
   return <>
@@ -92,19 +94,10 @@ const DateInput = ( {
         placeholder={ dateFormat }
       />
 
-      { tzs && tzs.length > 0 && <Tooltip
-        variant={ themeSource }
-        id={ tooltipId }
-        className="rounded shadow border border-1 bg-body-tertiary"
-      >
-        <div className="d-flex flex-column align-items-end">
-          { [...tzs].map( ( tz, idx ) => {
-            return isValidTimezones( tz ) ? <span key={idx}>
-              { tz }: { dayjs( tempVal ? tempVal : val ).tz( tz ).format( dateFormat ) }
-            </span> : null;
-          } ) }
-        </div>
-      </Tooltip> }
+      <TimezonesTooltip
+        tooltipId={ tooltipId }
+        value={ tempVal ? tempVal : val }
+      />
 
     </>;
 };

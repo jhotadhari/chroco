@@ -13,6 +13,7 @@ import {
 import { MultiSelect } from "react-multi-select-component";
 import Context from '../Context';
 import { dateFormat } from '../constants';
+import TimezonesTooltip from "./TimezonesTooltip";
 import Icon from "./Icon";
 import {
 	isValidDateInput,
@@ -312,12 +313,12 @@ const DateStartFilter = ( {
 			let newEditFilter;
 			switch( e.key ) {
 				case 'Escape':
-						const valSett = get( filterSett, ['value',key] );
-						if ( valSett ) {
-							newEditFilter = {...editFilter}
-							set( newEditFilter, ['value',key], valSett );
-							setEditFilter( newEditFilter );
-						}
+					const valSett = get( filterSett, ['value',key] );
+					if ( valSett ) {
+						newEditFilter = {...editFilter}
+						set( newEditFilter, ['value',key], valSett );
+						setEditFilter( newEditFilter );
+					}
 					break;
 				case 'Enter':
 					let newFilter = {...filter};
@@ -406,18 +407,28 @@ const DateStartFilter = ( {
 		<div className="row">
 			<div className="col">
 				<input
+        			data-tooltip-id={ 'filter--' + field + '--from' }
 					onKeyDown={ e => onKeyDownInput( e, 'from' ) }
 					className={ getInputClassName( 'from' ) }
 					value={ getInputValueEdit( 'from' ) }
 					onChange={ e => onChangeInput( e.target.value, 'from' ) }
 				/>
+				<TimezonesTooltip
+        			tooltipId={ 'filter--' + field + '--from' }
+				  	value={ getInputValueEdit( 'from' ) }
+				/>
 			</div>
 			<div className="col">
 				<input
+        			data-tooltip-id={ 'filter--' + field + '--to' }
 					onKeyDown={ e => onKeyDownInput( e, 'to' ) }
 					className={ getInputClassName( 'to' ) }
 					value={ getInputValueEdit( 'to' ) }
 					onChange={ e => onChangeInput( e.target.value, 'to' ) }
+				/>
+				<TimezonesTooltip
+        			tooltipId={ 'filter--' + field + '--to' }
+				  	value={ getInputValueEdit( 'to' ) }
 				/>
 			</div>
 		</div>
