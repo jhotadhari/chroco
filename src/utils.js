@@ -73,6 +73,9 @@ export const getDateValuesForFilter = ( { timeFrame, value } ) => {
 	switch( timeFrame ) {
 		case 'week':
 			inputValue = dayjs().day( startOfWeek );
+			if ( startOfWeek > parseInt( dayjs().day(), 10 ) ) {
+				inputValue = inputValue.add( -1, 'week' );
+			}
 			break;
 		case 'month':
 			inputValue = dayjs().date( 1 );

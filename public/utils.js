@@ -79,7 +79,10 @@ const getDateValuesForFilter = ( { timeFrame, value } ) => {
 	let inputValue;
 	switch( timeFrame ) {
 		case 'week':
-			inputValue = dayjs().day( startOfWeek );
+		inputValue = dayjs().day( startOfWeek );
+		if ( startOfWeek > parseInt( dayjs().day(), 10 ) ) {
+			inputValue = inputValue.add( -1, 'week' );
+		}
 			break;
 		case 'month':
 			inputValue = dayjs().date( 1 );
@@ -93,7 +96,7 @@ const getDateValuesForFilter = ( { timeFrame, value } ) => {
 			.add( value, timeFrame )
 			.valueOf(),
 		to: inputValue.set( 'second', 59 ).set( 'minute', 59 ).set( 'hour', 23 )
-			.add( value + 1, timeFrame )
+			.add( value + 1 , timeFrame )
 			.add( -1, 'day' )
 			.valueOf(),
 	};
