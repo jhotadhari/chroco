@@ -133,7 +133,7 @@ function App() {
     } );
   }, [] );
 
-  // Load timeSlots when dbPath of filters settings got changed.
+  // Load timeSlots when dbPath, startOfWeek or filters settings got changed.
   useEffect( () => {
     if ( getSetting( 'filters' ) ) {
       api.timeSlots.get( getSetting( 'filters' ) ).then( timeSlots => {
@@ -147,7 +147,7 @@ function App() {
 
       } );
     }
-  }, [getSetting( 'dbPath' ), getSetting( 'filters' )] );
+  }, [getSetting( 'dbPath' ), getSetting( 'filters' ), getSetting( 'startOfWeek' )] );
 
   // Set timeSlotCurrent when timeSlots change.
   useEffect( () => {

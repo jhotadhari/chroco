@@ -54,6 +54,8 @@ const settingsDefaults = {
 
     timezones: [],
 
+    startOfWeek: '1', // Monday
+
     filters: [
         {
             field: 'dateStart',

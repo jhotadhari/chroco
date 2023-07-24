@@ -86,13 +86,12 @@ export const isValidRegex = input => {
 }
 
 // same in fucking-simple-time-tracker/public/utils.js
-export const getDateValuesForFilter = ( { timeFrame, value } ) => {
-	const startOfWeek = 1;	// ??? TODO add setting
+export const getDateValuesForFilter = ( { timeFrame, value, startOfWeek } ) => {
 	let inputValue;
 	switch( timeFrame ) {
 		case 'week':
 			inputValue = dayjs().day( startOfWeek );
-			if ( startOfWeek > parseInt( dayjs().day(), 10 ) ) {
+			if ( parseInt( startOfWeek, 10 ) > parseInt( dayjs().day(), 10 ) ) {
 				inputValue = inputValue.add( -1, 'week' );
 			}
 			break;

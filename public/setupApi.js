@@ -74,55 +74,62 @@ api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
 // return   promise resolve array   timeSlots
 api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-        let query = {};
-        if ( filters && Array.isArray( filters ) ) {
-            [...filters].map( filter => {
+        db.settings.findOne( { key: 'startOfWeek' }, ( err, startOfWeek ) => {
+		    startOfWeek = startOfWeek ? startOfWeek.value : get( settingsDefaults, 'startOfWeek' );
+            let query = {};
+            if ( filters && Array.isArray( filters ) ) {
+                [...filters].map( filter => {
 
-                switch( timeSlotsSchemaBase[filter.field].type ) {
-                    case 'text':
-                        if ( filter.value.length && isValidRegex( filter.value ) ) {
-                            // query['$and'] = query['$and'] ? query['$and'] : {};
-                            switch( filter.type ) {
-                                case 'include':
-                                    set( query, [filter.field,'$regex'], new RegExp( filter.value ) );
-                                    break;
-                                case 'exclude':
-                                    set( query, ['$not','$or'], [
-                                        ...get( query, ['$not','$or'], [] ),
-                                        {
-                                            [filter.field]: new RegExp( filter.value ),
-                                        }
-                                    ] );
-                                    break;
+                    switch( timeSlotsSchemaBase[filter.field].type ) {
+                        case 'text':
+                            if ( filter.value.length && isValidRegex( filter.value ) ) {
+                                // query['$and'] = query['$and'] ? query['$and'] : {};
+                                switch( filter.type ) {
+                                    case 'include':
+                                        set( query, [filter.field,'$regex'], new RegExp( filter.value ) );
+                                        break;
+                                    case 'exclude':
+                                        set( query, ['$not','$or'], [
+                                            ...get( query, ['$not','$or'], [] ),
+                                            {
+                                                [filter.field]: new RegExp( filter.value ),
+                                            }
+                                        ] );
+                                        break;
+                                }
                             }
-                        }
-                        break;
-                    case 'date':
-                        if ( 'dateStart' === filter.field ) {
-                            if ( 'custom' === filter.type ) {
-                                set( query, ['dateStart','$gte'], filter.value.from );
-                                set( query, ['dateStart','$lte'], filter.value.to );
-                            } else {
-                                const values = getDateValuesForFilter( { timeFrame: filter.type, value: filter.value } );
-                                set( query, ['dateStart','$gte'], values.from );
-                                set( query, ['dateStart','$lte'], values.to );
+                            break;
+                        case 'date':
+                            if ( 'dateStart' === filter.field ) {
+                                if ( 'custom' === filter.type ) {
+                                    set( query, ['dateStart','$gte'], filter.value.from );
+                                    set( query, ['dateStart','$lte'], filter.value.to );
+                                } else {
+                                    const values = getDateValuesForFilter( {
+                                        timeFrame: filter.type,
+                                        value: filter.value,
+                                        startOfWeek,
+                                    } );
+                                    set( query, ['dateStart','$gte'], values.from );
+                                    set( query, ['dateStart','$lte'], values.to );
+                                }
                             }
-                        }
-                        break;
-                }
+                            break;
+                    }
+                } );
+            }
+            db.timeSlots.find( query ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
+                resolve( timeSlots );
             } );
-        }
-        db.timeSlots.find( query ).sort( { dateStart: -1 } ).exec( ( err, timeSlots ) => {
-            resolve( timeSlots );
-        } );
+		} );
     } );
 } );
 
 // return   promise resolve object   timeSlot
 api.timeSlots.getCurrent = () => new Promise( ( resolve, reject ) => {
     getDb().then( db => {
-        db.timeSlots.find( { dateStop: { $exists: false } } ).sort( { dateStart: -1 } ).limit( 1 ).exec( ( err, timeSlots ) => {
-            resolve( timeSlots.length ? timeSlots[0] : null );
+        db.timeSlots.findOne( { dateStop: { $exists: false } }, ( err, timeSlot ) => {
+            resolve( timeSlot );
         } );
     } );
 } );
@@ -254,6 +261,11 @@ const validateSetting = setting => {
             }
             // ??? TODO validate filters
             return true;
+        case 'startOfWeek':
+            if ( ! isString( setting.value ) || ! /[0-6]/.test( setting.value ) ) {
+                return [setting.key + ' must be type of string. Between 0 and 6.'];
+            }
+            return true;
         default:
             return ['"' + setting.key + '" is not a valid settings key.'];
     }
@@ -345,5 +357,4 @@ const setupApi = () => {
 module.exports = {
     setupApi,
     api,
-    settingsDefaults,
 };

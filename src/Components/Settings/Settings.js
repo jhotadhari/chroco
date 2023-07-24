@@ -1,9 +1,9 @@
 import classnames from "classnames";
-import Icon from "../Icon";
 import ThemeControl from "./ThemeControl";
 import HideFieldsControl from "./HideFieldsControl";
 import DbPathControl from "./DbPathControl";
 import TimezonesControl from "./TimezonesControl";
+import StartOfWeekControl from "./StartOfWeekControl";
 
 const Settings = ( {
 	showSettings,
@@ -22,7 +22,7 @@ const Settings = ( {
 			'bg-blur',
 			showSettings ? 'show' : ''
 		] ) }
-		tabindex="-1"
+		tabIndex="-1"
 	>
 		<div className="modal-dialog">
 			<div className="modal-content">
@@ -39,6 +39,7 @@ const Settings = ( {
 				<div className="modal-body">
 
 					<ThemeControl className="mb-5"/>
+					<StartOfWeekControl className="mb-5"/>
 					<HideFieldsControl className="mb-5"/>
 					<DbPathControl className="mb-5"/>
 					<TimezonesControl className="mb-5"/>

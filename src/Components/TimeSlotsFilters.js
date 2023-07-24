@@ -167,7 +167,11 @@ const DateStartFilter = ( {
 			to: dayjs( get( filter, ['value','to'] ) ).valueOf(),
 		};
 	} else {
-		inputValue = getDateValuesForFilter( { timeFrame: filterType, value: get( filter, 'value', 0 ) } );
+		inputValue = getDateValuesForFilter( {
+			timeFrame: filterType,
+			value: get( filter, 'value', 0 ),
+			startOfWeek: getSetting( 'startOfWeek' ),
+		} );
 	}
 
 	/**
