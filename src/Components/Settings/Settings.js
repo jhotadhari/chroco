@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import classnames from "classnames";
 import ThemeControl from "./ThemeControl";
 import HideFieldsControl from "./HideFieldsControl";
@@ -9,9 +10,10 @@ const Settings = ( {
 	showSettings,
 	setShowSettings,
 } ) => {
-
+	const ref = useRef( null );
 	return showSettings ? <div
 		onKeyDown={ e => 'Escape' === e.key && setShowSettings( false ) }
+		onClick={ e => e.target === ref.current && setShowSettings( false ) }
 		className={ classnames( [
 			'modal',
 			'fade',
@@ -23,8 +25,9 @@ const Settings = ( {
 			showSettings ? 'show' : ''
 		] ) }
 		tabIndex="-1"
+		ref={ ref }
 	>
-		<div className="modal-dialog">
+		<div className="modal-dialog" >
 			<div className="modal-content">
 				<div className="modal-header">
 					<h5 className="modal-title">Preferences</h5>
@@ -49,7 +52,6 @@ const Settings = ( {
 			</div>
 		</div>
 	</div> : null;
-
 }
 
 export default Settings;
