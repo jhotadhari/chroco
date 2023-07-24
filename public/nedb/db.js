@@ -45,16 +45,16 @@ const getDb = () => new Promise( ( resolve, reject ) => {
 				timestampData: true,
 			} ),
 		};
-		newDb.settings.find( { key: 'dbPath' }, ( err, settings ) => {
-			const dbPath = get( settings, [0, 'value'], get( settingsDefaults, 'dbPath' ) );
+		newDb.settings.findOne( { key: 'dbPath' }, ( err, setting ) => {
+			const dbPath = setting ? setting.value : get( settingsDefaults, 'dbPath' );
 			maybeAddDynamicPaths( newDb, dbPath )
 			db = newDb;
 			resolve( db );
 		} );
 
 	} else {
-		db.settings.find( { key: 'dbPath' }, ( err, settings ) => {
-			const dbPath = get( settings, [0, 'value'], get( settingsDefaults, 'dbPath' ) );
+		db.settings.findOne( { key: 'dbPath' }, ( err, setting ) => {
+			const dbPath = setting ? setting.value : get( settingsDefaults, 'dbPath' );
 			maybeAddDynamicPaths( db, dbPath );
 			resolve( db );
 		} );
