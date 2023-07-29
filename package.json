@@ -26,6 +26,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "format": "eslint --fix --config ./.eslintrc.format.js ./src/**/*.js ./public/**/*.js",
     "dev": "concurrently -k \"BROWSER=none npm start\" \"npm:electron\"",
     "electron": "wait-on tcp:3000 && electron ."
   },
@@ -53,6 +54,8 @@
     "electron": "^25.2.0",
     "electron-devtools-installer": "^3.2.0",
     "electron-is-dev": "^2.0.0",
+    "eslint": "^8.46.0",
+    "eslint-plugin-react": "^7.33.0",
     "wait-on": "^7.0.1"
   }
 }
