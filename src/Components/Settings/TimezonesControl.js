@@ -1,26 +1,28 @@
 import {
-  useState,
-  useContext,
-} from "react";
+	useState,
+	useContext,
+} from 'react';
 import {
 	difference,
 	get,
-} from "lodash";
-import classnames from "classnames";
+} from 'lodash';
+import classnames from 'classnames';
 import Context from '../../Context';
-import { isValidTimezones } from '../../utils';
+import {
+	isValidTimezones,
+} from '../../utils';
 const { api } = window;
 
-const TimezonesControl = ( {
-	className,
-} ) => {
+const TimezonesControl = ( {className} ) => {
 	const {
 		settings,
 		setSettings,
 		settingsDefaults,
 	} = useContext( Context );
 
-	const [editState,setEditState] = useState( false )
+	const [
+		editState, setEditState,
+	] = useState( false );
 
 	const settingKey = 'timezones';
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => sett.key && sett.key === settingKey ) : undefined;
@@ -36,7 +38,9 @@ const TimezonesControl = ( {
 				value: newVal,
 			};
 			api.settings.add( newSetting ).then( ( addedSetting ) => {
-				setSettings( [...settings, addedSetting] );
+				setSettings( [
+					...settings, addedSetting,
+				] );
 			} );
 		} else {
 			// update setting
@@ -66,7 +70,9 @@ const TimezonesControl = ( {
 						'form-control',
 					] ) }
 					aria-labelledby={ 'setting-label-' + settingKey }
-					style={ { width: '100%' } }
+					style={ {
+						width: '100%',
+					} }
 					value={ Array.isArray( value ) ? value.join( ',' ) : value }
 					onChange={ e => {
 						if ( isValidTimezones( e.target.value ) ) {
@@ -88,7 +94,7 @@ const TimezonesControl = ( {
 			{ difference( value, settingsDefaults[settingKey] ).length > 0 && <div className="col">
 				<button
 					onClick={ () => {
-						doUpdate( settingsDefaults[settingKey].join(',') );
+						doUpdate( settingsDefaults[settingKey].join( ',' ) );
 						setEditState( false );
 					} }
 					type="button"
@@ -97,6 +103,6 @@ const TimezonesControl = ( {
 			</div> }
 		</div>
 	</div>;
-}
+};
 
 export default TimezonesControl;

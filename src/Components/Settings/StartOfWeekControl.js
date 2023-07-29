@@ -1,19 +1,19 @@
 import {
-  useContext,
-} from "react";
+	useContext,
+} from 'react';
 import {
 	toString,
 	difference,
 	get,
-} from "lodash";
-import { MultiSelect } from "react-multi-select-component";
+} from 'lodash';
+import {
+	MultiSelect,
+} from 'react-multi-select-component';
 import Context from '../../Context';
 const { api } = window;
 
 
-const StartOfWeekControl = ( {
-	className,
-} ) => {
+const StartOfWeekControl = ( {className} ) => {
 	const {
 		themeSource,
 		settings,
@@ -25,20 +25,22 @@ const StartOfWeekControl = ( {
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => sett.key && sett.key === settingKey ) : undefined;
 
 	const options = [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-    ].map( ( label, valueInt ) => ( { value: toString( valueInt ), label } ) );
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	].map( ( label, valueInt ) => ( {
+		value: toString( valueInt ), label,
+	} ) );
 
 
-    console.log( 'debug options', options ); // debug
+	console.log( 'debug options', options ); // debug
 	let value = get( setting, 'value' ) ? options.find( opt => opt.value === setting.value ) : undefined;
-    value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
-    console.log( 'debug value', value ); // debug
+	value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
+	console.log( 'debug value', value ); // debug
 
 	const doUpdate = newVal => {
 
@@ -49,7 +51,9 @@ const StartOfWeekControl = ( {
 				value: newVal,
 			};
 			api.settings.add( newSetting ).then( ( addedSetting ) => {
-				setSettings( [...settings, addedSetting] );
+				setSettings( [
+					...settings, addedSetting,
+				] );
 
 			} );
 		} else {
@@ -85,12 +89,12 @@ const StartOfWeekControl = ( {
 					onChange={ res => {
 						if ( 2 === res.length ) {
 							// remove old value
-							res = [...res].filter( sett => sett.value !== value.value )
+							res = [...res].filter( sett => sett.value !== value.value );
 						}
 						if ( 1 !== res.length ) {
 							return;
 						}
-						doUpdate( res[0].value )
+						doUpdate( res[0].value );
 					} }
 				/>
 			</div>
@@ -105,6 +109,6 @@ const StartOfWeekControl = ( {
 
 		</div>
 	</div>;
-}
+};
 
 export default StartOfWeekControl;

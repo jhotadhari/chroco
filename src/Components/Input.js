@@ -1,13 +1,13 @@
-import classnames from "classnames";
+import classnames from 'classnames';
 import {
   	get,
   	omit,
-} from "lodash";
+} from 'lodash';
 import {
   	useContext,
   	useEffect,
   	useState,
-} from "react";
+} from 'react';
 import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
@@ -19,8 +19,8 @@ export const getFilteredSuggestions = ( value, suggestions ) => {
 	return inputLength === 0
 		? suggestions
 		: suggestions.filter( suggestion => {
-			const result = regex.test( suggestion.toLowerCase() )
-			return result
+			const result = regex.test( suggestion.toLowerCase() );
+			return result;
 
 		} );
 };
@@ -38,17 +38,23 @@ const Input = ( {
 		addFieldSuggestion,
 	} = useContext( Context );
 
-	const {
-		updateTimeSlot,
-	} = useTimeSlotCrud();
+	const {updateTimeSlot} = useTimeSlotCrud();
 
-	const title = get( timeSlotSchema, [field,'title'], '' );
-	const defaultVal = useDefault ? get( timeSlotSchema, [field, 'default'], '' ) : '';
+	const title = get( timeSlotSchema, [
+		field, 'title',
+	], '' );
+	const defaultVal = useDefault ? get( timeSlotSchema, [
+		field, 'default',
+	], '' ) : '';
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
 
-	const hasSuggestions = get( timeSlotSchema, [field,'hasSuggestions'] );
-	const [suggestions,setSuggestions] = useState( get( fieldSuggestions, field, [] ) );
+	const hasSuggestions = get( timeSlotSchema, [
+		field, 'hasSuggestions',
+	] );
+	const [
+		suggestions, setSuggestions,
+	] = useState( get( fieldSuggestions, field, [] ) );
 
 	const inputClassName = classnames( {
 		'form-control': true,
@@ -62,9 +68,13 @@ const Input = ( {
 			&& value === defaultVal
 			&& ! ( get( timeSlot, field ) || get( editTimeSlot, field ) )
 		) {
-			setEditTimeSlot( { ...editTimeSlot, [field]: value } );
+			setEditTimeSlot( {
+				...editTimeSlot, [field]: value,
+			} );
 		}
-	}, [timeSlot,editTimeSlot] );
+	}, [
+		timeSlot, editTimeSlot,
+	] );
 
 	const onKeyDown = e => {
 		if ( isDirty ) {
@@ -95,7 +105,9 @@ const Input = ( {
 			onSuggestionsFetchRequested={ ( { value } ) => setSuggestions( getFilteredSuggestions( value, get( fieldSuggestions, field, [] ) ) ) }
 			onSuggestionsClearRequested={ () => setSuggestions( [] ) }
 			renderSuggestion={ suggestion => <span>{ suggestion }</span> }
-			renderSuggestionsContainer={ ( { containerProps, children, query } ) => {
+			renderSuggestionsContainer={ ( {
+				containerProps, children, query,
+			} ) => {
 				const props = {
 					...containerProps,
 					className: classnames( [
@@ -121,9 +133,13 @@ const Input = ( {
 				className: inputClassName,
 				value,
 				onKeyDown,
-				onChange: ( event, { type, newValue } ) => {
-					setEditTimeSlot( { ...editTimeSlot, [field]: newValue } );
-				}
+				onChange: ( event, {
+					type, newValue,
+				} ) => {
+					setEditTimeSlot( {
+						...editTimeSlot, [field]: newValue,
+					} );
+				},
 			} }
 		/>;
 
@@ -133,7 +149,9 @@ const Input = ( {
 			className={ inputClassName }
 			type="text"
 			onChange={ ( e ) => {
-				setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
+				setEditTimeSlot( {
+					...editTimeSlot, [field]: e.target.value,
+				} );
 			} }
 			value={ value }
 			title={ title }

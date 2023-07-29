@@ -1,10 +1,12 @@
-import { useRef } from "react";
-import classnames from "classnames";
-import ThemeControl from "./ThemeControl";
-import HideFieldsControl from "./HideFieldsControl";
-import DbPathControl from "./DbPathControl";
-import TimezonesControl from "./TimezonesControl";
-import StartOfWeekControl from "./StartOfWeekControl";
+import {
+	useRef,
+} from 'react';
+import classnames from 'classnames';
+import ThemeControl from './ThemeControl';
+import HideFieldsControl from './HideFieldsControl';
+import DbPathControl from './DbPathControl';
+import TimezonesControl from './TimezonesControl';
+import StartOfWeekControl from './StartOfWeekControl';
 
 const Settings = ( {
 	showSettings,
@@ -22,7 +24,7 @@ const Settings = ( {
 			'bg-black',
 			'bg-opacity-50',
 			'bg-blur',
-			showSettings ? 'show' : ''
+			showSettings ? 'show' : '',
 		] ) }
 		tabIndex="-1"
 		ref={ ref }
@@ -52,6 +54,6 @@ const Settings = ( {
 			</div>
 		</div>
 	</div> : null;
-}
+};
 
 export default Settings;

@@ -1,16 +1,16 @@
 import {
-  useContext,
-} from "react";
+	useContext,
+} from 'react';
 import {
 	get,
-} from "lodash";
-import { MultiSelect } from "react-multi-select-component";
+} from 'lodash';
+import {
+	MultiSelect,
+} from 'react-multi-select-component';
 import Context from '../../Context';
 const { api } = window;
 
-const ThemeControl = ( {
-	className,
-} ) => {
+const ThemeControl = ( {className} ) => {
 	const {
 		setThemeSource,
 		themeSource,
@@ -23,13 +23,19 @@ const ThemeControl = ( {
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => sett.key && sett.key === settingKey ) : undefined;
 
 	const options = [
-		{ value: 'system',	label: 'System' },
-		{ value: 'dark',	label: 'Dark' },
-		{ value: 'light',	label: 'Light' },
+		{
+			value: 'system',	label: 'System',
+		},
+		{
+			value: 'dark',	label: 'Dark',
+		},
+		{
+			value: 'light',	label: 'Light',
+		},
 	];
 
 	let value = get( setting, 'value' ) ? options.find( opt => opt.value === setting.value ) : undefined;
-		value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
+	value = value ? value : options.find( opt => opt.value === settingsDefaults[settingKey] );
 
 	const doUpdate = newVal => {
 		const updateFrontend = () => api.darkMode.setThemeSource( newVal ).then( () => {
@@ -45,7 +51,9 @@ const ThemeControl = ( {
 				value: newVal,
 			};
 			api.settings.add( newSetting ).then( ( addedSetting ) => {
-				setSettings( [...settings, addedSetting] );
+				setSettings( [
+					...settings, addedSetting,
+				] );
 				updateFrontend();
 
 			} );
@@ -83,12 +91,12 @@ const ThemeControl = ( {
 					onChange={ res => {
 						if ( 2 === res.length ) {
 							// remove old value
-							res = [...res].filter( sett => sett.value !== value.value )
+							res = [...res].filter( sett => sett.value !== value.value );
 						}
 						if ( 1 !== res.length ) {
 							return;
 						}
-						doUpdate( res[0].value )
+						doUpdate( res[0].value );
 					} }
 				/>
 			</div>
@@ -103,6 +111,6 @@ const ThemeControl = ( {
 
 		</div>
 	</div>;
-}
+};
 
 export default ThemeControl;

@@ -1,18 +1,18 @@
 import {
-  useContext,
-} from "react";
+	useContext,
+} from 'react';
 import {
 	difference,
 	get,
-} from "lodash";
-import { MultiSelect } from "react-multi-select-component";
+} from 'lodash';
+import {
+	MultiSelect,
+} from 'react-multi-select-component';
 import Context from '../../Context';
 const { api } = window;
 
 
-const HideFieldsControl = ( {
-	className,
-} ) => {
+const HideFieldsControl = ( {className} ) => {
 	const {
 		themeSource,
 		settings,
@@ -26,14 +26,19 @@ const HideFieldsControl = ( {
 
 	const value = [...get( setting, 'value', settingsDefaults[settingKey] )].map( key => ( {
 		value: key,
-		label: !! timeSlotSchema ? get( timeSlotSchema, [key,'title'] ) : '',
+		label: timeSlotSchema ? get( timeSlotSchema, [
+			key, 'title',
+		] ) : '',
 	} ) );
 
-	const options = !! timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => key !== '_id').map( key => ( {
-		value: key,
-		label: timeSlotSchema[key].title,
-		disabled: ['title','dateStart','dateStop'].includes( key ),
-	} ) ) : [];
+	const options = timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => key !== '_id' )
+		.map( key => ( {
+			value: key,
+			label: timeSlotSchema[key].title,
+			disabled: [
+				'title', 'dateStart', 'dateStop',
+			].includes( key ),
+		} ) ) : [];
 
 	const doUpdate = newVal => {
 		if ( undefined === setting ) {
@@ -43,7 +48,9 @@ const HideFieldsControl = ( {
 				value: [...newVal].map( opt => opt.value ),
 			};
 			api.settings.add( newSetting ).then( ( addedSetting ) => {
-				setSettings( [...settings, addedSetting] );
+				setSettings( [
+					...settings, addedSetting,
+				] );
 			} );
 		} else {
 			// update setting
@@ -87,6 +94,6 @@ const HideFieldsControl = ( {
 			</div> }
 		</div>
 	</div>;
-}
+};
 
 export default HideFieldsControl;

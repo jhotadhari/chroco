@@ -1,29 +1,33 @@
-import classnames from "classnames";
-import dayjs from "dayjs";
+import classnames from 'classnames';
+import dayjs from 'dayjs';
 import {
-  get,
-  isObject,
-  omit,
-} from "lodash";
+	get,
+	isObject,
+	omit,
+} from 'lodash';
 import {
 	useState,
 	useContext,
 	// useEffect,
 	Fragment,
 	// useRef,
-} from "react";
+} from 'react';
 import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
-import { dateFormat } from '../constants';
-import TimeSlot from "./TimeSlot";
+import {
+	dateFormat,
+} from '../constants';
+import TimeSlot from './TimeSlot';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
-import useTick from "../hooks/useTick";
-import { getFilteredSuggestions } from "./Input";
-import Icon from "./Icon";
+import useTick from '../hooks/useTick';
+import {
+	getFilteredSuggestions,
+} from './Input';
+import Icon from './Icon';
 import {
 	sortTimeSlotsCompare,
 	formatSeconds,
-} from "../utils";
+} from '../utils';
 const { api } = window;
 
 const GroupInput = ( {
@@ -32,7 +36,7 @@ const GroupInput = ( {
 	updateTimeSlots,
 	editTimeSlot,
 	setEditTimeSlot,
-  } ) => {
+} ) => {
 
 	const {
 		timeSlotSchema,
@@ -40,12 +44,18 @@ const GroupInput = ( {
 		addFieldSuggestion,
 	} = useContext( Context );
 
-	const title = get( timeSlotSchema, [field,'title'], '' );
+	const title = get( timeSlotSchema, [
+		field, 'title',
+	], '' );
 	const value = get( editTimeSlot, field, get( timeSlot, field, '' ) );
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 
-	const hasSuggestions = get( timeSlotSchema, [field,'hasSuggestions'] );
-	const [suggestions,setSuggestions] = useState( get( fieldSuggestions, field, [] ) );
+	const hasSuggestions = get( timeSlotSchema, [
+		field, 'hasSuggestions',
+	] );
+	const [
+		suggestions, setSuggestions,
+	] = useState( get( fieldSuggestions, field, [] ) );
 
 	const inputClassName = classnames( {
 		'form-control': true,
@@ -78,7 +88,9 @@ const GroupInput = ( {
 			onSuggestionsFetchRequested={ ( { value } ) => setSuggestions( getFilteredSuggestions( value, get( fieldSuggestions, field, [] ) ) ) }
 			onSuggestionsClearRequested={ () => setSuggestions( [] ) }
 			renderSuggestion={ suggestion => <span>{ suggestion }</span> }
-			renderSuggestionsContainer={ ( { containerProps, children, query } ) => {
+			renderSuggestionsContainer={ ( {
+				containerProps, children, query,
+			} ) => {
 				const props = {
 					...containerProps,
 					className: classnames( [
@@ -104,9 +116,13 @@ const GroupInput = ( {
 				className: inputClassName,
 				value,
 				onKeyDown,
-				onChange: ( event, { type, newValue } ) => {
-					setEditTimeSlot( { ...editTimeSlot, [field]: newValue } );
-				}
+				onChange: ( event, {
+					type, newValue,
+				} ) => {
+					setEditTimeSlot( {
+						...editTimeSlot, [field]: newValue,
+					} );
+				},
 			} }
 		/>;
 
@@ -116,7 +132,9 @@ const GroupInput = ( {
 			className={ inputClassName }
 			type="text"
 			onChange={ ( e ) => {
-				setEditTimeSlot( { ...editTimeSlot, [field]: e.target.value } );
+				setEditTimeSlot( {
+					...editTimeSlot, [field]: e.target.value,
+				} );
 			} }
 			value={ value }
 			title={ title }
@@ -125,9 +143,7 @@ const GroupInput = ( {
 	}
 };
 
-const GroupDuration = ( {
-	timeSlotsSlice,
-  } ) => {
+const GroupDuration = ( {timeSlotsSlice} ) => {
 
 	const {
 		timeSlotCurrent,
@@ -136,7 +152,7 @@ const GroupDuration = ( {
 
 	useTick( timeSlotCurrent
 		? !! timeSlotsSlice.find( ts => ts._id === timeSlotCurrent._id )
-		: undefined
+		: undefined,
 	);
 
 	let isDirty = false;
@@ -158,28 +174,28 @@ const GroupDuration = ( {
 
 	return <div
 	  className={ classnames( {
-		"timeSlot--duration": true,
-		"text-end": true,
-		'align-middle': true,
-		'bg-transparent': true,
-		'col-3': true,
-		'd-flex': true,
-		'justify-content-end': true,
+			'timeSlot--duration': true,
+			'text-end': true,
+			'align-middle': true,
+			'bg-transparent': true,
+			'col-3': true,
+			'd-flex': true,
+			'justify-content-end': true,
 	  } ) }
 	>
 	  <span
-		className={ classnames( {
+			className={ classnames( {
 		  invalid: seconds < 0,
 		  'p-2': true,
 		  'dirty': isDirty,
-		} ) }
+			} ) }
 	  >
-		{ false !== seconds
+			{ false !== seconds
 		  ? formatSeconds( seconds )
 		  : '- m' }
 	  </span>
 	</div>;
-  };
+};
 
 const GroupHeader = ( {
 	timeSlotsSlice,
@@ -200,27 +216,33 @@ const GroupHeader = ( {
 		stopTimeSlot,
 	} = useTimeSlotCrud();
 
-	const [editTimeSlot, setEditTimeSlot] = useState( {} );
+	const [
+		editTimeSlot, setEditTimeSlot,
+	] = useState( {
+	} );
 
 	const updateTimeSlots = ( { includeFields } ) => {
 		let newTimeSlots = [...timeSlots];
 		return [...timeSlotsSlice].reduce( ( accumulatorPromise, timeSlot, index ) => {
 			return accumulatorPromise.then( () => {
 				return new Promise( ( resolve, reject ) => {
-					let newEditTimeSlot = {};
-					let newTimeSlot = {...timeSlot};
+					let newEditTimeSlot = {
+					};
+					let newTimeSlot = {
+						...timeSlot,
+					};
 					if ( includeFields ) {
 						Object.keys( editTimeSlot ).map( key => {
-						if ( includeFields.includes( key ) ) {
-							newTimeSlot[key] = editTimeSlot[key];
-						} else {
-							newEditTimeSlot[key] = editTimeSlot[key];
-						}
+							if ( includeFields.includes( key ) ) {
+								newTimeSlot[key] = editTimeSlot[key];
+							} else {
+								newEditTimeSlot[key] = editTimeSlot[key];
+							}
 						} );
 					} else {
 						newTimeSlot = {
-						...newTimeSlot,
-						...editTimeSlot,
+							...newTimeSlot,
+							...editTimeSlot,
 						};
 					}
 					api.timeSlots.update( newTimeSlot ).then( numberUpdated => {
@@ -292,7 +314,7 @@ const GroupHeader = ( {
 				timeSlotsSlice={ timeSlotsSlice }
 			/>
 
-			<div className={ "col-4 timeSlot--actions d-flex" }>
+			<div className={ 'col-4 timeSlot--actions d-flex' }>
 				<button
 					className="btn me-2 save"
 					onClick={ updateTimeSlots }
@@ -311,12 +333,13 @@ const GroupHeader = ( {
 							[...timeSlotsSliceCurrents].map( timeSlot => stopTimeSlot( {
 								timeSlot,
 							} ) );
-							setTimeSlotCurrentEdit( {} );
+							setTimeSlotCurrentEdit( {
+							} );
 						} else {
 							// start new one
 							startTimeSlot( {
 								timeSlot: timeSlotsSlice[0],
-							} )
+							} );
 						}
 					} }
 					title={ timeSlotsSliceCurrents.length ? 'Stop' : 'Start' }
@@ -330,11 +353,11 @@ const GroupHeader = ( {
 	</div>;
 };
 
-const DateGroup = ( {
-	timeSlotsSlice,
-} ) => {
+const DateGroup = ( {timeSlotsSlice} ) => {
 	const timeSlotsSliceCurrents = timeSlotsSlice.filter( ts => ! ts.dateStop );
-	const [expanded, setExpanded] = useState( !! timeSlotsSliceCurrents.length );
+	const [
+		expanded, setExpanded,
+	] = useState( !! timeSlotsSliceCurrents.length );
 
 	return <>
 		{ timeSlotsSlice.length > 1 && <GroupHeader
@@ -358,19 +381,19 @@ const DateGroup = ( {
 
 const TimeSlotsTable = () => {
 
-	const {
-		timeSlots,
-	} = useContext( Context );
+	const {timeSlots} = useContext( Context );
 
-	const timeSlotsGrouped = {};
+	const timeSlotsGrouped = {
+	};
 	[...timeSlots].map( ( timeSlot ) => {
-		let groupDateId = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat) );
+		let groupDateId = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat ) );
 		if ( ! groupDateId || ! groupDateId.length ) {
 			return;
 		}
 		groupDateId = groupDateId[0];
 		if ( ! timeSlotsGrouped[groupDateId] ) {
-			timeSlotsGrouped[groupDateId] = {};
+			timeSlotsGrouped[groupDateId] = {
+			};
 		}
 		const groupId = [
 			'title',
@@ -384,9 +407,7 @@ const TimeSlotsTable = () => {
 				timeSlot,
 			];
 		} else {
-			timeSlotsGrouped[groupDateId][groupId] = [
-				timeSlot,
-			];
+			timeSlotsGrouped[groupDateId][groupId] = [timeSlot];
 		}
 	} );
 
@@ -399,33 +420,35 @@ const TimeSlotsTable = () => {
   	return <div className='container-fluid mb-3' >
 		<div className="timeSlots-table" >
 			{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
-					<div className="row">
+				<div className="row">
 
-						<div className="col position-relative">
-							<span className="bg-body-bg bg-body z-1 pe-4">
-								{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
-							</span>
-							<div className="border-bottom position-absolute" style={ {
-								width: '95%',
-								right: '1rem',
-							} }
-							></div>
-						</div>
-
-						{ <GroupDuration
-							timeSlotsSlice={ Object.keys( timeSlotsGrouped[groupDateId] ).reduce(
-								( timeSlotsSlice, groupId ) => [...timeSlotsSlice,...timeSlotsGrouped[groupDateId][groupId]]
-							, [] ) }
-						/> }
-
-						<div className={ "col-4" }></div>
-
+					<div className="col position-relative">
+						<span className="bg-body-bg bg-body z-1 pe-4">
+							{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
+						</span>
+						<div className="border-bottom position-absolute" style={ {
+							width: '95%',
+							right: '1rem',
+						} }
+						></div>
 					</div>
-					{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
-						key={ groupId }
-						timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
-					/> ) }
-				</Fragment> ) }
+
+					{ <GroupDuration
+						timeSlotsSlice={ Object.keys( timeSlotsGrouped[groupDateId] ).reduce(
+							( timeSlotsSlice, groupId ) => [
+								...timeSlotsSlice, ...timeSlotsGrouped[groupDateId][groupId],
+							]
+							, [] ) }
+					/> }
+
+					<div className={ 'col-4' }></div>
+
+				</div>
+				{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
+					key={ groupId }
+					timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
+				/> ) }
+			</Fragment> ) }
 		</div>
 	</div> ;
 };

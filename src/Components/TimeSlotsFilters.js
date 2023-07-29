@@ -1,30 +1,32 @@
-import classnames from "classnames";
-import dayjs from "dayjs";
+import classnames from 'classnames';
+import dayjs from 'dayjs';
 import {
 	isInteger,
 	set,
   	get,
-} from "lodash";
+} from 'lodash';
 import {
 	useState,
 	useContext,
 	Fragment,
-} from "react";
-import { MultiSelect } from "react-multi-select-component";
+} from 'react';
+import {
+	MultiSelect,
+} from 'react-multi-select-component';
 import Context from '../Context';
-import { dateFormat } from '../constants';
-import TimezonesTooltip from "./TimezonesTooltip";
-import Icon from "./Icon";
+import {
+	dateFormat,
+} from '../constants';
+import TimezonesTooltip from './TimezonesTooltip';
+import Icon from './Icon';
 import {
 	isValidDateInput,
 	getDateValuesForFilter,
 	isValidRegex,
-} from "../utils";
+} from '../utils';
 const { api } = window;
 
-const useDoUpdate = ( {
-	settingKey
-} ) => {
+const useDoUpdate = ( {settingKey} ) => {
 	const {
 		settings,
 		setSettings,
@@ -40,7 +42,9 @@ const useDoUpdate = ( {
 				value: newVal,
 			};
 			api.settings.add( newSetting ).then( ( addedSetting ) => {
-				setSettings( [...settings, addedSetting] );
+				setSettings( [
+					...settings, addedSetting,
+				] );
 			} );
 		} else {
 			// update setting
@@ -60,11 +64,9 @@ const useDoUpdate = ( {
 	};
 
 	return doUpdate;
-}
+};
 
-const DateStartFilter = ( {
-	field,
-} ) => {
+const DateStartFilter = ( {field} ) => {
 
 	const {
 		getSetting,
@@ -72,7 +74,9 @@ const DateStartFilter = ( {
 	} = useContext( Context );
 
 	const settingKey = 'filters';
-	const doUpdate = useDoUpdate( { settingKey } );
+	const doUpdate = useDoUpdate( {
+		settingKey,
+	} );
 
 	let options = [
 		{
@@ -102,7 +106,10 @@ const DateStartFilter = ( {
 		},
 	];
 
-	const [editFilter,setEditFilter] = useState( {} );
+	const [
+		editFilter, setEditFilter,
+	] = useState( {
+	} );
 
 	const filters = getSetting( 'filters' );
 	const filterIdx = filters && Array.isArray( filters )
@@ -113,7 +120,7 @@ const DateStartFilter = ( {
 	const filterBase = {
 		...( filterSett ? filterSett : {
 			field,
-		} )
+		} ),
 	};
 	const filter = {
 		...filterBase,
@@ -163,8 +170,12 @@ const DateStartFilter = ( {
 	const filterType = get( filter, 'type', selectedOption.value );
 	if ( filterType === 'custom' ) {
 		inputValue = {
-			from: dayjs( get( filter, ['value','from'] ) ).valueOf(),
-			to: dayjs( get( filter, ['value','to'] ) ).valueOf(),
+			from: dayjs( get( filter, [
+				'value', 'from',
+			] ) ).valueOf(),
+			to: dayjs( get( filter, [
+				'value', 'to',
+			] ) ).valueOf(),
 		};
 	} else {
 		inputValue = getDateValuesForFilter( {
@@ -182,14 +193,22 @@ const DateStartFilter = ( {
 	 * @param   string  key     from|to
 	 */
 	const getInputValueEdit = key => {
-		if ( null !== get( editFilter, ['value',key], null ) ) {
-			if ( /^\d+$/.test( get( editFilter, ['value',key], '' ) ) ) {
-				return dayjs( get( editFilter, ['value',key] ) ).format( dateFormat );
+		if ( null !== get( editFilter, [
+			'value', key,
+		], null ) ) {
+			if ( /^\d+$/.test( get( editFilter, [
+				'value', key,
+			], '' ) ) ) {
+				return dayjs( get( editFilter, [
+					'value', key,
+				] ) ).format( dateFormat );
 			} else {
-				return get( editFilter, ['value',key] );
+				return get( editFilter, [
+					'value', key,
+				] );
 			}
 		} else {
-			return dayjs( inputValue[key] ).format( dateFormat )
+			return dayjs( inputValue[key] ).format( dateFormat );
 		}
 	};
 
@@ -201,7 +220,11 @@ const DateStartFilter = ( {
 	const getInputClassName = key => classnames( {
 		'form-control': true,
 		'mt-2': true,
-		'dirty': get( editFilter, ['value',key] ) && ! /^\d+$/.test( get( editFilter, ['value',key] ) ),
+		'dirty': get( editFilter, [
+			'value', key,
+		] ) && ! /^\d+$/.test( get( editFilter, [
+			'value', key,
+		] ) ),
 		'invalid': ! isValidDateInput( getInputValueEdit( key ) ),
 	} );
 
@@ -212,7 +235,7 @@ const DateStartFilter = ( {
 	 */
 	const onChangeMultiSelect = res => {
 		if ( 0 === res.length ) {
-			res = [options[0]]
+			res = [options[0]];
 		}
 		if ( 2 === res.length ) {
 			// remove old value
@@ -222,18 +245,21 @@ const DateStartFilter = ( {
 			return;
 		}
 		if ( options.find( opt => opt.value === res[0].value ) ) {
-			let newFilter = {};
+			let newFilter = {
+			};
 			let newFilters = [...filters];
 			if ( 'custom' === res[0].value ) {
 				newFilter = {
 					...filter,
 					type: res[0].value,
-					value: {...inputValue},
+					value: {
+						...inputValue,
+					},
 				};
 				if ( filterIdx === -1 ) {
 					newFilters = [
 						...newFilters,
-						newFilter
+						newFilter,
 					];
 				} else {
 					newFilters[filterIdx] = newFilter;
@@ -247,7 +273,7 @@ const DateStartFilter = ( {
 				if ( filterIdx === -1 ) {
 					newFilters = [
 						...newFilters,
-						newFilter
+						newFilter,
 					];
 				} else {
 					newFilters[filterIdx] = newFilter;
@@ -267,7 +293,9 @@ const DateStartFilter = ( {
 		if ( 'custom' !== get( filter, 'value' ) ) {
 			let newFilters = [...filters];
 			if ( filterIdx !== -1 ) {
-				let newFilter = {...filter};
+				let newFilter = {
+					...filter,
+				};
 				newFilter.value = get( newFilter, 'value', 0 );
 				newFilter.value = isInteger( newFilter.value ) ? newFilter.value : 0;
 				switch( direction ) {
@@ -283,7 +311,7 @@ const DateStartFilter = ( {
 				doUpdate( newFilters );
 			}
 		}
-	}
+	};
 
 	/**
 	 * callback input onChange
@@ -297,7 +325,8 @@ const DateStartFilter = ( {
 			type: 'custom',
 			value: {
 				...inputValue,
-				...get( editFilter, 'value', {} ),
+				...get( editFilter, 'value', {
+				} ),
 				[key]: newVal,
 			},
 		};
@@ -311,21 +340,33 @@ const DateStartFilter = ( {
 	 * @param   string  key     from|to
 	 */
 	const onKeyDownInput = ( e, key ) => {
-		if ( get( editFilter, ['value','from'] )
-			|| get( editFilter, ['value','to'] )
+		if ( get( editFilter, [
+			'value', 'from',
+		] )
+			|| get( editFilter, [
+				'value', 'to',
+			] )
 		) {
 			let newEditFilter;
 			switch( e.key ) {
 				case 'Escape':
-					const valSett = get( filterSett, ['value',key] );
+					const valSett = get( filterSett, [
+						'value', key,
+					] );
 					if ( valSett ) {
-						newEditFilter = {...editFilter}
-						set( newEditFilter, ['value',key], valSett );
+						newEditFilter = {
+							...editFilter,
+						};
+						set( newEditFilter, [
+							'value', key,
+						], valSett );
 						setEditFilter( newEditFilter );
 					}
 					break;
 				case 'Enter':
-					let newFilter = {...filter};
+					let newFilter = {
+						...filter,
+					};
 					let newFilters = [...filters];
 
 					if ( ! Object.keys( newFilter.value ).reduce( ( valid, k ) => {
@@ -345,7 +386,7 @@ const DateStartFilter = ( {
 					if ( filterIdx === -1 ) {
 						newFilters = [
 							...newFilters,
-							newFilter
+							newFilter,
 						];
 					} else {
 						newFilters[filterIdx] = newFilter;
@@ -382,15 +423,19 @@ const DateStartFilter = ( {
 			<div className="col">
 				<MultiSelect
 					ClearSelectedIcon={ null }
-					className={ classnames( [ themeSource, 'w-100', 'text-center' ] ) }
+					className={ classnames( [
+						themeSource, 'w-100', 'text-center',
+					] ) }
 					hasSelectAll={ false }
 					disableSearch={ true }
 					closeOnChangedValue={ true }
 					options={ options }
-					value={ [{
-						...selectedOption,
-						label: options.find( opt => opt.value === selectedOption.value ).label,
-					}] }
+					value={ [
+						{
+							...selectedOption,
+							label: options.find( opt => opt.value === selectedOption.value ).label,
+						},
+					] }
 					onChange={ onChangeMultiSelect }
 				/>
 			</div>
@@ -440,9 +485,7 @@ const DateStartFilter = ( {
 	</div>;
 };
 
-const InputFilter = ( {
-	field,
-} ) => {
+const InputFilter = ( {field} ) => {
 
 	const {
 		getSetting,
@@ -451,10 +494,16 @@ const InputFilter = ( {
 	} = useContext( Context );
 
 	const settingKey = 'filters';
-	const doUpdate = useDoUpdate( { settingKey } );
+	const doUpdate = useDoUpdate( {
+		settingKey,
+	} );
 
-	const title = get( timeSlotSchema, [field,'title'], '' );
-	const titlePlural = get( timeSlotSchema, [field,'titlePlural'], title );
+	const title = get( timeSlotSchema, [
+		field, 'title',
+	], '' );
+	const titlePlural = get( timeSlotSchema, [
+		field, 'titlePlural',
+	], title );
 
 	const options = [
 		{
@@ -471,7 +520,10 @@ const InputFilter = ( {
 		},
 	];
 
-	const [editFilter,setEditFilter] = useState( {} );
+	const [
+		editFilter, setEditFilter,
+	] = useState( {
+	} );
 
 	const filters = getSetting( 'filters' );
 	const filterIdx = filters && Array.isArray( filters )
@@ -497,12 +549,12 @@ const InputFilter = ( {
 	return <div
 	//   key={ field }
 	  className={ classnames( [
-		'timeSlot--filter',
-		'timeSlot--filter--' + field,
-		'title' === field ? 'col-9' : 'col',
-		'position-relative',
+			'timeSlot--filter',
+			'timeSlot--filter--' + field,
+			'title' === field ? 'col-9' : 'col',
+			'position-relative',
 
-		isFiltered ? '' : 'unfiltered'
+			isFiltered ? '' : 'unfiltered',
 	  ] ) }
 	>
 		<div
@@ -520,7 +572,7 @@ const InputFilter = ( {
 				value={ [selectedOption] }
 				onChange={ res => {
 					if ( 0 === res.length ) {
-						res = [options[0]]
+						res = [options[0]];
 					}
 					if ( 2 === res.length ) {
 						// remove old value
@@ -530,11 +582,13 @@ const InputFilter = ( {
 						return;
 					}
 					if ( options.find( opt => opt.value === res[0].value ) ) {
-						let newFilter = {};
+						let newFilter = {
+						};
 						let newFilters = [...filters];
 						if ( 'all' === res[0].value ) {
 							if ( filterIdx !== -1 ) {
-								newFilter = {}
+								newFilter = {
+								};
 								newFilters.splice( filterIdx, 1 );
 							}
 						} else {
@@ -546,7 +600,7 @@ const InputFilter = ( {
 								};
 								newFilters = [
 									...newFilters,
-									newFilter
+									newFilter,
 								];
 							} else {
 								newFilter = {
@@ -566,7 +620,8 @@ const InputFilter = ( {
 				onKeyDown={ e => {
 					switch( e.key ) {
 						case 'Escape':
-							setEditFilter( {} );
+							setEditFilter( {
+							} );
 							if ( ! get( editFilter, 'value', [] ).length && ! get( filterSett, 'value', [] ).length ) {
 								if ( filterIdx !== -1 ) {
 									let newFilters = [...filters];
@@ -578,7 +633,9 @@ const InputFilter = ( {
 						case 'Enter':
 							if ( isValidRegex( filter.value ) ) {
 								let newFilters = [...filters];
-								newFilters[filterIdx] = {...filter};
+								newFilters[filterIdx] = {
+									...filter,
+								};
 								doUpdate( newFilters );
 							}
 							break;
@@ -588,7 +645,7 @@ const InputFilter = ( {
 					'form-control': true,
 					'mt-2': true,
 					'dirty': isInputDirty,
-					'invalid': ! isValidRegex( get( filter, 'value', '' ) )
+					'invalid': ! isValidRegex( get( filter, 'value', '' ) ),
 				} ) }
 				type="text"
 				onChange={ ( e ) => {
@@ -605,8 +662,8 @@ const InputFilter = ( {
 				placeholder={ 'RegExp' }
 			/> }
 		</div>
-	</div>
-}
+	</div>;
+};
 
 const TimeSlotsFilters = () => {
 
@@ -625,26 +682,27 @@ const TimeSlotsFilters = () => {
 
 			<div className="col-1"></div>
 
-			{ !! timeSlotSchema ? Object.keys( timeSlotSchema ).filter( field => ! [
+			{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( field => ! [
 				...getSetting( 'hideFields' ),
 				'_id',
-			].includes( field ) ).map( field => {
-				if ( 'text' !== timeSlotSchema[field].type ) {
-					switch( field ) {
-						case 'dateStart':
-							return <DateStartFilter
-								key={ field }
-								field={ field }
-							/>
-						default:
-							return <Fragment key={ field }/>;
+			].includes( field ) )
+				.map( field => {
+					if ( 'text' !== timeSlotSchema[field].type ) {
+						switch( field ) {
+							case 'dateStart':
+								return <DateStartFilter
+									key={ field }
+									field={ field }
+								/>;
+							default:
+								return <Fragment key={ field }/>;
+						}
 					}
-				}
-				return <InputFilter
-					key={ field }
-					field={ field }
-				/>
-			} ) : '' }
+					return <InputFilter
+						key={ field }
+						field={ field }
+					/>;
+				} ) : '' }
 
 			<div className="col-3"></div>
 

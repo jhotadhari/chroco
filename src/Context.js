@@ -1,7 +1,8 @@
 import {
-    createContext,
-} from "react";
+	createContext,
+} from 'react';
 
-const Context = createContext( {} );
+const Context = createContext( {
+} );
 
 export default Context;

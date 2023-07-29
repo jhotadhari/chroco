@@ -1,22 +1,20 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 import {
-  omit,
-} from "lodash";
+	omit,
+} from 'lodash';
 import {
-  useContext,
-} from "react";
+	useContext,
+} from 'react';
 import Context from '../Context';
 const { api } = window;
 
 const useTimeSlotCrud = () => {
 	const {
-        timeSlots,
-        setTimeSlots,
+		timeSlots,
+		setTimeSlots,
 	} = useContext( Context );
 
-	const startTimeSlot = ( {
-		timeSlot,
-	} ) => {
+	const startTimeSlot = ( {timeSlot} ) => {
 		const newTimeSlot = omit( {
 			...timeSlot,
 			dateStart: dayjs().valueOf(),
@@ -27,18 +25,20 @@ const useTimeSlotCrud = () => {
 			'updatedAt',
 		] );
 
-		api.timeSlots.add( newTimeSlot ).then( ( { addedTimeSlot, stoppedTimeSlot } ) => {
-		const newTimeSlots = [
-			addedTimeSlot,
-			...timeSlots,
-		];
-		if ( stoppedTimeSlot ) {
-			const idxStopped = newTimeSlots.findIndex( ts => ts._id === stoppedTimeSlot._id );
-			if ( idxStopped ) {
-				newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
+		api.timeSlots.add( newTimeSlot ).then( ( {
+			addedTimeSlot, stoppedTimeSlot,
+		} ) => {
+			const newTimeSlots = [
+				addedTimeSlot,
+				...timeSlots,
+			];
+			if ( stoppedTimeSlot ) {
+				const idxStopped = newTimeSlots.findIndex( ts => ts._id === stoppedTimeSlot._id );
+				if ( idxStopped ) {
+					newTimeSlots.splice( idxStopped, 1, stoppedTimeSlot );
+				}
 			}
-		}
-		setTimeSlots( newTimeSlots );
+			setTimeSlots( newTimeSlots );
 		} );
 	};
 
@@ -51,8 +51,11 @@ const useTimeSlotCrud = () => {
 		if ( ! timeSlot || ! timeSlot._id ) {
 			return;
 		}
-		let newEditTimeSlot = {};
-		let newTimeSlot = {...timeSlot};
+		let newEditTimeSlot = {
+		};
+		let newTimeSlot = {
+			...timeSlot,
+		};
 		if ( includeFields ) {
 			Object.keys( editTimeSlot ).map( key => {
 				if ( includeFields.includes( key ) ) {
@@ -78,29 +81,25 @@ const useTimeSlotCrud = () => {
 		} );
 	};
 
-	const stopTimeSlot = ( {
-		timeSlot,
-	} ) => {
+	const stopTimeSlot = ( {timeSlot} ) => {
 		api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
-		if ( updatedTimeSlot ) {
-			const newTimeSlots = [...timeSlots];
-			const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
-			newTimeSlots.splice( idx, 1, updatedTimeSlot );
-			setTimeSlots( newTimeSlots );
-		}
+			if ( updatedTimeSlot ) {
+				const newTimeSlots = [...timeSlots];
+				const idx = newTimeSlots.findIndex( ts => ts._id === timeSlot._id );
+				newTimeSlots.splice( idx, 1, updatedTimeSlot );
+				setTimeSlots( newTimeSlots );
+			}
 		} );
 	};
 
-	const deleteTimeSlot = ( {
-		deleteId,
-	} ) => {
+	const deleteTimeSlot = ( {deleteId} ) => {
 		api.timeSlots.delete( deleteId ).then( numberDeleted => {
-		if ( numberDeleted ) {
-			const newTimeSlots = [...timeSlots];
-			const idx = newTimeSlots.findIndex( ts => ts._id === deleteId );
-			newTimeSlots.splice( idx, 1 );
-			setTimeSlots( newTimeSlots );
-		}
+			if ( numberDeleted ) {
+				const newTimeSlots = [...timeSlots];
+				const idx = newTimeSlots.findIndex( ts => ts._id === deleteId );
+				newTimeSlots.splice( idx, 1 );
+				setTimeSlots( newTimeSlots );
+			}
 		} );
 	};
 
@@ -110,5 +109,5 @@ const useTimeSlotCrud = () => {
 		stopTimeSlot,
 		deleteTimeSlot,
 	};
-}
+};
 export default useTimeSlotCrud;

@@ -1,20 +1,27 @@
-import { useState, useContext, useRef } from "react";
-import classnames from "classnames";
 import {
-  get,
-  isObject,
-} from "lodash";
+	useState, useContext, useRef,
+} from 'react';
+import classnames from 'classnames';
+import {
+	get,
+	isObject,
+} from 'lodash';
 import Context from '../Context';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
-import Icon from "./Icon";
-import DateInput from "./DateInput";
-import Duration from "./Duration";
-import Input from "./Input";
+import Icon from './Icon';
+import DateInput from './DateInput';
+import Duration from './Duration';
+import Input from './Input';
 
 const CreateTimeSlot = () => {
 
-	const [editTimeSlot, setEditTimeSlot] = useState( {} );
-	const [random, setRandom] = useState( 0 );
+	const [
+		editTimeSlot, setEditTimeSlot,
+	] = useState( {
+	} );
+	const [
+		random, setRandom,
+	] = useState( 0 );
 	const ref = useRef( null );
 
 	const {
@@ -46,14 +53,16 @@ const CreateTimeSlot = () => {
 		onKeyDown={ e => {
 			switch( e.key ) {
 				case 'Enter':
-				if ( e.ctrlKey && ! get( timeSlot, '_id' ) ) {
-					startTimeSlot( {
-						timeSlot: editTimeSlot,
-					} );
-					_setEditTimeSlot( {} );
-				}
-				break;
-		} } }
+					if ( e.ctrlKey && ! get( timeSlot, '_id' ) ) {
+						startTimeSlot( {
+							timeSlot: editTimeSlot,
+						} );
+						_setEditTimeSlot( {
+						} );
+					}
+					break;
+			}
+		} }
 	>
 
 		<div className="row mb-2">
@@ -80,30 +89,31 @@ const CreateTimeSlot = () => {
 
 			<div className="col-1"></div>
 
-			{ !! timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
+			{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
 				if ( 'date' === timeSlotSchema[key].type ) {
 					return false;
 				}
 				return ! [
 					...getSetting( 'hideFields' ),
 					'_id',
-				].includes( key )
-			} ).map( key => {
-				return <div
-					key={ key }
-					className={ classnames( [
-					'timeSlot--' + key,
-					'title' === key ? 'col-9' : 'col',
-					'position-relative',
-					] ) }
-				><Input
-					field={ key }
-					useDefault={ true }
-					timeSlot={ timeSlot }
-					editTimeSlot={ _editTimeSlot }
-					setEditTimeSlot={ _setEditTimeSlot }
-				/></div>
-			} ) : '' }
+				].includes( key );
+			} )
+				.map( key => {
+					return <div
+						key={ key }
+						className={ classnames( [
+							'timeSlot--' + key,
+							'title' === key ? 'col-9' : 'col',
+							'position-relative',
+						] ) }
+					><Input
+							field={ key }
+							useDefault={ true }
+							timeSlot={ timeSlot }
+							editTimeSlot={ _editTimeSlot }
+							setEditTimeSlot={ _setEditTimeSlot }
+						/></div>;
+				} ) : '' }
 
 			<div className="col-4">
 				{ timeSlot && <DateInput
@@ -124,7 +134,7 @@ const CreateTimeSlot = () => {
 			{ ! timeSlot && <div className="col-3 timeSlot--duration"></div> }
 
 			<div
-				className={ "col-4 timeSlot--actions d-flex" }
+				className={ 'col-4 timeSlot--actions d-flex' }
 			>
 				<button
 					className="btn me-2 save"
@@ -147,12 +157,14 @@ const CreateTimeSlot = () => {
 							startTimeSlot( {
 								timeSlot: _editTimeSlot,
 							} );
-							setEditTimeSlot( {} );
+							setEditTimeSlot( {
+							} );
 						} else {
 							stopTimeSlot( {
 								timeSlot: timeSlotCurrent,
 							} );
-							_setEditTimeSlot( {} );
+							_setEditTimeSlot( {
+							} );
 						}
 					} }
 					title={ timeSlot.dateStop ? 'Start' : 'Stop' }
