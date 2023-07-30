@@ -1,5 +1,5 @@
 /**
- * eslint cnfig to use with `npm run format`
+ * eslint config to use with `npm run format`
  *
  */
 module.exports = {

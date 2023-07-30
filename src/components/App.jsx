@@ -1,4 +1,4 @@
-import './style/App.scss';
+import '../style/App.scss';
 import {
 	get,
 } from 'lodash';
