@@ -31,7 +31,7 @@ const createWindow = () => {
 	mainWindow.loadURL( MAIN_WINDOW_WEBPACK_ENTRY );
 
 	mainWindow.webContents.on( 'did-stop-loading', () => {
-		mainWindow.setTitle( app.getName() );
+		mainWindow.setTitle( app.getName() + ' - offline time tracker' );
 	} );
 
 	setupWindowMenu( mainWindow );
