@@ -2,9 +2,9 @@ name: Release
 
 on:
 	workflow_dispatch:
-    release:
-        types:
-            - created
+	push:
+		tags:
+			- 'v*'
 
 jobs:
     publish_on_linux:
