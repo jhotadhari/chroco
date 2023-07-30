@@ -7,15 +7,15 @@ import {
 	useState,
 	useContext,
 } from 'react';
-import Context from './Context';
-import useTimeSlotCrud from './hooks/useTimeSlotCrud';
-import Settings from './Components/Settings/Settings';
-import CreateTimeSlot from './Components/CreateTimeSlot';
-import TimeSlotsTable from './Components/TimeSlotsTable';
-import TimeSlotsFilters from './Components/TimeSlotsFilters';
+import Context from '../Context';
+import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
+import Settings from './Settings/Settings';
+import CreateTimeSlot from './CreateTimeSlot';
+import TimeSlotsTable from './TimeSlotsTable';
+import TimeSlotsFilters from './TimeSlotsFilters';
 import {
 	sortTimeSlotsCompare,
-} from './utils';
+} from '../utils';
 const { api } = window;
 
 const eventTick = new Event( 'tick' );
