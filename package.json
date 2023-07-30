@@ -1,14 +1,15 @@
 {
   "name": "chroco",
   "productName": "chroco",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple electron offline time tracker",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish",
+    "publish": "bash ./scripts/publish.sh",
+    "_publish": "electron-forge publish",
     "format": "eslint --fix --config ./eslint.config.js ."
   },
   "keywords": [],
@@ -27,6 +28,7 @@
     "@electron-forge/maker-zip": "^6.2.1",
     "@electron-forge/plugin-auto-unpack-natives": "^6.2.1",
     "@electron-forge/plugin-webpack": "^6.2.1",
+    "@electron-forge/publisher-github": "^6.2.1",
     "@eslint/js": "^8.46.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
     "babel-loader": "^9.1.3",
