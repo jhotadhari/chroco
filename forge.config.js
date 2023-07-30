@@ -27,6 +27,7 @@ module.exports = {
 					owner: 'jhotadhari',
 					name: 'chroco',
 				},
+				prerelease: false,
 			},
 		},
 	],
