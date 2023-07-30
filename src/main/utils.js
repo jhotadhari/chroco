@@ -40,7 +40,7 @@ const isPathValid = p => {
 	}
 };
 
-// same in chroco/src/utils.js
+// same in chroco/src/renderer//utils.js
 const isValidTimezones = input => {
 	if ( ! input
 		|| ! input.length
@@ -63,7 +63,7 @@ const isValidTimezones = input => {
 	return valid;
 };
 
-// same in chroco/src/utils.js
+// same in chroco/src/renderer//utils.js
 const isValidRegex = input => {
 	let valid = true;
 	try {
@@ -74,7 +74,7 @@ const isValidRegex = input => {
 	return valid;
 };
 
-// same in chroco/src/utils.js
+// same in chroco/src/renderer//utils.js
 const getDateValuesForFilter = ( {
 	timeFrame, value, startOfWeek,
 } ) => {
