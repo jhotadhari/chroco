@@ -17,7 +17,7 @@ if ( require( 'electron-squirrel-startup' ) ) {
 const createWindow = () => {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow( {
-		width: 1400,
+		width: 1600,
 		height: 800,
 		webPreferences: {
 			nodeIntegration: false, // is default value after Electron v5
