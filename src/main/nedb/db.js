@@ -1,5 +1,5 @@
-const {app} = require( 'electron' );
-const {get} = require( 'lodash' );
+const { app } = require( 'electron' );
+const { get } = require( 'lodash' );
 const path = require( 'path' );
 const Datastore = require( 'nedb' );
 const { settingsDefaults } = require( '../constants' );
@@ -42,9 +42,7 @@ const getDb = () => new Promise( ( resolve, reject ) => {
 				timestampData: true,
 			} ),
 		};
-		newDb.settings.findOne( {
-			key: 'dbPath',
-		}, ( err, setting ) => {
+		newDb.settings.findOne( { key: 'dbPath' }, ( err, setting ) => {
 			const dbPath = setting ? setting.value : get( settingsDefaults, 'dbPath' );
 			maybeAddDynamicPaths( newDb, dbPath );
 			db = newDb;
@@ -52,9 +50,7 @@ const getDb = () => new Promise( ( resolve, reject ) => {
 		} );
 
 	} else {
-		db.settings.findOne( {
-			key: 'dbPath',
-		}, ( err, setting ) => {
+		db.settings.findOne( { key: 'dbPath' }, ( err, setting ) => {
 			const dbPath = setting ? setting.value : get( settingsDefaults, 'dbPath' );
 			maybeAddDynamicPaths( db, dbPath );
 			resolve( db );

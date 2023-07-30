@@ -1,16 +1,10 @@
-import React, {
-	useContext,
-} from 'react';
-import {
-	get,
-} from 'lodash';
-import {
-	MultiSelect,
-} from 'react-multi-select-component';
+import React, { useContext } from 'react';
+import { get } from 'lodash';
+import { MultiSelect } from 'react-multi-select-component';
 import Context from '../../Context';
 const { api } = window;
 
-const ThemeControl = ( {className} ) => {
+const ThemeControl = ( { className } ) => {
 	const {
 		setThemeSource,
 		themeSource,

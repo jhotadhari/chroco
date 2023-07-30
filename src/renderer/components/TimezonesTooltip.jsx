@@ -1,19 +1,11 @@
 import dayjs from 'dayjs';
-import React, {
-	useContext,
-} from 'react';
+import React, { useContext } from 'react';
 import Context from '../Context';
-import {
-	dateFormat,
-} from '../constants';
-import {
-	isValidTimezones,
-} from '../utils';
+import { dateFormat } from '../constants';
+import { isValidTimezones } from '../utils';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import {
-	Tooltip,
-} from 'react-tooltip';
+import { Tooltip } from 'react-tooltip';
 dayjs.extend( utc );
 dayjs.extend( timezone );
 

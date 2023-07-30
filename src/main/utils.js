@@ -24,7 +24,7 @@ dayjs.extend( dayOfYear );
  */
 const isPathValid = p => {
 
-	if ( path.join( p, '..') === path.join( p ) ) {
+	if ( path.join( p, '..' ) === path.join( p ) ) {
 		return false;	// is root
 	}
 
@@ -36,9 +36,9 @@ const isPathValid = p => {
 			return false;	// not writable
 		}
 	} else {
-		return isPathValid( path.join( p, '..') );
+		return isPathValid( path.join( p, '..' ) );
 	}
-}
+};
 
 // same in chroco/src/utils.js
 const isValidTimezones = input => {
@@ -50,17 +50,18 @@ const isValidTimezones = input => {
 	}
 	input = isString( input ) ? input.split( ',' ) : input;
 	let valid = [...input].reduce( ( acc, tz ) => {
-		if ( ! acc ) { return acc }
+		if ( ! acc ) {
+			return acc;
+		}
 		try {
 			dayjs().tz( tz );
 			return true;
-		}
-		catch ( ex ) {
+		} catch ( ex ) {
 			return false;
 		}
-	}, true )
+	}, true );
 	return valid;
-}
+};
 
 // same in chroco/src/utils.js
 const isValidRegex = input => {
@@ -71,17 +72,19 @@ const isValidRegex = input => {
 		valid = false;
 	}
 	return valid;
-}
+};
 
 // same in chroco/src/utils.js
-const getDateValuesForFilter = ( { timeFrame, value, startOfWeek } ) => {
+const getDateValuesForFilter = ( {
+	timeFrame, value, startOfWeek,
+} ) => {
 	let inputValue;
 	switch( timeFrame ) {
 		case 'week':
-		inputValue = dayjs().day( startOfWeek );
-		if ( parseInt( startOfWeek, 10 ) > parseInt( dayjs().day(), 10 ) ) {
-			inputValue = inputValue.add( -1, 'week' );
-		}
+			inputValue = dayjs().day( startOfWeek );
+			if ( parseInt( startOfWeek, 10 ) > parseInt( dayjs().day(), 10 ) ) {
+				inputValue = inputValue.add( -1, 'week' );
+			}
 			break;
 		case 'month':
 			inputValue = dayjs().date( 1 );
@@ -91,20 +94,22 @@ const getDateValuesForFilter = ( { timeFrame, value, startOfWeek } ) => {
 			break;
 	}
 	inputValue = {
-		from: inputValue.set( 'second', 0 ).set( 'minute', 0 ).set( 'hour', 0 )
+		from: inputValue.set( 'second', 0 ).set( 'minute', 0 )
+			.set( 'hour', 0 )
 			.add( value, timeFrame )
 			.valueOf(),
-		to: inputValue.set( 'second', 59 ).set( 'minute', 59 ).set( 'hour', 23 )
-			.add( value + 1 , timeFrame )
+		to: inputValue.set( 'second', 59 ).set( 'minute', 59 )
+			.set( 'hour', 23 )
+			.add( value + 1, timeFrame )
 			.add( -1, 'day' )
 			.valueOf(),
 	};
 	return inputValue;
-}
+};
 
 module.exports = {
 	isPathValid,
-    isValidTimezones,
-    isValidRegex,
-    getDateValuesForFilter,
+	isValidTimezones,
+	isValidRegex,
+	getDateValuesForFilter,
 };

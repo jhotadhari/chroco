@@ -1,18 +1,14 @@
-import React, {
-	useContext,
-} from 'react';
+import React, { useContext } from 'react';
 import {
 	difference,
 	get,
 } from 'lodash';
-import {
-	MultiSelect,
-} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import Context from '../../Context';
 const { api } = window;
 
 
-const HideFieldsControl = ( {className} ) => {
+const HideFieldsControl = ( { className } ) => {
 	const {
 		themeSource,
 		settings,

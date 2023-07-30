@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
-import {
-	omit,
-} from 'lodash';
-import {
-	useContext,
-} from 'react';
+import { omit } from 'lodash';
+import { useContext } from 'react';
 import Context from '../Context';
 const { api } = window;
 
@@ -14,7 +10,7 @@ const useTimeSlotCrud = () => {
 		setTimeSlots,
 	} = useContext( Context );
 
-	const startTimeSlot = ( {timeSlot} ) => {
+	const startTimeSlot = ( { timeSlot } ) => {
 		const newTimeSlot = omit( {
 			...timeSlot,
 			dateStart: dayjs().valueOf(),
@@ -51,11 +47,8 @@ const useTimeSlotCrud = () => {
 		if ( ! timeSlot || ! timeSlot._id ) {
 			return;
 		}
-		let newEditTimeSlot = {
-		};
-		let newTimeSlot = {
-			...timeSlot,
-		};
+		let newEditTimeSlot = {};
+		let newTimeSlot = { ...timeSlot };
 		if ( includeFields ) {
 			Object.keys( editTimeSlot ).map( key => {
 				if ( includeFields.includes( key ) ) {
@@ -81,7 +74,7 @@ const useTimeSlotCrud = () => {
 		} );
 	};
 
-	const stopTimeSlot = ( {timeSlot} ) => {
+	const stopTimeSlot = ( { timeSlot } ) => {
 		api.timeSlots.stop( timeSlot ).then( updatedTimeSlot => {
 			if ( updatedTimeSlot ) {
 				const newTimeSlots = [...timeSlots];
@@ -92,7 +85,7 @@ const useTimeSlotCrud = () => {
 		} );
 	};
 
-	const deleteTimeSlot = ( {deleteId} ) => {
+	const deleteTimeSlot = ( { deleteId } ) => {
 		api.timeSlots.delete( deleteId ).then( numberDeleted => {
 			if ( numberDeleted ) {
 				const newTimeSlots = [...timeSlots];

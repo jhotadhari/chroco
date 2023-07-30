@@ -10,13 +10,9 @@ import React, {
 	useContext,
 	Fragment,
 } from 'react';
-import {
-	MultiSelect,
-} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import Context from '../Context';
-import {
-	dateFormat,
-} from '../constants';
+import { dateFormat } from '../constants';
 import TimezonesTooltip from './TimezonesTooltip.jsx';
 import Icon from './Icon.jsx';
 import {
@@ -26,7 +22,7 @@ import {
 } from '../utils';
 const { api } = window;
 
-const useDoUpdate = ( {settingKey} ) => {
+const useDoUpdate = ( { settingKey } ) => {
 	const {
 		settings,
 		setSettings,
@@ -66,7 +62,7 @@ const useDoUpdate = ( {settingKey} ) => {
 	return doUpdate;
 };
 
-const DateStartFilter = ( {field} ) => {
+const DateStartFilter = ( { field } ) => {
 
 	const {
 		getSetting,
@@ -74,9 +70,7 @@ const DateStartFilter = ( {field} ) => {
 	} = useContext( Context );
 
 	const settingKey = 'filters';
-	const doUpdate = useDoUpdate( {
-		settingKey,
-	} );
+	const doUpdate = useDoUpdate( { settingKey } );
 
 	let options = [
 		{
@@ -108,8 +102,7 @@ const DateStartFilter = ( {field} ) => {
 
 	const [
 		editFilter, setEditFilter,
-	] = useState( {
-	} );
+	] = useState( {} );
 
 	const filters = getSetting( 'filters' );
 	const filterIdx = filters && Array.isArray( filters )
@@ -117,11 +110,7 @@ const DateStartFilter = ( {field} ) => {
 		: -1;
 
 	const filterSett = get( filters, filterIdx );
-	const filterBase = {
-		...( filterSett ? filterSett : {
-			field,
-		} ),
-	};
+	const filterBase = { ...( filterSett ? filterSett : { field } ) };
 	const filter = {
 		...filterBase,
 		...editFilter,
@@ -245,16 +234,13 @@ const DateStartFilter = ( {field} ) => {
 			return;
 		}
 		if ( options.find( opt => opt.value === res[0].value ) ) {
-			let newFilter = {
-			};
+			let newFilter = {};
 			let newFilters = [...filters];
 			if ( 'custom' === res[0].value ) {
 				newFilter = {
 					...filter,
 					type: res[0].value,
-					value: {
-						...inputValue,
-					},
+					value: { ...inputValue },
 				};
 				if ( filterIdx === -1 ) {
 					newFilters = [
@@ -293,9 +279,7 @@ const DateStartFilter = ( {field} ) => {
 		if ( 'custom' !== get( filter, 'value' ) ) {
 			let newFilters = [...filters];
 			if ( filterIdx !== -1 ) {
-				let newFilter = {
-					...filter,
-				};
+				let newFilter = { ...filter };
 				newFilter.value = get( newFilter, 'value', 0 );
 				newFilter.value = isInteger( newFilter.value ) ? newFilter.value : 0;
 				switch( direction ) {
@@ -325,8 +309,7 @@ const DateStartFilter = ( {field} ) => {
 			type: 'custom',
 			value: {
 				...inputValue,
-				...get( editFilter, 'value', {
-				} ),
+				...get( editFilter, 'value', {} ),
 				[key]: newVal,
 			},
 		};
@@ -354,9 +337,7 @@ const DateStartFilter = ( {field} ) => {
 						'value', key,
 					] );
 					if ( valSett ) {
-						newEditFilter = {
-							...editFilter,
-						};
+						newEditFilter = { ...editFilter };
 						set( newEditFilter, [
 							'value', key,
 						], valSett );
@@ -364,9 +345,7 @@ const DateStartFilter = ( {field} ) => {
 					}
 					break;
 				case 'Enter':
-					let newFilter = {
-						...filter,
-					};
+					let newFilter = { ...filter };
 					let newFilters = [...filters];
 
 					if ( ! Object.keys( newFilter.value ).reduce( ( valid, k ) => {
@@ -407,7 +386,7 @@ const DateStartFilter = ( {field} ) => {
 		] ) }
 	>
 
-		<div className="row actions" >
+		<div className="row actions">
 			<div className="col">
 				<button
 					disabled={ 'custom' === get( filter, 'type' ) }
@@ -416,7 +395,7 @@ const DateStartFilter = ( {field} ) => {
 					title={ 'One ' + selectedOption.label.singular + ' to the past' }
 					onClick={ () => onClickNavBtn( 'prev' ) }
 				>
-					<Icon type='caret-left'/>
+					<Icon type='caret-left' />
 				</button>
 			</div>
 
@@ -448,7 +427,7 @@ const DateStartFilter = ( {field} ) => {
 					className={ 'btn border-0' }
 					onClick={ () => onClickNavBtn( 'next' ) }
 				>
-					<Icon type='caret-right'/>
+					<Icon type='caret-right' />
 				</button>
 			</div>
 		</div>
@@ -456,28 +435,28 @@ const DateStartFilter = ( {field} ) => {
 		<div className="row">
 			<div className="col">
 				<input
-        			data-tooltip-id={ 'filter--' + field + '--from' }
+					data-tooltip-id={ 'filter--' + field + '--from' }
 					onKeyDown={ e => onKeyDownInput( e, 'from' ) }
 					className={ getInputClassName( 'from' ) }
 					value={ getInputValueEdit( 'from' ) }
 					onChange={ e => onChangeInput( e.target.value, 'from' ) }
 				/>
 				<TimezonesTooltip
-        			tooltipId={ 'filter--' + field + '--from' }
-				  	value={ getInputValueEdit( 'from' ) }
+					tooltipId={ 'filter--' + field + '--from' }
+					value={ getInputValueEdit( 'from' ) }
 				/>
 			</div>
 			<div className="col">
 				<input
-        			data-tooltip-id={ 'filter--' + field + '--to' }
+					data-tooltip-id={ 'filter--' + field + '--to' }
 					onKeyDown={ e => onKeyDownInput( e, 'to' ) }
 					className={ getInputClassName( 'to' ) }
 					value={ getInputValueEdit( 'to' ) }
 					onChange={ e => onChangeInput( e.target.value, 'to' ) }
 				/>
 				<TimezonesTooltip
-        			tooltipId={ 'filter--' + field + '--to' }
-				  	value={ getInputValueEdit( 'to' ) }
+					tooltipId={ 'filter--' + field + '--to' }
+					value={ getInputValueEdit( 'to' ) }
 				/>
 			</div>
 		</div>
@@ -485,7 +464,7 @@ const DateStartFilter = ( {field} ) => {
 	</div>;
 };
 
-const InputFilter = ( {field} ) => {
+const InputFilter = ( { field } ) => {
 
 	const {
 		getSetting,
@@ -494,9 +473,7 @@ const InputFilter = ( {field} ) => {
 	} = useContext( Context );
 
 	const settingKey = 'filters';
-	const doUpdate = useDoUpdate( {
-		settingKey,
-	} );
+	const doUpdate = useDoUpdate( { settingKey } );
 
 	const title = get( timeSlotSchema, [
 		field, 'title',
@@ -522,8 +499,7 @@ const InputFilter = ( {field} ) => {
 
 	const [
 		editFilter, setEditFilter,
-	] = useState( {
-	} );
+	] = useState( {} );
 
 	const filters = getSetting( 'filters' );
 	const filterIdx = filters && Array.isArray( filters )
@@ -532,9 +508,7 @@ const InputFilter = ( {field} ) => {
 
 	const filterSett = get( filters, filterIdx );
 	const filter = {
-		...( filterSett ? filterSett : {
-			field,
-		} ),
+		...( filterSett ? filterSett : { field } ),
 		...editFilter,
 	};
 
@@ -548,7 +522,7 @@ const InputFilter = ( {field} ) => {
 
 	return <div
 	//   key={ field }
-	  className={ classnames( [
+		className={ classnames( [
 			'timeSlot--filter',
 			'timeSlot--filter--' + field,
 			'title' === field ? 'col-9' : 'col',
@@ -582,13 +556,11 @@ const InputFilter = ( {field} ) => {
 						return;
 					}
 					if ( options.find( opt => opt.value === res[0].value ) ) {
-						let newFilter = {
-						};
+						let newFilter = {};
 						let newFilters = [...filters];
 						if ( 'all' === res[0].value ) {
 							if ( filterIdx !== -1 ) {
-								newFilter = {
-								};
+								newFilter = {};
 								newFilters.splice( filterIdx, 1 );
 							}
 						} else {
@@ -620,8 +592,7 @@ const InputFilter = ( {field} ) => {
 				onKeyDown={ e => {
 					switch( e.key ) {
 						case 'Escape':
-							setEditFilter( {
-							} );
+							setEditFilter( {} );
 							if ( ! get( editFilter, 'value', [] ).length && ! get( filterSett, 'value', [] ).length ) {
 								if ( filterIdx !== -1 ) {
 									let newFilters = [...filters];
@@ -633,9 +604,7 @@ const InputFilter = ( {field} ) => {
 						case 'Enter':
 							if ( isValidRegex( filter.value ) ) {
 								let newFilters = [...filters];
-								newFilters[filterIdx] = {
-									...filter,
-								};
+								newFilters[filterIdx] = { ...filter };
 								doUpdate( newFilters );
 							}
 							break;
@@ -672,17 +641,17 @@ const TimeSlotsFilters = () => {
 		timeSlotSchema,
 	} = useContext( Context );
 
-  	return <div className='container-fluid mb-5 timeSlots-filters' >
+  	return <div className='container-fluid mb-5 timeSlots-filters'>
 		<div className="row">
-			<div className="col">
+		<div className="col">
 				{ 'Filter records' }
 			</div>
-		</div>
+	</div>
 		<div className="row">
 
-			<div className="col-1"></div>
+		<div className="col-1"></div>
 
-			{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( field => ! [
+		{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( field => ! [
 				...getSetting( 'hideFields' ),
 				'_id',
 			].includes( field ) )
@@ -695,7 +664,7 @@ const TimeSlotsFilters = () => {
 									field={ field }
 								/>;
 							default:
-								return <Fragment key={ field }/>;
+								return <Fragment key={ field } />;
 						}
 					}
 					return <InputFilter
@@ -704,11 +673,11 @@ const TimeSlotsFilters = () => {
 					/>;
 				} ) : '' }
 
-			<div className="col-3"></div>
+		<div className="col-3"></div>
 
-			<div className="col-4"></div>
+		<div className="col-4"></div>
 
-		</div>
+	</div>
 	</div> ;
 };
 

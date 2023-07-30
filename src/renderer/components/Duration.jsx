@@ -1,13 +1,9 @@
 import React from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
-import {
-	get,
-} from 'lodash';
+import { get } from 'lodash';
 import useTick from '../hooks/useTick';
-import {
-	formatSeconds,
-} from '../utils';
+import { formatSeconds } from '../utils';
 
 const Duration = ( {
 	timeSlot,

@@ -7,7 +7,7 @@ import { MultiSelect } from 'react-multi-select-component';
 import Context from '../../Context';
 const { api } = window;
 
-const StartOfWeekControl = ( {className} ) => {
+const StartOfWeekControl = ( { className } ) => {
 	const {
 		themeSource,
 		settings,

@@ -1,7 +1,5 @@
 import classnames from 'classnames';
-import {
-	isObject,
-} from 'lodash';
+import { isObject } from 'lodash';
 import React, {
 	useState,
 	useContext,
@@ -13,12 +11,11 @@ import DateInput from './DateInput.jsx';
 import Duration from './Duration.jsx';
 import Input from './Input.jsx';
 
-const TimeSlot = ( {timeSlot} ) => {
+const TimeSlot = ( { timeSlot } ) => {
 
 	const [
 		editTimeSlot, setEditTimeSlot,
-	] = useState( {
-	} );
+	] = useState( {} );
 
 	const {
 		timeSlotSchema,
@@ -39,10 +36,12 @@ const TimeSlot = ( {timeSlot} ) => {
 	const _editTimeSlot = isCurrent ? timeSlotCurrentEdit : editTimeSlot;
 	const _setEditTimeSlot = isCurrent ? setTimeSlotCurrentEdit : setEditTimeSlot;
 
-	return <div className={ classnames( [
-		'row',
-		! timeSlot.dateStop > 0 ? 'highlight' : '',
-	] ) }>
+	return <div
+		className={ classnames( [
+			'row',
+			! timeSlot.dateStop > 0 ? 'highlight' : '',
+		] ) }
+	>
 
 		<div className="col-1"></div>
 
@@ -99,32 +98,26 @@ const TimeSlot = ( {timeSlot} ) => {
 				disabled={ ! isObject( _editTimeSlot ) || ! Object.keys( _editTimeSlot ).length }
 				title="Save"
 			>
-				<Icon type='save'/>
+				<Icon type='save' />
 			</button>
 
 			<button
 				type='button'
 				className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
-				onClick={ () => timeSlot.dateStop ? startTimeSlot( {
-					timeSlot,
-				} ) : stopTimeSlot( {
-					timeSlot,
-				} ) }
+				onClick={ () => timeSlot.dateStop ? startTimeSlot( { timeSlot } ) : stopTimeSlot( { timeSlot } ) }
 				title={ timeSlot.dateStop ? 'Start' : 'Stop' }
 			>
-				{ timeSlot.dateStop && <Icon type='play'/> }
-				{ ! timeSlot.dateStop && <Icon type='stop'/> }
+				{ timeSlot.dateStop && <Icon type='play' /> }
+				{ ! timeSlot.dateStop && <Icon type='stop' /> }
 			</button>
 
 			<button
 				type='button'
 				className="btn delete"
-				onClick={ () => deleteTimeSlot( {
-					deleteId: timeSlot._id,
-				} ) }
+				onClick={ () => deleteTimeSlot( { deleteId: timeSlot._id } ) }
 				title="Delete"
 			>
-				<Icon type='trash'/>
+				<Icon type='trash' />
 			</button>
 
 		</div>

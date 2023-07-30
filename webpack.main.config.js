@@ -5,7 +5,5 @@ module.exports = {
    */
 	entry: './src/main/main.js',
 	// Put your normal webpack config below here
-	module: {
-		rules: require( './webpack.rules' ),
-	},
+	module: { rules: require( './webpack.rules' ) },
 };

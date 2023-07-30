@@ -38,7 +38,7 @@ const Input = ( {
 		addFieldSuggestion,
 	} = useContext( Context );
 
-	const {updateTimeSlot} = useTimeSlotCrud();
+	const { updateTimeSlot } = useTimeSlotCrud();
 
 	const title = get( timeSlotSchema, [
 		field, 'title',

@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import Context from '../../Context';
 const { api } = window;
 
-const DbPathControl = ( {className} ) => {
+const DbPathControl = ( { className } ) => {
 	const {
 		settingsDefaults,
 		settings,
@@ -23,8 +23,7 @@ const DbPathControl = ( {className} ) => {
 	] = useState( [] );
 	const [
 		dbPathEdit, setDbPathEdit,
-	] = useState( {
-	} );
+	] = useState( {} );
 	const [
 		isCompacting, setIsCompacting,
 	] = useState( false );
@@ -67,9 +66,7 @@ const DbPathControl = ( {className} ) => {
 						<input
 							onKeyDown={ e => isDirty && 'Escape' === e.key ? setDbPathEdit( omit( dbPathEdit, key ) ) : null }
 							aria-labelledby={ 'setting-label-' + settingKey + '-' + key }
-							style={ {
-								width: '100%',
-							} }
+							style={ { width: '100%' } }
 							className={ classnames( [
 								isDirty ? 'dirty' : '',
 								'form-control',
@@ -115,8 +112,7 @@ const DbPathControl = ( {className} ) => {
 										...settings, addedSetting,
 									] );
 									setErrors( [] );
-									setDbPathEdit( {
-									} );
+									setDbPathEdit( {} );
 								} )
 									.catch( err => {
 										setErrors( err.message.replace( /Error\sinvoking\sremote\smethod.*?':\s?/, '' ).split( '#####' ) );
@@ -138,8 +134,7 @@ const DbPathControl = ( {className} ) => {
 										newSettings.splice( idx, 1, newSetting );
 										setSettings( newSettings );
 										setErrors( [] );
-										setDbPathEdit( {
-										} );
+										setDbPathEdit( {} );
 									}
 								} )
 									.catch( err => {
@@ -151,13 +146,15 @@ const DbPathControl = ( {className} ) => {
 
 				</div>
 
-				{ errors.length ? [...errors].map( ( err, idx ) => <div key={ idx } className={ classnames(
-					'border',
-					'border-danger',
-					'p-3',
-					'mt-3',
-					'rounded',
-				) }>{ err }</div> ) : '' }
+				{ errors.length ? [...errors].map( ( err, idx ) => <div
+					key={ idx } className={ classnames(
+						'border',
+						'border-danger',
+						'p-3',
+						'mt-3',
+						'rounded',
+					) }
+				>{ err }</div> ) : '' }
 
 
 			</div>

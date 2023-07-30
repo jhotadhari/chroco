@@ -29,9 +29,7 @@ const useTick = shouldTick => {
 		};
 		if ( shouldTick ) {
 			if ( ! intervalID ) {
-				window.addEventListener( 'tick', setupTick, {
-					once: true,
-				} );
+				window.addEventListener( 'tick', setupTick, { once: true } );
 			}
 		} else {
 			if ( intervalID ) {

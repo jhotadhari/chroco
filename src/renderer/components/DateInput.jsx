@@ -12,12 +12,8 @@ import React, {
 } from 'react';
 import Context from '../Context';
 import TimezonesTooltip from './TimezonesTooltip.jsx';
-import {
-	dateFormat,
-} from '../constants';
-import {
-	isValidDateInput,
-} from '../utils';
+import { dateFormat } from '../constants';
+import { isValidDateInput } from '../utils';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 dayjs.extend( utc );
 dayjs.extend( timezone );
@@ -28,9 +24,9 @@ const DateInput = ( {
 	editTimeSlot,
 	setEditTimeSlot,
 } ) => {
-	const {timeSlotSchema} = useContext( Context );
+	const { timeSlotSchema } = useContext( Context );
 
-	const {updateTimeSlot} = useTimeSlotCrud();
+	const { updateTimeSlot } = useTimeSlotCrud();
 
 	const [
 		tempVal, setTempVal,

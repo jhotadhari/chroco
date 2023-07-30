@@ -19,8 +19,7 @@ const CreateTimeSlot = () => {
 
 	const [
 		editTimeSlot, setEditTimeSlot,
-	] = useState( {
-	} );
+	] = useState( {} );
 	const [
 		random, setRandom,
 	] = useState( 0 );
@@ -56,19 +55,16 @@ const CreateTimeSlot = () => {
 			switch( e.key ) {
 				case 'Enter':
 					if ( e.ctrlKey && ! get( timeSlot, '_id' ) ) {
-						startTimeSlot( {
-							timeSlot: editTimeSlot,
-						} );
-						_setEditTimeSlot( {
-						} );
+						startTimeSlot( { timeSlot: editTimeSlot } );
+						_setEditTimeSlot( {} );
 					}
 					break;
 			}
 		} }
-	>
+  	>
 
 		<div className="row mb-2">
-			<div className="col">
+		<div className="col">
 				{ timeSlotCurrent ? 'Current' : 'Add new' }
 
 				{ ! get( timeSlot, '_id' )
@@ -82,16 +78,18 @@ const CreateTimeSlot = () => {
 					&& <span className="ms-5">Press <span className="font-style-italic"> "ctrl + Escape" </span> to stop time tracking</span>
 				}
 			</div>
-		</div>
+	</div>
 
-		<div className={ classnames( [
-			'row',
-			timeSlotCurrent ? 'highlight' : '',
-		] ) }>
+		<div
+		className={ classnames( [
+				'row',
+				timeSlotCurrent ? 'highlight' : '',
+			] ) }
+	>
 
-			<div className="col-1"></div>
+		<div className="col-1"></div>
 
-			{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
+		{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
 				if ( 'date' === timeSlotSchema[key].type ) {
 					return false;
 				}
@@ -117,77 +115,69 @@ const CreateTimeSlot = () => {
 						/></div>;
 				} ) : '' }
 
-			<div className="col-4">
+		<div className="col-4">
 				{ timeSlot && <DateInput
-					field={ 'dateStart' }
-					timeSlot={ timeSlot }
-					editTimeSlot={ _editTimeSlot }
-					setEditTimeSlot={ _setEditTimeSlot }
-				/> }
+				field={ 'dateStart' }
+				timeSlot={ timeSlot }
+				editTimeSlot={ _editTimeSlot }
+				setEditTimeSlot={ _setEditTimeSlot }
+			/> }
 			</div>
 
-			<div className="col-4"></div>
+		<div className="col-4"></div>
 
-			{ timeSlot && <Duration
+		{ timeSlot && <Duration
 				timeSlot={ timeSlot }
 				editTimeSlot={ _editTimeSlot }
 			/> }
 
-			{ ! timeSlot && <div className="col-3 timeSlot--duration"></div> }
+		{ ! timeSlot && <div className="col-3 timeSlot--duration"></div> }
 
-			<div
+		<div
 				className={ 'col-4 timeSlot--actions d-flex' }
 			>
 				<button
-					className="btn me-2 save"
-					onClick={ () => updateTimeSlot( {
+				className="btn me-2 save"
+				onClick={ () => updateTimeSlot( {
 						timeSlot,
 						editTimeSlot: _editTimeSlot,
 						setEditTimeSlot: _setEditTimeSlot,
 					} ) }
-					disabled={ ! timeSlotCurrent || ! isObject( _editTimeSlot ) || ! Object.keys( _editTimeSlot ).length }
-					title="Save"
-				>
-					<Icon type='save'/>
-				</button>
+				disabled={ ! timeSlotCurrent || ! isObject( _editTimeSlot ) || ! Object.keys( _editTimeSlot ).length }
+				title="Save"
+			>
+				<Icon type='save' />
+			</button>
 
 				<button
-					type='button'
-					className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
-					onClick={ () => {
+				type='button'
+				className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
+				onClick={ () => {
 						if ( ! timeSlotCurrent ) {
-							startTimeSlot( {
-								timeSlot: _editTimeSlot,
-							} );
-							setEditTimeSlot( {
-							} );
+							startTimeSlot( { timeSlot: _editTimeSlot } );
+							setEditTimeSlot( {} );
 						} else {
-							stopTimeSlot( {
-								timeSlot: timeSlotCurrent,
-							} );
-							_setEditTimeSlot( {
-							} );
+							stopTimeSlot( { timeSlot: timeSlotCurrent } );
+							_setEditTimeSlot( {} );
 						}
 					} }
-					title={ timeSlot.dateStop ? 'Start' : 'Stop' }
-				>
-					{ ! timeSlotCurrent && <Icon type='play'/> }
-					{ timeSlotCurrent && <Icon type='stop'/> }
-				</button>
+				title={ timeSlot.dateStop ? 'Start' : 'Stop' }
+			>
+				{ ! timeSlotCurrent && <Icon type='play' /> }
+				{ timeSlotCurrent && <Icon type='stop' /> }
+			</button>
 
 				{ timeSlot._id && <button
-					type='button'
-					className="btn delete"
-					onClick={ () => deleteTimeSlot( {
-						deleteId: timeSlot._id,
-					} ) }
-					title="Delete"
-				>
-					<Icon type='trash'/>
+				type='button'
+				className="btn delete"
+				onClick={ () => deleteTimeSlot( { deleteId: timeSlot._id } ) }
+				title="Delete"
+			>
+				<Icon type='trash' />
 				</button> }
 
 			</div>
-    	</div>
+	</div>
 	</div>;
 };
 

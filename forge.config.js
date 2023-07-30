@@ -1,14 +1,10 @@
 module.exports = {
-	packagerConfig: {
-		asar: true,
-	},
-	rebuildConfig: {
-	},
+	packagerConfig: { asar: true },
+	rebuildConfig: {},
 	makers: [
 		{
 			name: '@electron-forge/maker-squirrel',
-			config: {
-			},
+			config: {},
 		},
 		{
 			name: '@electron-forge/maker-zip',
@@ -16,20 +12,17 @@ module.exports = {
 		},
 		{
 			name: '@electron-forge/maker-deb',
-			config: {
-			},
+			config: {},
 		},
 		{
 			name: '@electron-forge/maker-rpm',
-			config: {
-			},
+			config: {},
 		},
 	],
 	plugins: [
 		{
 			name: '@electron-forge/plugin-auto-unpack-natives',
-			config: {
-			},
+			config: {},
 		},
 		{
 			name: '@electron-forge/plugin-webpack',
@@ -42,9 +35,7 @@ module.exports = {
 							html: './src/renderer/index.html',
 							js: './src/renderer/renderer.js',
 							name: 'main_window',
-							preload: {
-								js: './src/main/preload.js',
-							},
+							preload: { js: './src/main/preload.js' },
 						},
 					],
 				},

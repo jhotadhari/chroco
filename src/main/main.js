@@ -2,9 +2,11 @@ const {
 	app,
 	BrowserWindow,
 } = require( 'electron' );
-const path = require('path')
-const { setupApi, api } = require('./setupApi');
-const setupWindowMenu = require('./setupWindowMenu');
+const path = require( 'path' );
+const {
+	setupApi, api,
+} = require( './setupApi' );
+const setupWindowMenu = require( './setupWindowMenu' );
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -13,27 +15,27 @@ if ( require( 'electron-squirrel-startup' ) ) {
 }
 
 const createWindow = () => {
-    // Create the browser window.
-    const mainWindow = new BrowserWindow( {
-        width: 1400,
-        height: 800,
-        webPreferences: {
-            nodeIntegration: false, // is default value after Electron v5
-            contextIsolation: true, // protect against prototype pollution
-            enableRemoteModule: false, // turn off remote
+	// Create the browser window.
+	const mainWindow = new BrowserWindow( {
+		width: 1400,
+		height: 800,
+		webPreferences: {
+			nodeIntegration: false, // is default value after Electron v5
+			contextIsolation: true, // protect against prototype pollution
+			enableRemoteModule: false, // turn off remote
 			preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        },
-    } );
+		},
+	} );
 
 	// and load the index.html of the app.
 	mainWindow.loadURL( MAIN_WINDOW_WEBPACK_ENTRY );
 
-    mainWindow.webContents.on( 'did-stop-loading', () => {
-        mainWindow.setTitle( app.getName() );
-    } );
+	mainWindow.webContents.on( 'did-stop-loading', () => {
+		mainWindow.setTitle( app.getName() );
+	} );
 
-    setupWindowMenu( mainWindow );
-    setupApi();
+	setupWindowMenu( mainWindow );
+	setupApi();
 };
 
 // This method will be called when Electron has finished
@@ -61,11 +63,11 @@ app.on( 'activate', () => {
 // Compact db when closing app.
 let shouldCompactDatafile = true;
 app.on( 'before-quit', ( e ) => {
-    if ( shouldCompactDatafile ) {
-        e.preventDefault()
-        api.db.compact().then( () => {
-            shouldCompactDatafile = false;
-            app.quit();
-        } );
-    }
+	if ( shouldCompactDatafile ) {
+		e.preventDefault();
+		api.db.compact().then( () => {
+			shouldCompactDatafile = false;
+			app.quit();
+		} );
+	}
 } );

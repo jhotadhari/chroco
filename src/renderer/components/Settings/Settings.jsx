@@ -1,6 +1,4 @@
-import React, {
-	useRef,
-} from 'react';
+import React, { useRef } from 'react';
 import classnames from 'classnames';
 import ThemeControl from './ThemeControl.jsx';
 import HideFieldsControl from './HideFieldsControl.jsx';
@@ -29,7 +27,7 @@ const Settings = ( {
 		tabIndex="-1"
 		ref={ ref }
 	>
-		<div className="modal-dialog" >
+		<div className="modal-dialog">
 			<div className="modal-content">
 				<div className="modal-header">
 					<h5 className="modal-title">Preferences</h5>
@@ -43,11 +41,11 @@ const Settings = ( {
 				</div>
 				<div className="modal-body">
 
-					<ThemeControl className="mb-5"/>
-					<StartOfWeekControl className="mb-5"/>
-					<HideFieldsControl className="mb-5"/>
-					<DbPathControl className="mb-5"/>
-					<TimezonesControl className="mb-5"/>
+					<ThemeControl className="mb-5" />
+					<StartOfWeekControl className="mb-5" />
+					<HideFieldsControl className="mb-5" />
+					<DbPathControl className="mb-5" />
+					<TimezonesControl className="mb-5" />
 
 
 				</div>

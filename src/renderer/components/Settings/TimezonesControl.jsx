@@ -8,12 +8,10 @@ import {
 } from 'lodash';
 import classnames from 'classnames';
 import Context from '../../Context';
-import {
-	isValidTimezones,
-} from '../../utils';
+import { isValidTimezones } from '../../utils';
 const { api } = window;
 
-const TimezonesControl = ( {className} ) => {
+const TimezonesControl = ( { className } ) => {
 	const {
 		settings,
 		setSettings,
@@ -70,9 +68,7 @@ const TimezonesControl = ( {className} ) => {
 						'form-control',
 					] ) }
 					aria-labelledby={ 'setting-label-' + settingKey }
-					style={ {
-						width: '100%',
-					} }
+					style={ { width: '100%' } }
 					value={ Array.isArray( value ) ? value.join( ',' ) : value }
 					onChange={ e => {
 						if ( isValidTimezones( e.target.value ) ) {

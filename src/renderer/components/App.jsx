@@ -1,6 +1,4 @@
-import {
-	get,
-} from 'lodash';
+import { get } from 'lodash';
 import React, {
 	useEffect,
 	useState,
@@ -12,9 +10,7 @@ import Settings from './Settings/Settings.jsx';
 import CreateTimeSlot from './CreateTimeSlot.jsx';
 import TimeSlotsTable from './TimeSlotsTable.jsx';
 import TimeSlotsFilters from './TimeSlotsFilters.jsx';
-import {
-	sortTimeSlotsCompare,
-} from '../utils';
+import { sortTimeSlotsCompare } from '../utils';
 const { api } = window;
 
 const eventTick = new Event( 'tick' );
@@ -30,7 +26,7 @@ const AppInner = () => {
 		themeSource,
 	} = useContext( Context );
 
-	const {stopTimeSlot} = useTimeSlotCrud();
+	const { stopTimeSlot } = useTimeSlotCrud();
 
 	const [
 		showSettings, setShowSettings,
@@ -47,14 +43,11 @@ const AppInner = () => {
 		onKeyDown={ e => {
 			if (
 				'Escape' === e.key
-        && e.ctrlKey
-        && get( timeSlotCurrent, '_id' )
+				&& e.ctrlKey
+				&& get( timeSlotCurrent, '_id' )
 			) {
-				stopTimeSlot( {
-					timeSlot: timeSlotCurrent,
-				} );
-				setTimeSlotCurrentEdit( {
-				} );
+				stopTimeSlot( { timeSlot: timeSlotCurrent } );
+				setTimeSlotCurrentEdit( {} );
 			}
 		} }
 		tabIndex="0"
@@ -64,19 +57,18 @@ const AppInner = () => {
 			setShowSettings={ setShowSettings }
 		/> }
 
-		<CreateTimeSlot/>
+		<CreateTimeSlot />
 
-		<TimeSlotsFilters/>
+		<TimeSlotsFilters />
 
-		<TimeSlotsTable/>
+		<TimeSlotsTable />
 	</div>;
 };
 
-function App() {
+const App = () => {
 	const [
 		appInfo, setAppInfo,
-	] = useState( {
-	} );
+	] = useState( {} );
 	const [
 		settings, setSettings,
 	] = useState( [] );
@@ -102,8 +94,7 @@ function App() {
 
 	const [
 		fieldSuggestions, setFieldSuggestions,
-	] = useState( {
-	} );
+	] = useState( {} );
 
 	// Helper function to retrieve one setting value.
 	const getSetting = ( key, _settings, _settingsDefaults ) => {
@@ -182,9 +173,7 @@ function App() {
 	}, [timeSlots] );
 
 	const addFieldSuggestion = ( timeSlot, newFieldSuggestions, shouldSet ) => {
-		newFieldSuggestions = newFieldSuggestions ? newFieldSuggestions : {
-			...fieldSuggestions,
-		};
+		newFieldSuggestions = newFieldSuggestions ? newFieldSuggestions : { ...fieldSuggestions };
 		shouldSet = undefined === shouldSet ? true : shouldSet;
 
 		Object.keys( timeSlotSchema ).filter( field => get( timeSlotSchema[field], 'hasSuggestions' ) )
@@ -211,9 +200,7 @@ function App() {
 	};
 
 	useEffect( () => {
-		const newFieldSuggestions = {
-			...fieldSuggestions,
-		};
+		const newFieldSuggestions = { ...fieldSuggestions };
 		[...timeSlots].map( timeSlot => {
 			addFieldSuggestion( timeSlot, newFieldSuggestions, false );
 		} );
@@ -221,29 +208,31 @@ function App() {
 		setFieldSuggestions( newFieldSuggestions );
 	}, [timeSlots] );
 
-	return ! settingsDefaults ? null : <Context.Provider value={ {
-		appInfo,
+	return ! settingsDefaults ? null : <Context.Provider
+		value={ {
+			appInfo,
 
-		timeSlotSchema,
-		timeSlots,
-		setTimeSlots,
+			timeSlotSchema,
+			timeSlots,
+			setTimeSlots,
 
-		timeSlotCurrent,
-		timeSlotCurrentEdit,
-		setTimeSlotCurrentEdit,
+			timeSlotCurrent,
+			timeSlotCurrentEdit,
+			setTimeSlotCurrentEdit,
 
-		themeSource,
-		setThemeSource,
-		settings,
-		getSetting,
-		setSettings,
-		settingsDefaults,
+			themeSource,
+			setThemeSource,
+			settings,
+			getSetting,
+			setSettings,
+			settingsDefaults,
 
-		fieldSuggestions,
-		addFieldSuggestion,
-	} }>
-		<AppInner/>
+			fieldSuggestions,
+			addFieldSuggestion,
+		} }
+	>
+		<AppInner />
 	</Context.Provider>;
-}
+};
 
 export default App;

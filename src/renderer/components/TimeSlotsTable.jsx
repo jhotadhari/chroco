@@ -137,7 +137,7 @@ const GroupInput = ( {
 	}
 };
 
-const GroupDuration = ( {timeSlotsSlice} ) => {
+const GroupDuration = ( { timeSlotsSlice } ) => {
 
 	const {
 		timeSlotCurrent,
@@ -167,7 +167,7 @@ const GroupDuration = ( {timeSlotsSlice} ) => {
 	}, 0 );
 
 	return <div
-	  className={ classnames( {
+		className={ classnames( {
 			'timeSlot--duration': true,
 			'text-end': true,
 			'align-middle': true,
@@ -177,17 +177,17 @@ const GroupDuration = ( {timeSlotsSlice} ) => {
 			'justify-content-end': true,
 	  } ) }
 	>
-	  <span
+		<span
 			className={ classnames( {
 		  invalid: seconds < 0,
 		  'p-2': true,
 		  'dirty': isDirty,
 			} ) }
-	  >
+		>
 			{ false !== seconds
 		  ? formatSeconds( seconds )
 		  : '- m' }
-	  </span>
+		</span>
 	</div>;
 };
 
@@ -212,19 +212,15 @@ const GroupHeader = ( {
 
 	const [
 		editTimeSlot, setEditTimeSlot,
-	] = useState( {
-	} );
+	] = useState( {} );
 
 	const updateTimeSlots = ( { includeFields } ) => {
 		let newTimeSlots = [...timeSlots];
 		return [...timeSlotsSlice].reduce( ( accumulatorPromise, timeSlot, index ) => {
 			return accumulatorPromise.then( () => {
 				return new Promise( ( resolve, reject ) => {
-					let newEditTimeSlot = {
-					};
-					let newTimeSlot = {
-						...timeSlot,
-					};
+					let newEditTimeSlot = {};
+					let newTimeSlot = { ...timeSlot };
 					if ( includeFields ) {
 						Object.keys( editTimeSlot ).map( key => {
 							if ( includeFields.includes( key ) ) {
@@ -255,21 +251,23 @@ const GroupHeader = ( {
 		}, Promise.resolve() );
 	};
 
-	return <div className={ classnames( [
-		'row',
-		! expanded && timeSlotsSliceCurrents.length > 0 ? 'highlight' : '',
-	] ) }>
-		<div className="col-1" >
+	return <div
+		className={ classnames( [
+			'row',
+			! expanded && timeSlotsSliceCurrents.length > 0 ? 'highlight' : '',
+		] ) }
+	>
+		<div className="col-1">
 			 <button
 				className="btn border-0 d-flex align-items-center"
 				onClick={ () => setExpanded( ! expanded ) }
 				title={ expanded ? 'Collapse' : 'Expand' }
-			>
+			 >
 				<span className="group-count">
 					{ timeSlotsSlice.length }
 				</span>
-				{ expanded && <Icon type='caret-down'/> }
-				{ ! expanded && <Icon type='caret-right'/> }
+				{ expanded && <Icon type='caret-down' /> }
+				{ ! expanded && <Icon type='caret-right' /> }
 			</button>
 		</div>
 
@@ -315,7 +313,7 @@ const GroupHeader = ( {
 					disabled={ ! isObject( editTimeSlot ) || ! Object.keys( editTimeSlot ).length }
 					title="Save"
 				>
-					<Icon type='save'/>
+					<Icon type='save' />
 				</button>
 
 				<button
@@ -324,22 +322,17 @@ const GroupHeader = ( {
 					onClick={ () => {
 						if ( timeSlotsSliceCurrents.length ) {
 							// stop all, should be max one.
-							[...timeSlotsSliceCurrents].map( timeSlot => stopTimeSlot( {
-								timeSlot,
-							} ) );
-							setTimeSlotCurrentEdit( {
-							} );
+							[...timeSlotsSliceCurrents].map( timeSlot => stopTimeSlot( { timeSlot } ) );
+							setTimeSlotCurrentEdit( {} );
 						} else {
 							// start new one
-							startTimeSlot( {
-								timeSlot: timeSlotsSlice[0],
-							} );
+							startTimeSlot( { timeSlot: timeSlotsSlice[0] } );
 						}
 					} }
 					title={ timeSlotsSliceCurrents.length ? 'Stop' : 'Start' }
 				>
-					{ 0 == timeSlotsSliceCurrents.length && <Icon type='play'/> }
-					{ timeSlotsSliceCurrents.length > 0 && <Icon type='stop'/> }
+					{ 0 == timeSlotsSliceCurrents.length && <Icon type='play' /> }
+					{ timeSlotsSliceCurrents.length > 0 && <Icon type='stop' /> }
 				</button>
 			</div>
 
@@ -347,7 +340,7 @@ const GroupHeader = ( {
 	</div>;
 };
 
-const DateGroup = ( {timeSlotsSlice} ) => {
+const DateGroup = ( { timeSlotsSlice } ) => {
 	const timeSlotsSliceCurrents = timeSlotsSlice.filter( ts => ! ts.dateStop );
 	const [
 		expanded, setExpanded,
@@ -375,10 +368,9 @@ const DateGroup = ( {timeSlotsSlice} ) => {
 
 const TimeSlotsTable = () => {
 
-	const {timeSlots} = useContext( Context );
+	const { timeSlots } = useContext( Context );
 
-	const timeSlotsGrouped = {
-	};
+	const timeSlotsGrouped = {};
 	[...timeSlots].map( ( timeSlot ) => {
 		let groupDateId = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat ) );
 		if ( ! groupDateId || ! groupDateId.length ) {
@@ -386,8 +378,7 @@ const TimeSlotsTable = () => {
 		}
 		groupDateId = groupDateId[0];
 		if ( ! timeSlotsGrouped[groupDateId] ) {
-			timeSlotsGrouped[groupDateId] = {
-			};
+			timeSlotsGrouped[groupDateId] = {};
 		}
 		const groupId = [
 			'title',
@@ -411,23 +402,24 @@ const TimeSlotsTable = () => {
 		} );
 	} );
 
-  	return <div className='container-fluid mb-3' >
-		<div className="timeSlots-table" >
-			{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId } >
+  	return <div className='container-fluid mb-3'>
+		<div className="timeSlots-table">
+		{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId }>
 				<div className="row">
 
-					<div className="col position-relative">
+				<div className="col position-relative">
 						<span className="bg-body-bg bg-body z-1 pe-4">
-							{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
-						</span>
-						<div className="border-bottom position-absolute" style={ {
-							width: '95%',
-							right: '1rem',
-						} }
-						></div>
+						{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
+					</span>
+						<div
+						className="border-bottom position-absolute" style={ {
+								width: '95%',
+								right: '1rem',
+							} }
+					></div>
 					</div>
 
-					{ <GroupDuration
+				{ <GroupDuration
 						timeSlotsSlice={ Object.keys( timeSlotsGrouped[groupDateId] ).reduce(
 							( timeSlotsSlice, groupId ) => [
 								...timeSlotsSlice, ...timeSlotsGrouped[groupDateId][groupId],
@@ -435,15 +427,15 @@ const TimeSlotsTable = () => {
 							, [] ) }
 					/> }
 
-					<div className={ 'col-4' }></div>
+				<div className={ 'col-4' }></div>
 
-				</div>
+			</div>
 				{ Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => <DateGroup
-					key={ groupId }
-					timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
-				/> ) }
+				key={ groupId }
+				timeSlotsSlice={ timeSlotsGrouped[groupDateId][groupId] }
+			/> ) }
 			</Fragment> ) }
-		</div>
+	</div>
 	</div> ;
 };
 
