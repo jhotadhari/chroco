@@ -52,7 +52,7 @@ export const isValidDateInput = dateInputString => {
 	return true;
 };
 
-// same in fucking-simple-time-tracker/public/utils.js
+// same in chroco/public/utils.js
 export const isValidTimezones = input => {
 	if ( ! input
 		|| ! input.length
@@ -75,7 +75,7 @@ export const isValidTimezones = input => {
 	return valid;
 };
 
-// same in fucking-simple-time-tracker/public/utils.js
+// same in chroco/public/utils.js
 export const isValidRegex = input => {
 	let valid = true;
 	try {
@@ -86,7 +86,7 @@ export const isValidRegex = input => {
 	return valid;
 };
 
-// same in fucking-simple-time-tracker/public/utils.js
+// same in chroco/public/utils.js
 export const getDateValuesForFilter = ( {
 	timeFrame, value, startOfWeek,
 } ) => {
