@@ -14,6 +14,7 @@ import Icon from './Icon.jsx';
 import DateInput from './DateInput.jsx';
 import Duration from './Duration.jsx';
 import Input from './Input.jsx';
+import ToggleBool from './ToggleBool.jsx';
 
 const CreateTimeSlot = () => {
 
@@ -99,21 +100,38 @@ const CreateTimeSlot = () => {
 				].includes( key );
 			} )
 				.map( key => {
-					return <div
-						key={ key }
-						className={ classnames( [
-							'timeSlot--' + key,
-							'title' === key ? 'col-9' : 'col',
-							'position-relative',
-						] ) }
-					><Input
-							field={ key }
-							useDefault={ true }
-							timeSlot={ timeSlot }
-							editTimeSlot={ _editTimeSlot }
-							setEditTimeSlot={ _setEditTimeSlot }
-						/></div>;
-				} ) : '' }
+					switch( timeSlotSchema[key].type ) {
+						case 'text':
+							return <div
+								key={ key }
+								className={ classnames( [
+									'timeSlot--' + key,
+									'title' === key ? 'col-9' : 'col',
+									'position-relative',
+								] ) }
+							><Input
+									field={ key }
+									useDefault={ true }
+									timeSlot={ timeSlot }
+									editTimeSlot={ _editTimeSlot }
+									setEditTimeSlot={ _setEditTimeSlot }
+								/></div>;
+						case 'bool':
+							return <div
+								key={ key }
+								className={ 'col-1 timeSlot--' + key }
+							><ToggleBool
+									field={ key }
+									useDefault={ true }
+									timeSlot={ timeSlot }
+									editTimeSlot={ _editTimeSlot }
+									setEditTimeSlot={ _setEditTimeSlot }
+								/></div>;
+						default:
+							return null;
+					}
+				},
+				) : '' }
 
 		<div className="col-4">
 				{ timeSlot && <DateInput

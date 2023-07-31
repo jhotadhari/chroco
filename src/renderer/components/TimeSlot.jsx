@@ -10,6 +10,7 @@ import Icon from './Icon.jsx';
 import DateInput from './DateInput.jsx';
 import Duration from './Duration.jsx';
 import Input from './Input.jsx';
+import ToggleBool from './ToggleBool.jsx';
 
 const TimeSlot = ( { timeSlot } ) => {
 
@@ -60,21 +61,31 @@ const TimeSlot = ( { timeSlot } ) => {
 								'position-relative',
 							] ) }
 						><Input
-								field={ key }
-								timeSlot={ timeSlot }
-								editTimeSlot={ _editTimeSlot }
-								setEditTimeSlot={ _setEditTimeSlot }
-							/></div>;
+							field={ key }
+							timeSlot={ timeSlot }
+							editTimeSlot={ _editTimeSlot }
+							setEditTimeSlot={ _setEditTimeSlot }
+						/></div>;
 					case 'date':
 						return <div
 							className={ 'col-4 timeSlot--' + key }
 							key={ key }
 						><DateInput
-								field={ key }
-								timeSlot={ timeSlot }
-								editTimeSlot={ _editTimeSlot }
-								setEditTimeSlot={ _setEditTimeSlot }
-							/></div>;
+							field={ key }
+							timeSlot={ timeSlot }
+							editTimeSlot={ _editTimeSlot }
+							setEditTimeSlot={ _setEditTimeSlot }
+						/></div>;
+					case 'bool':
+						return <div
+							className={ 'col-1 timeSlot--' + key }
+							key={ key }
+						><ToggleBool
+							field={ key }
+							timeSlot={ timeSlot }
+							editTimeSlot={ _editTimeSlot }
+							setEditTimeSlot={ _setEditTimeSlot }
+						/></div>;
 					default:
 						return null;
 				}

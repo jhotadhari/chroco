@@ -133,10 +133,15 @@
   }
 }
 
-.form-control {
+.form-check-input {
+  outline: 2px solid transparent !important;
+  background-color: transparent !important;
   &.dirty {
-      border-color: var(--bssuccess) !important;
+    outline-color: var(--bssuccess) !important;
+    border-color: var(--bssuccess) !important;
   }
+}
+.form-control {
   &.invalid {
       border-color: var(--bsdanger) !important;
   }

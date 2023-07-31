@@ -31,6 +31,11 @@ const timeSlotsSchemaBase = {
 		titlePlural: 'Users',
 		hasSuggestions: true,
 	},
+	billable: {
+		type: 'bool',
+		title: 'Billable',
+		default: '0',
+	},
 	dateStart: {
 		type: 'date',
 		title: 'Start',
