@@ -450,9 +450,14 @@ const TimeSlotsTable = () => {
 		getSetting,
 	} = useContext( Context );
 
+	const[shouldGroupDays,setShouldGroupDays] = useState( true )
+
 	const timeSlotsGrouped = {};
 	[...timeSlots].map( ( timeSlot ) => {
-		let groupDateId = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat ) );
+
+		let groupDateId = shouldGroupDays
+			? /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat ) )
+			: ['all'];
 		if ( ! groupDateId || ! groupDateId.length ) {
 			return;
 		}
@@ -488,13 +493,27 @@ const TimeSlotsTable = () => {
 	} );
 
   	return <div className='container-fluid mb-3'>
+
+		<div className="form-check form-switch">
+			<input
+				title="Group record by day"
+				className="form-check-input"
+				type="checkbox"
+				role="switch"
+				checked={ shouldGroupDays }
+				onChange={ () => {
+					setShouldGroupDays( ! shouldGroupDays );
+				} }
+			/>
+		</div>
+
 		<div className="timeSlots-table">
 		{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId }>
 				<div className="row">
 
 				<div className="col position-relative">
 						<span className="bg-body-bg bg-body z-1 pe-4">
-						{ dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
+						{ 'all' === groupDateId ? '' : dayjs( groupDateId ).format( 'dddd DD. MMMM YYYY' ) }
 					</span>
 						<div
 						className="border-bottom position-absolute" style={ {
