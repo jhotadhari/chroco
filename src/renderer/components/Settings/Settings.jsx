@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import classnames from 'classnames';
 import ThemeControl from './ThemeControl.jsx';
 import HideFieldsControl from './HideFieldsControl.jsx';
+import FieldsControl from './FieldsControl.jsx';
 import DbPathControl from './DbPathControl.jsx';
 import TimezonesControl from './TimezonesControl.jsx';
 import StartOfWeekControl from './StartOfWeekControl.jsx';
@@ -44,6 +45,7 @@ const Settings = ( {
 					<ThemeControl className="mb-5" />
 					<StartOfWeekControl className="mb-5" />
 					<HideFieldsControl className="mb-5" />
+					<FieldsControl className="mb-5" />
 					<DbPathControl className="mb-5" />
 					<TimezonesControl className="mb-5" />
 

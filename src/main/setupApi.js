@@ -286,6 +286,12 @@ const validateSetting = setting => {
 			}
 			// ??? TODO validate filters
 			return true;
+		case 'fields':
+			if ( ! isArray( setting.value ) ) {
+				return [setting.key + ' must be type of array.'];
+			}
+			// ??? TODO validate filters
+			return true;
 		case 'startOfWeek':
 			if ( ! isString( setting.value ) || ! /[0-6]/.test( setting.value ) ) {
 				return [setting.key + ' must be type of string. Between 0 and 6.'];
