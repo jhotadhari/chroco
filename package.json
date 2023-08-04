@@ -21,6 +21,8 @@
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@babel/preset-react": "^7.22.5",
+    "@dnd-kit/core": "^6.0.8",
+    "@dnd-kit/sortable": "^7.0.2",
     "@electron-forge/cli": "^6.2.1",
     "@electron-forge/maker-deb": "^6.2.1",
     "@electron-forge/maker-dmg": "^6.2.1",
@@ -49,7 +51,6 @@
     "react-dom": "^18.2.0",
     "react-multi-select-component": "^4.3.4",
     "react-scripts": "5.0.1",
-    "react-sortable-hoc": "^2.0.0",
     "react-tooltip": "^5.18.0",
     "sass": "^1.64.1",
     "sass-loader": "^13.3.2",
