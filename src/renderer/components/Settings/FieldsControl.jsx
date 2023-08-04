@@ -4,9 +4,11 @@ import React, {
 	forwardRef,
 	useRef,
 	useEffect,
+	createContext,
 } from 'react';
 import classnames from 'classnames';
 import { get } from 'lodash';
+import { MultiSelect } from 'react-multi-select-component';
 import {
 	DndContext,
 	closestCenter,
@@ -28,6 +30,10 @@ import Context from '../../Context';
 import Icon from '../Icon.jsx';
 const { api } = window;
 
+
+const FieldsControlContext = createContext( {} );
+
+
 const sortFields = fields => {
 	let index;
 	index = fields.findIndex( field => field.key === 'title' );
@@ -39,13 +45,108 @@ const sortFields = fields => {
 	return fields;
 };
 
+const FieldDetails = ( {
+	field,
+} ) => {
+	const {
+		themeSource,
+	} = useContext( Context );
+
+	const {
+		selectedKey,
+		setSelectedKey,
+	} = useContext( FieldsControlContext );
+
+	const typeOptions = [
+		{ value: 'text', label: 'Text' },
+		{ value: 'bool', label: 'Boolean' },
+	];
+
+	return <div className='col'>
+		<div className='card h-100'>
+
+			<div className="card-header">
+				<span>
+					{ field.key }
+				</span>
+				<button
+					className={ classnames( ['btn btn-close float-end'] ) }
+					type="button"
+					onClick={ () => setSelectedKey( null ) }
+				>
+				</button>
+			</div>
+
+			<div className="card-body">
+
+				<div className='row'>
+					<div className='col mb-3'>
+						<label htmlFor={ field.key + '-' + 'title' } className="form-label">Title Singular</label>
+						<input
+							className="form-control"
+							id={ field.key + '-' + 'title' }
+							value={ get( field, 'title', '' ) }
+							onChange={ () => null }
+						/>
+					</div>
+					<div className='col mb-3'>
+						<label htmlFor={ field.key + '-' + 'title' } className="form-label">Title Plural</label>
+						<input
+							className="form-control"
+							id={ field.key + '-' + 'titlePlural' }
+							aria-describedby={ field.key + '-' + 'titlePlural' + 'desc' }
+							value={ get( field, 'titlePlural', '' ) }
+							onChange={ () => null }
+						/>
+						<div id={ field.key + '-' + 'titlePlural' + 'desc' } className="form-text">Fallback to singular title.</div>
+					</div>
+				</div>
+
+				<div className='row'>
+
+					<div className="col mb-3">
+						<label id={ field.key + '-' + 'type' } className="form-label">Field Type</label>
+						<MultiSelect
+							labelledBy={ field.key + '-' + 'type' }
+							ClearSelectedIcon={ null }
+							closeOnChangedValue={ true }
+							className={ themeSource }
+							hasSelectAll={ false }
+							disableSearch={ true }
+							options={ typeOptions }
+							value={ [typeOptions[0]] }
+							onChange={ selectedOpt => null }
+						/>
+					</div>
+
+					<div className='col'></div>
+
+				</div>
+
+
+				{/* default */}
+
+
+				{/* default force */}
+
+
+				<span className='float-end'>Press <i>Enter</i> to <button className="btn btn-primary ms-1">Save</button></span>
+
+			</div>
+		</div>
+	</div>;
+};
+
 const Field = forwardRef( ( {
 	field,
 	style,
-	setSelectedKey,
-	selectedKey,
 	children,
 }, ref ) => {
+
+	const {
+		selectedKey,
+		setSelectedKey,
+	} = useContext( FieldsControlContext );
 
 	return <div
 		ref={ ref }
@@ -63,11 +164,12 @@ const Field = forwardRef( ( {
 			type="text"
 			className="form-control"
 			placeholder="Field Title"
-			value={ field.title }
+			value={ field.key }
 			disabled={ field.required }
 			onChange={ () => null }
+			onFocus={ () => setSelectedKey( field.key ) }
 		/>
-		<button
+		{/* <button
 			className={ classnames( [
 				'btn btn-outline-secondary',
 				selectedKey === field.key ? 'text-body-emphasis' : '',
@@ -80,14 +182,13 @@ const Field = forwardRef( ( {
 			}
 		>
 			<Icon type="gear" />
-		</button>
+		</button> */}
 	</div>;
 } );
 
 const SortableItem = ( {
 	field,
-	setSelectedKey,
-	selectedKey,
+	index,
 } ) => {
 	const {
 		attributes,
@@ -96,6 +197,7 @@ const SortableItem = ( {
 		transform,
 		transition,
 		isDragging,
+		items,
 	} = useSortable( { id: field.key } );
 
 	const style = {
@@ -106,11 +208,9 @@ const SortableItem = ( {
 
 	return <li
 		style={ style }
-		className='pb-2'
+		className={ items.length - 1 !== index ? 'mb-2' : '' }
 	>
 		<Field
-			setSelectedKey={ setSelectedKey }
-			selectedKey={ selectedKey }
 			field={ field }
 		>
 			<span
@@ -215,59 +315,56 @@ const FieldsControl = ( { className } ) => {
 		}
 	};
 
-	return fieldsS && Array.isArray( fieldsS ) ? <div className={ className }>
-		<label id={ 'setting-label-' + settingKey } className="form-label">Fields</label>
-		<div className="row">
-			<div className="col-1"></div>
-			<div className="col-13 position-relative">
-				<DndContext
-					sensors={ sensors }
-					collisionDetection={ closestCenter }
-					onDragEnd={ handleDragEnd }
-					onDragOver={ handleDragOver }
-				>
-					<ul className="list-unstyled" ref={ ref }>
+	return fieldsS && Array.isArray( fieldsS ) ? <FieldsControlContext.Provider
+		value={ {
+			selectedKey,
+			setSelectedKey,
+		} }
+	>
+		<div className={ className }>
+			<label id={ 'setting-label-' + settingKey } className="form-label">Fields</label>
+			<div className="row">
+				<div className="col-1"></div>
+				<div className="col-13 position-relative">
+					<DndContext
+						sensors={ sensors }
+						collisionDetection={ closestCenter }
+						onDragEnd={ handleDragEnd }
+						onDragOver={ handleDragOver }
+					>
+						<ul className="list-unstyled mb-0" ref={ ref }>
+							<SortableContext
+								items={ fieldsS }
+								strategy={ verticalListSortingStrategy }
+							>
+								{ [...fieldsS].map( ( field, index ) => <SortableItem
+									id={ field.key }
+									key={ field.key }
+									index={ index }
+									field={ field }
+									handle={ true }
+								/> ) }
+							</SortableContext>
+						</ul>
+					</DndContext>
+				</div>
 
-						<SortableContext
-							items={ fieldsS }
-							strategy={ verticalListSortingStrategy }
-						>
-							{ [...fieldsS].map( field => <SortableItem
-								id={ field.key }
-								key={ field.key }
-								setSelectedKey={ setSelectedKey }
-								selectedKey={ selectedKey }
-								field={ field }
-								handle={ true }
-							/> ) }
-						</SortableContext>
-					</ul>
-				</DndContext>
+				{ selectedKey && <FieldDetails
+					field={ fields.find( f => f.key === selectedKey ) }
+				/> }
+
+				<div className='col-1'></div>
+
+				{/* { difference( get( setting, 'value' ), settingsDefaults[settingKey] ).length > 0 && <div className="col">
+					<button
+						onClick={ () => doUpdate( settingsDefaults[settingKey] ) }
+						type="button"
+						className="btn btn-link border-0"
+					>Reset</button>
+				</div> } */}
 			</div>
-
-			<div className='col-1'></div>
-			{ selectedKey && <div className='col border rounded p-3'>
-				{ selectedKey }
-
-				<button
-					className={ classnames( ['btn btn-close float-end'] ) }
-					type="button"
-					onClick={ () => setSelectedKey( null ) }
-				>
-				</button>
-
-			</div> }
-			<div className='col-1'></div>
-
-			{/* { difference( get( setting, 'value' ), settingsDefaults[settingKey] ).length > 0 && <div className="col">
-				<button
-					onClick={ () => doUpdate( settingsDefaults[settingKey] ) }
-					type="button"
-					className="btn btn-link border-0"
-				>Reset</button>
-			</div> } */}
 		</div>
-	</div> : null;
+	</FieldsControlContext.Provider> : null;
 };
 
 export default FieldsControl;
