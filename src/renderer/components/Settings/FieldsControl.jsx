@@ -56,6 +56,7 @@ const FieldDetails = () => {
 		selectedField,
 		setSelectedField,
 		selectedFieldIsDirty,
+		saveSelectedField,
 	} = useContext( FieldsControlContext );
 
 	const typeOptions = [
@@ -84,7 +85,6 @@ const FieldDetails = () => {
 				<button
 					className={ classnames( ['btn btn-close float-end'] ) }
 					type="button"
-					// onClick={ () => setSelectedField( null ) }
 					onClick={ () => setSelectedField( {} ) }
 				>
 				</button>
@@ -162,13 +162,20 @@ const FieldDetails = () => {
 				{/* default force */}
 
 
-				{/* ??? TODO check valid */}
-				{/* ??? TODO check OnClick */}
+				{/* ??? TODO check OnKeyDown */}
 				<span className='float-end'>
-					{ selectedFieldIsDirty && <>
-						Press <i>Enter</i> to
-					</> }
-					<button disabled={ ! selectedFieldIsDirty } className="btn btn-primary ms-1">Save</button></span>
+					{ selectedFieldIsDirty && <>Press <i>Enter</i> to</> }
+					<button
+						className="btn btn-primary ms-1"
+						disabled={ ! selectedFieldIsDirty }
+						onClick={ () => {
+							// ??? TODO check valid
+							saveSelectedField();
+						} }
+					>
+						Save
+					</button>
+				</span>
 
 			</div>
 		</div>
@@ -179,6 +186,7 @@ const Field = forwardRef( ( {
 	field,
 	style,
 	children,
+	disabled,
 }, ref ) => {
 
 	const {
@@ -190,8 +198,6 @@ const Field = forwardRef( ( {
 	const value = get( selectedField, 'key' ) === field.key
 		? get( selectedField, 'newKey',  selectedField.key )
 		: field.key;
-
-	const disabled = selectedField.key && selectedFieldIsDirty && selectedField.key !== field.key;
 
 	// ??? TODO onEscape
 
@@ -248,11 +254,18 @@ const SortableItem = ( {
 		items,
 	} = useSortable( { id: field.key } );
 
+	const {
+		selectedField,
+		selectedFieldIsDirty,
+	} = useContext( FieldsControlContext );
+
 	const style = {
 		transform: CSS.Transform.toString( transform ),
 		transition,
 		opacity: isDragging ? 0.5 : 1,
 	};
+
+	const disabled = selectedField.key && selectedFieldIsDirty && selectedField.key !== field.key;
 
 	return <li
 		style={ style }
@@ -260,15 +273,20 @@ const SortableItem = ( {
 	>
 		<Field
 			field={ field }
+			disabled={ disabled }
 		>
 			<span
 				ref={ setNodeRef }
 				{ ...listeners }
 				{ ...attributes }
+				// ref={ disabled ? null : setNodeRef }
+				// { ...( disabled ? {} : {...listeners} ) }
+				// { ...( disabled ? {} : {...attributes} ) }
 				className={ classnames( [
 					'btn',
 					'drag-handle',
 					field.required ? 'disabled opacity-25' : 'border-light-subtle',
+					disabled && 'disabled',
 				] ) }
 			>
 				<Icon type="grip-horizontal" />
@@ -305,14 +323,14 @@ const FieldsControl = ( { className } ) => {
 
 	const selectedFieldIsDirty = selectedField.key && ! isEqual( fields.find( f => f.key === selectedField.key ), selectedField );
 
-
 	const [
 		fieldsState, setFieldsState,
 	] = useState( fields );
 
+	// Update fieldsState if fields have changed.
 	useEffect( () => {
 		setFieldsState( fields );
-	}, [[...fields].map( f => f.key ).join( '' )] );
+	}, [[...fields].map( f => JSON.stringify( f ) ).join( '' )] );
 
 	const doUpdate = newVal => {
 		if ( undefined === setting ) {
@@ -340,6 +358,21 @@ const FieldsControl = ( { className } ) => {
 					setSettings( newSettings );
 				}
 			} );
+		}
+	};
+
+	const saveSelectedField = () => {
+		if ( selectedField.key ) {
+			let {
+				newKey, ...newField
+			} = selectedField;
+			const index = fieldsState.findIndex( field => field.key === newField.key );
+			newField.key = newKey || newField.key;
+			if ( -1 !== index ) {
+				const newFields = [...fieldsState];
+				newFields[index] = newField;
+				doUpdate( newFields );
+			}
 		}
 	};
 
@@ -371,6 +404,7 @@ const FieldsControl = ( { className } ) => {
 			selectedField,
 			setSelectedField,
 			selectedFieldIsDirty,
+			saveSelectedField,
 		} }
 	>
 		<div className={ className }>
