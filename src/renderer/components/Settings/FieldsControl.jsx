@@ -45,16 +45,14 @@ const sortFields = fields => {
 	return fields;
 };
 
-const FieldDetails = ( {
-	field,
-} ) => {
+const FieldDetails = () => {
 	const {
 		themeSource,
 	} = useContext( Context );
 
 	const {
-		selectedKey,
-		setSelectedKey,
+		selectedField,
+		setSelectedField,
 	} = useContext( FieldsControlContext );
 
 	const typeOptions = [
@@ -62,17 +60,20 @@ const FieldDetails = ( {
 		{ value: 'bool', label: 'Boolean' },
 	];
 
+	const selectedTypeOption = typeOptions.find( opt => opt.value === selectedField.type );
+
 	return <div className='col'>
 		<div className='card h-100'>
 
 			<div className="card-header">
 				<span>
-					{ field.key }
+					{ selectedField.key }
 				</span>
 				<button
 					className={ classnames( ['btn btn-close float-end'] ) }
 					type="button"
-					onClick={ () => setSelectedKey( null ) }
+					// onClick={ () => setSelectedField( null ) }
+					onClick={ () => setSelectedField( {} ) }
 				>
 				</button>
 			</div>
@@ -81,41 +82,57 @@ const FieldDetails = ( {
 
 				<div className='row'>
 					<div className='col mb-3'>
-						<label htmlFor={ field.key + '-' + 'title' } className="form-label">Title Singular</label>
+						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Singular</label>
 						<input
 							className="form-control"
-							id={ field.key + '-' + 'title' }
-							value={ get( field, 'title', '' ) }
-							onChange={ () => null }
+							id={ selectedField.key + '-' + 'title' }
+							value={ get( selectedField, 'title', '' ) }
+							onChange={ e => setSelectedField( {
+								...selectedField,
+								title: e.target.value,
+							} ) }
 						/>
 					</div>
 					<div className='col mb-3'>
-						<label htmlFor={ field.key + '-' + 'title' } className="form-label">Title Plural</label>
+						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Plural</label>
 						<input
 							className="form-control"
-							id={ field.key + '-' + 'titlePlural' }
-							aria-describedby={ field.key + '-' + 'titlePlural' + 'desc' }
-							value={ get( field, 'titlePlural', '' ) }
-							onChange={ () => null }
+							id={ selectedField.key + '-' + 'titlePlural' }
+							aria-describedby={ selectedField.key + '-' + 'titlePlural' + 'desc' }
+							value={ get( selectedField, 'titlePlural', '' ) }
+							onChange={ e => setSelectedField( {
+								...selectedField,
+								titlePlural: e.target.value,
+							} ) }
 						/>
-						<div id={ field.key + '-' + 'titlePlural' + 'desc' } className="form-text">Fallback to singular title.</div>
+						<div id={ selectedField.key + '-' + 'titlePlural' + 'desc' } className="form-text">Fallback to singular title.</div>
 					</div>
 				</div>
 
 				<div className='row'>
 
 					<div className="col mb-3">
-						<label id={ field.key + '-' + 'type' } className="form-label">Field Type</label>
+						<label id={ selectedField.key + '-' + 'type' } className="form-label">Field Type</label>
 						<MultiSelect
-							labelledBy={ field.key + '-' + 'type' }
+							labelledBy={ selectedField.key + '-' + 'type' }
 							ClearSelectedIcon={ null }
 							closeOnChangedValue={ true }
 							className={ themeSource }
 							hasSelectAll={ false }
 							disableSearch={ true }
 							options={ typeOptions }
-							value={ [typeOptions[0]] }
-							onChange={ selectedOpt => null }
+							value={ selectedTypeOption ? [selectedTypeOption] : [] }
+							onChange={ selectedOptions => {
+								if ( selectedOptions.length ) {
+									if ( selectedOptions.length === 2 ) {
+										selectedOptions = selectedOptions.filter( opt => opt.value !== selectedField.type )
+									}
+									setSelectedField( {
+										...selectedField,
+										type: selectedOptions[0].value,
+									} );
+								}
+							} }
 						/>
 					</div>
 
@@ -144,8 +161,8 @@ const Field = forwardRef( ( {
 }, ref ) => {
 
 	const {
-		selectedKey,
-		setSelectedKey,
+		selectedField,
+		setSelectedField,
 	} = useContext( FieldsControlContext );
 
 	return <div
@@ -154,7 +171,7 @@ const Field = forwardRef( ( {
 			'input-group',
 			'position-relative',
 			'sortable-item',
-			! selectedKey || selectedKey === field.key ? '' : 'opacity-25',
+			! selectedField.key || selectedField.key === field.key ? '' : 'opacity-25',
 		] ) }
 		style={ style }
 	>
@@ -167,22 +184,9 @@ const Field = forwardRef( ( {
 			value={ field.key }
 			disabled={ field.required }
 			onChange={ () => null }
-			onFocus={ () => setSelectedKey( field.key ) }
+			// onFocus={ () => setSelectedKey( field.key ) }
+			onFocus={ () => setSelectedField( {...field} ) }
 		/>
-		{/* <button
-			className={ classnames( [
-				'btn btn-outline-secondary',
-				selectedKey === field.key ? 'text-body-emphasis' : '',
-			] ) }
-			type="button"
-			disabled={ field.required }
-			onClick={ () => selectedKey === field.key
-				? setSelectedKey( null )
-				: setSelectedKey( field.key )
-			}
-		>
-			<Icon type="gear" />
-		</button> */}
 	</div>;
 } );
 
@@ -242,8 +246,8 @@ const FieldsControl = ( { className } ) => {
 	const ref = useRef( null );
 
 	const [
-		selectedKey, setSelectedKey,
-	] = useState( null );
+		selectedField, setSelectedField,
+	] = useState( {} );
 
 	const sensors = useSensors(
 		useSensor( PointerSensor ),
@@ -256,11 +260,11 @@ const FieldsControl = ( { className } ) => {
 	const fields = get( setting, 'value', settingsDefaults[settingKey], [] ).filter( field => field.key !== '_id' );
 
 	const [
-		fieldsS, setFieldsS,
+		fieldsState, setFieldsState,
 	] = useState( fields );
 
 	useEffect( () => {
-		setFieldsS( fields );
+		setFieldsState( fields );
 	}, [[...fields].map( f => f.key ).join( '' )] );
 
 	const doUpdate = newVal => {
@@ -296,10 +300,10 @@ const FieldsControl = ( { className } ) => {
 		active,
 		over,
 	} ) => {
-		const oldIndex = fieldsS.findIndex( field => field.key === active.id );
-		const newIndex = fieldsS.findIndex( field => field.key === over.id );
-		const newFieldsS = sortFields( arrayMove( fieldsS, oldIndex, newIndex ) );
-		setFieldsS( newFieldsS );
+		const oldIndex = fieldsState.findIndex( field => field.key === active.id );
+		const newIndex = fieldsState.findIndex( field => field.key === over.id );
+		const newFieldsState = sortFields( arrayMove( fieldsState, oldIndex, newIndex ) );
+		setFieldsState( newFieldsState );
 	};
 
 	const handleDragEnd = ( {
@@ -310,15 +314,15 @@ const FieldsControl = ( { className } ) => {
 			const oldIndex = fields.findIndex( field => field.key === active.id );
 			const newIndex = fields.findIndex( field => field.key === over.id );
 			const newFields = sortFields( arrayMove( fields, oldIndex, newIndex ) );
-			setFieldsS( newFields );
+			setFieldsState( newFields );
 			doUpdate( newFields );
 		}
 	};
 
-	return fieldsS && Array.isArray( fieldsS ) ? <FieldsControlContext.Provider
+	return fieldsState && Array.isArray( fieldsState ) ? <FieldsControlContext.Provider
 		value={ {
-			selectedKey,
-			setSelectedKey,
+			selectedField,
+			setSelectedField,
 		} }
 	>
 		<div className={ className }>
@@ -334,10 +338,10 @@ const FieldsControl = ( { className } ) => {
 					>
 						<ul className="list-unstyled mb-0" ref={ ref }>
 							<SortableContext
-								items={ fieldsS }
+								items={ fieldsState }
 								strategy={ verticalListSortingStrategy }
 							>
-								{ [...fieldsS].map( ( field, index ) => <SortableItem
+								{ [...fieldsState].map( ( field, index ) => <SortableItem
 									id={ field.key }
 									key={ field.key }
 									index={ index }
@@ -349,8 +353,8 @@ const FieldsControl = ( { className } ) => {
 					</DndContext>
 				</div>
 
-				{ selectedKey && <FieldDetails
-					field={ fields.find( f => f.key === selectedKey ) }
+				{ selectedField.key && <FieldDetails
+					field={ fields.find( f => f.key === selectedField.key ) }
 				/> }
 
 				<div className='col-1'></div>
