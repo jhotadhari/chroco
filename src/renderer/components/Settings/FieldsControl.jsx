@@ -7,7 +7,11 @@ import React, {
 	createContext,
 } from 'react';
 import classnames from 'classnames';
-import { get } from 'lodash';
+import {
+	get,
+	isEqual,
+	omit,
+} from 'lodash';
 import { MultiSelect } from 'react-multi-select-component';
 import {
 	DndContext,
@@ -46,28 +50,36 @@ const sortFields = fields => {
 };
 
 const FieldDetails = () => {
-	const {
-		themeSource,
-	} = useContext( Context );
+	const { themeSource } = useContext( Context );
 
 	const {
 		selectedField,
 		setSelectedField,
+		selectedFieldIsDirty,
 	} = useContext( FieldsControlContext );
 
 	const typeOptions = [
-		{ value: 'text', label: 'Text' },
-		{ value: 'bool', label: 'Boolean' },
+		{
+			value: 'text', label: 'Text',
+		},
+		{
+			value: 'bool', label: 'Boolean',
+		},
 	];
 
 	const selectedTypeOption = typeOptions.find( opt => opt.value === selectedField.type );
 
 	return <div className='col'>
-		<div className='card h-100'>
+		<div
+			className={ classnames( [
+				'card h-100',
+				selectedFieldIsDirty && 'border-success',
+			] ) }
+		>
 
 			<div className="card-header">
 				<span>
-					{ selectedField.key }
+					Field Key: { selectedField.newKey || selectedField.key }
 				</span>
 				<button
 					className={ classnames( ['btn btn-close float-end'] ) }
@@ -83,6 +95,8 @@ const FieldDetails = () => {
 				<div className='row'>
 					<div className='col mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Singular</label>
+						{/* // ??? TODO onEscape */}
+						{/* // ??? TODO maybe required */}
 						<input
 							className="form-control"
 							id={ selectedField.key + '-' + 'title' }
@@ -94,7 +108,8 @@ const FieldDetails = () => {
 						/>
 					</div>
 					<div className='col mb-3'>
-						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Plural</label>
+						<label htmlFor={ selectedField.key + '-' + 'titlePlural' } className="form-label">Title Plural</label>
+						{/* // ??? TODO onEscape */}
 						<input
 							className="form-control"
 							id={ selectedField.key + '-' + 'titlePlural' }
@@ -125,7 +140,7 @@ const FieldDetails = () => {
 							onChange={ selectedOptions => {
 								if ( selectedOptions.length ) {
 									if ( selectedOptions.length === 2 ) {
-										selectedOptions = selectedOptions.filter( opt => opt.value !== selectedField.type )
+										selectedOptions = selectedOptions.filter( opt => opt.value !== selectedField.type );
 									}
 									setSelectedField( {
 										...selectedField,
@@ -147,7 +162,13 @@ const FieldDetails = () => {
 				{/* default force */}
 
 
-				<span className='float-end'>Press <i>Enter</i> to <button className="btn btn-primary ms-1">Save</button></span>
+				{/* ??? TODO check valid */}
+				{/* ??? TODO check OnClick */}
+				<span className='float-end'>
+					{ selectedFieldIsDirty && <>
+						Press <i>Enter</i> to
+					</> }
+					<button disabled={ ! selectedFieldIsDirty } className="btn btn-primary ms-1">Save</button></span>
 
 			</div>
 		</div>
@@ -163,15 +184,25 @@ const Field = forwardRef( ( {
 	const {
 		selectedField,
 		setSelectedField,
+		selectedFieldIsDirty,
 	} = useContext( FieldsControlContext );
+
+	const value = get( selectedField, 'key' ) === field.key
+		? get( selectedField, 'newKey',  selectedField.key )
+		: field.key;
+
+	const disabled = selectedField.key && selectedFieldIsDirty && selectedField.key !== field.key;
+
+	// ??? TODO onEscape
 
 	return <div
 		ref={ ref }
+		disabled={ disabled }
 		className={ classnames( [
 			'input-group',
 			'position-relative',
 			'sortable-item',
-			! selectedField.key || selectedField.key === field.key ? '' : 'opacity-25',
+			disabled && 'opacity-25',
 		] ) }
 		style={ style }
 	>
@@ -179,13 +210,26 @@ const Field = forwardRef( ( {
 
 		<input
 			type="text"
-			className="form-control"
-			placeholder="Field Title"
-			value={ field.key }
-			disabled={ field.required }
-			onChange={ () => null }
-			// onFocus={ () => setSelectedKey( field.key ) }
-			onFocus={ () => setSelectedField( {...field} ) }
+			className={ classnames( [
+				'form-control',
+				! /^[a-zA-Z0-9]+$/.test( value ) && 'invalid',
+				selectedFieldIsDirty && 'dirty',
+			] ) }
+			value={ value }
+			disabled={ disabled || field.required }
+			onChange={ e => {
+				if ( /^[a-zA-Z0-9]*$/.test( e.target.value ) ) {
+					if ( e.target.value === selectedField.key ) {
+						setSelectedField( omit( selectedField, 'newKey' ) );
+					} else {
+						setSelectedField( {
+							...selectedField,
+							newKey: e.target.value,
+						} );
+					}
+				}
+			} }
+			onFocus={ () => get( selectedField, 'key' ) !== field.key && setSelectedField( { ...field } ) }
 		/>
 	</div>;
 } );
@@ -259,6 +303,9 @@ const FieldsControl = ( { className } ) => {
 
 	const fields = get( setting, 'value', settingsDefaults[settingKey], [] ).filter( field => field.key !== '_id' );
 
+	const selectedFieldIsDirty = selectedField.key && ! isEqual( fields.find( f => f.key === selectedField.key ), selectedField );
+
+
 	const [
 		fieldsState, setFieldsState,
 	] = useState( fields );
@@ -323,6 +370,7 @@ const FieldsControl = ( { className } ) => {
 		value={ {
 			selectedField,
 			setSelectedField,
+			selectedFieldIsDirty,
 		} }
 	>
 		<div className={ className }>
