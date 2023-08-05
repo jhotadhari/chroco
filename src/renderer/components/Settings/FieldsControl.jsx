@@ -34,9 +34,17 @@ import Context from '../../Context';
 import Icon from '../Icon.jsx';
 const { api } = window;
 
-
 const FieldsControlContext = createContext( {} );
 
+const getFieldValidErrors = selectedField => {
+	let errors = [];
+	if ( selectedField.hasOwnProperty( 'newKey' ) && ! selectedField.newKey.length ) {
+		errors = [
+			...errors, 'Field key can\'t be empty',
+		];
+	}
+	return errors;
+};
 
 const sortFields = fields => {
 	let index;
@@ -57,6 +65,7 @@ const FieldDetails = () => {
 		setSelectedField,
 		selectedFieldIsDirty,
 		saveSelectedField,
+		selectedFieldValidErrors,
 		isUpdating,
 	} = useContext( FieldsControlContext );
 
@@ -116,7 +125,6 @@ const FieldDetails = () => {
 				<div className='row'>
 					<div className='col mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Singular</label>
-						{/* // ??? TODO onEscape */}
 						{/* // ??? TODO maybe required */}
 						<input
 							className="form-control"
@@ -130,7 +138,6 @@ const FieldDetails = () => {
 					</div>
 					<div className='col mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'titlePlural' } className="form-label">Title Plural</label>
-						{/* // ??? TODO onEscape */}
 						<input
 							className="form-control"
 							id={ selectedField.key + '-' + 'titlePlural' }
@@ -176,25 +183,23 @@ const FieldDetails = () => {
 
 				</div>
 
+				{/* ??? TODO default */}
 
-				{/* default */}
-
-				{/* default force */}
+				{/* ??? TODO default force */}
 
 			</div>
 
 			<div className="card-footer">
-
-				{/* ??? TODO check OnKeyDown */}
 				<span className='float-end d-inline-flex align-items-center'>
-					{ selectedFieldIsDirty && ! isUpdating && <>Press <i className='mx-1'>Enter</i> to</> }
+					{ selectedFieldValidErrors.length > 0 && [...selectedFieldValidErrors].map( ( err, idx ) => <span key={ idx } className='text-danger'>{ err }</span> ) }
+					{ selectedFieldIsDirty && 0 === selectedFieldValidErrors.length && ! isUpdating && <>Press <i className='mx-1'>Enter</i> to</> }
 					{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
 						<div className="spinner-border spinner-border-sm ms-auto me-2" aria-hidden="true"></div>
 						<span role="status">Updating...</span>
 					</span> }
 					<button
 						className="btn btn-primary ms-2"
-						disabled={ isUpdating || ! selectedFieldIsDirty }
+						disabled={ selectedFieldValidErrors.length > 0 || isUpdating || ! selectedFieldIsDirty }
 						onClick={ () => {
 							// ??? TODO check valid
 							saveSelectedField();
@@ -225,8 +230,6 @@ const Field = forwardRef( ( {
 	const value = get( selectedField, 'key' ) === field.key
 		? get( selectedField, 'newKey',  selectedField.key )
 		: field.key;
-
-	// ??? TODO onEscape
 
 	return <div
 		ref={ ref }
@@ -269,9 +272,7 @@ const Field = forwardRef( ( {
 	</div>;
 } );
 
-const SortableItem = ( {
-	field,
-} ) => {
+const SortableItem = ( { field } ) => {
 	const {
 		attributes,
 		listeners,
@@ -323,7 +324,6 @@ const SortableItem = ( {
 		</Field>
 	</li>;
 };
-
 
 const FieldsControl = ( { className } ) => {
 	const {
@@ -407,7 +407,7 @@ const FieldsControl = ( { className } ) => {
 				newFields[index] = newField;
 				setIsUpdating( true );
 				doUpdate( newFields ).then( () => {
-					setSelectedField( {...newField} );
+					setSelectedField( { ...newField } );
 					setIsUpdating( false );
 			 	} );
 			}
@@ -440,16 +440,41 @@ const FieldsControl = ( { className } ) => {
 		}
 	};
 
+	const selectedFieldValidErrors = getFieldValidErrors( selectedField );
+
 	return fieldsState && Array.isArray( fieldsState ) ? <FieldsControlContext.Provider
 		value={ {
 			selectedField,
 			setSelectedField,
+			selectedFieldValidErrors,
 			selectedFieldIsDirty,
 			saveSelectedField,
 			isUpdating,
 		} }
 	>
-		<div className={ classnames( [className, 'fields-control']) }>
+		<div
+			className={ classnames( [
+				className,
+				'fields-control',
+			] ) }
+			onKeyDown={ e => {
+				if (
+					'Enter' === e.key
+					&& selectedField.key
+					&& 0 === selectedFieldValidErrors.length
+				) {
+					saveSelectedField();
+				}
+				if ( 'Escape' === e.key && selectedField.key ) {
+					if ( selectedFieldIsDirty ) {
+						setSelectedField( { ...fields.find( f => f.key === selectedField.key ) } );
+					} else {
+						setSelectedField( {} );
+					}
+				}
+			} }
+			tabIndex="0"
+		>
 			<label id={ 'setting-label-' + settingKey } className="form-label">Fields</label>
 			<div className="row">
 				<div className="col-1"></div>
@@ -476,7 +501,7 @@ const FieldsControl = ( { className } ) => {
 						</ul>
 					</DndContext>
 
-					<div class="w-100">
+					<div className="w-100">
 						{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
 							<div className="spinner-border spinner-border-sm ms-2 me-3" aria-hidden="true"></div>
 							<span className="ms-2" role="status">Updating...</span>
@@ -490,9 +515,6 @@ const FieldsControl = ( { className } ) => {
 							<Icon type="plus" />
 						</button>
 					</div>
-						{/* <span className='p-2'>
-							{ true && <Icon type="arrow-repeat" /> }
-						</span> */}
 				</div>
 
 				{ selectedField.key && <FieldDetails
