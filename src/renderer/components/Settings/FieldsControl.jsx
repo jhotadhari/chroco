@@ -87,37 +87,40 @@ const FieldDetails = () => {
 				selectedFieldIsDirty && 'border-success',
 			] ) }
 		>
-			<div className="card-header">
-				<label htmlFor={ selectedField.key + '-' + 'key' } className="form-label me-2">Field Key</label>
-				<input
-					type="text"
-					id={ selectedField.key + '-' + 'key' }
-					className={ classnames( [
-						'form-control',
-						'w-50 d-inline-block',
-						! /^[a-zA-Z0-9]+$/.test( get( selectedField, 'newKey',  selectedField.key ) ) && 'invalid',
-						selectedFieldIsDirty && 'dirty',
-					] ) }
-					value={ get( selectedField, 'newKey',  selectedField.key ) }
-					onChange={ e => {
-						if ( /^[a-zA-Z0-9]*$/.test( e.target.value ) ) {
-							if ( e.target.value === selectedField.key ) {
-								setSelectedField( omit( selectedField, 'newKey' ) );
-							} else {
-								setSelectedField( {
-									...selectedField,
-									newKey: e.target.value,
-								} );
-							}
-						}
-					} }
-				/>
+			<div className="card-header d-flex align-items-center flex-row-reverse justify-content-between">
 				<button
 					className={ classnames( ['btn btn-close float-end'] ) }
 					type="button"
 					onClick={ () => setSelectedField( {} ) }
 				>
 				</button>
+				<div className='d-flex align-items-center'>
+
+					<label htmlFor={ selectedField.key + '-' + 'key' } className="form-label me-2 mb-0">Field Key</label>
+					<input
+						type="text"
+						id={ selectedField.key + '-' + 'key' }
+						className={ classnames( [
+							'form-control',
+							'w-50 d-inline-block',
+							! /^[a-zA-Z0-9]+$/.test( get( selectedField, 'newKey',  selectedField.key ) ) && 'invalid',
+							selectedFieldIsDirty && 'dirty',
+						] ) }
+						value={ get( selectedField, 'newKey',  selectedField.key ) }
+						onChange={ e => {
+							if ( /^[a-zA-Z0-9]*$/.test( e.target.value ) ) {
+								if ( e.target.value === selectedField.key ) {
+									setSelectedField( omit( selectedField, 'newKey' ) );
+								} else {
+									setSelectedField( {
+										...selectedField,
+										newKey: e.target.value,
+									} );
+								}
+							}
+						} }
+					/>
+				</div>
 			</div>
 
 			<div className="card-body">
