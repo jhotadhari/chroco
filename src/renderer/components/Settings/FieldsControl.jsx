@@ -70,18 +70,38 @@ const FieldDetails = () => {
 
 	const selectedTypeOption = typeOptions.find( opt => opt.value === selectedField.type );
 
-	return <div className='col'>
+	return selectedField.required ? null : <div className='col'>
 		<div
 			className={ classnames( [
 				'card h-100',
 				selectedFieldIsDirty && 'border-success',
 			] ) }
 		>
-
 			<div className="card-header">
-				<span>
-					Field Key: { selectedField.newKey || selectedField.key }
-				</span>
+				<label htmlFor={ selectedField.key + '-' + 'key' } className="form-label me-2">Field Key</label>
+				<input
+					type="text"
+					id={ selectedField.key + '-' + 'key' }
+					className={ classnames( [
+						'form-control',
+						'w-50 d-inline-block',
+						! /^[a-zA-Z0-9]+$/.test( get( selectedField, 'newKey',  selectedField.key ) ) && 'invalid',
+						selectedFieldIsDirty && 'dirty',
+					] ) }
+					value={ get( selectedField, 'newKey',  selectedField.key ) }
+					onChange={ e => {
+						if ( /^[a-zA-Z0-9]*$/.test( e.target.value ) ) {
+							if ( e.target.value === selectedField.key ) {
+								setSelectedField( omit( selectedField, 'newKey' ) );
+							} else {
+								setSelectedField( {
+									...selectedField,
+									newKey: e.target.value,
+								} );
+							}
+						}
+					} }
+				/>
 				<button
 					className={ classnames( ['btn btn-close float-end'] ) }
 					type="button"
