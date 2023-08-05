@@ -40,7 +40,12 @@ const getFieldValidErrors = selectedField => {
 	let errors = [];
 	if ( selectedField.hasOwnProperty( 'newKey' ) && ! selectedField.newKey.length ) {
 		errors = [
-			...errors, 'Field key can\'t be empty',
+			...errors, 'Field key can\'t be empty.',
+		];
+	}
+	if ( ! get( selectedField, 'title', '' ).length ) {
+		errors = [
+			...errors, 'Field title is required.',
 		];
 	}
 	return errors;
@@ -128,16 +133,17 @@ const FieldDetails = () => {
 				<div className='row'>
 					<div className='col mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Singular</label>
-						{/* // ??? TODO maybe required */}
 						<input
 							className="form-control"
 							id={ selectedField.key + '-' + 'title' }
+							aria-describedby={ selectedField.key + '-' + 'title' + 'desc' }
 							value={ get( selectedField, 'title', '' ) }
 							onChange={ e => setSelectedField( {
 								...selectedField,
 								title: e.target.value,
 							} ) }
 						/>
+						<div id={ selectedField.key + '-' + 'title' + 'desc' } className="form-text">Required</div>
 					</div>
 					<div className='col mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'titlePlural' } className="form-label">Title Plural</label>
@@ -151,7 +157,7 @@ const FieldDetails = () => {
 								titlePlural: e.target.value,
 							} ) }
 						/>
-						<div id={ selectedField.key + '-' + 'titlePlural' + 'desc' } className="form-text">Fallback to singular title.</div>
+						<div id={ selectedField.key + '-' + 'titlePlural' + 'desc' } className="form-text">Fallback to singular title</div>
 					</div>
 				</div>
 
@@ -194,7 +200,7 @@ const FieldDetails = () => {
 
 			<div className="card-footer">
 				<span className='float-end d-inline-flex align-items-center'>
-					{ selectedFieldValidErrors.length > 0 && [...selectedFieldValidErrors].map( ( err, idx ) => <span key={ idx } className='text-danger'>{ err }</span> ) }
+					{ selectedFieldValidErrors.length > 0 && <span className='text-danger'>{ selectedFieldValidErrors.join( ' ' ) }</span> }
 					{ selectedFieldIsDirty && 0 === selectedFieldValidErrors.length && ! isUpdating && <>Press <i className='mx-1'>Enter</i> to</> }
 					{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
 						<div className="spinner-border spinner-border-sm ms-auto me-2" aria-hidden="true"></div>
@@ -203,10 +209,7 @@ const FieldDetails = () => {
 					<button
 						className="btn btn-primary ms-2"
 						disabled={ selectedFieldValidErrors.length > 0 || isUpdating || ! selectedFieldIsDirty }
-						onClick={ () => {
-							// ??? TODO check valid
-							saveSelectedField();
-						} }
+						onClick={ saveSelectedField }
 					>
 						Save
 					</button>
