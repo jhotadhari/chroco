@@ -57,6 +57,7 @@ const FieldDetails = () => {
 		setSelectedField,
 		selectedFieldIsDirty,
 		saveSelectedField,
+		isUpdating,
 	} = useContext( FieldsControlContext );
 
 	const typeOptions = [
@@ -178,16 +179,22 @@ const FieldDetails = () => {
 
 				{/* default */}
 
-
 				{/* default force */}
 
+			</div>
+
+			<div className="card-footer">
 
 				{/* ??? TODO check OnKeyDown */}
-				<span className='float-end'>
-					{ selectedFieldIsDirty && <>Press <i>Enter</i> to</> }
+				<span className='float-end d-inline-flex align-items-center'>
+					{ selectedFieldIsDirty && ! isUpdating && <>Press <i className='mx-1'>Enter</i> to</> }
+					{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
+						<div className="spinner-border spinner-border-sm ms-auto me-2" aria-hidden="true"></div>
+						<span className="me-2" role="status">Updating...</span>
+					</span> }
 					<button
 						className="btn btn-primary ms-1"
-						disabled={ ! selectedFieldIsDirty }
+						disabled={ isUpdating || ! selectedFieldIsDirty }
 						onClick={ () => {
 							// ??? TODO check valid
 							saveSelectedField();
@@ -196,8 +203,8 @@ const FieldDetails = () => {
 						Save
 					</button>
 				</span>
-
 			</div>
+
 		</div>
 	</div>;
 };
@@ -262,7 +269,6 @@ const Field = forwardRef( ( {
 
 const SortableItem = ( {
 	field,
-	index,
 } ) => {
 	const {
 		attributes,
@@ -289,7 +295,7 @@ const SortableItem = ( {
 
 	return <li
 		style={ style }
-		className={ items.length - 1 !== index ? 'mb-2' : '' }
+		className="mb-2"
 	>
 		<Field
 			field={ field }
@@ -299,13 +305,14 @@ const SortableItem = ( {
 				ref={ setNodeRef }
 				{ ...listeners }
 				{ ...attributes }
-				// ref={ disabled ? null : setNodeRef }
-				// { ...( disabled ? {} : {...listeners} ) }
-				// { ...( disabled ? {} : {...attributes} ) }
 				className={ classnames( [
 					'btn',
 					'drag-handle',
-					field.required ? 'disabled opacity-25' : 'border-light-subtle',
+					field.required ? 'disabled opacity-25' : (
+						selectedField.key && selectedFieldIsDirty && selectedField.key === field.key
+							? 'border-success'
+							: 'border-light-subtle'
+					),
 					disabled && 'disabled',
 				] ) }
 			>
@@ -346,13 +353,16 @@ const FieldsControl = ( { className } ) => {
 	const [
 		fieldsState, setFieldsState,
 	] = useState( fields );
+	const [
+		isUpdating, setIsUpdating,
+	] = useState( false );
 
 	// Update fieldsState if fields have changed.
 	useEffect( () => {
 		setFieldsState( fields );
 	}, [[...fields].map( f => JSON.stringify( f ) ).join( '' )] );
 
-	const doUpdate = newVal => {
+	const doUpdate = newVal => new Promise( ( resolve, reject ) => {
 		if ( undefined === setting ) {
 			// add new setting
 			const newSetting = {
@@ -363,6 +373,7 @@ const FieldsControl = ( { className } ) => {
 				setSettings( [
 					...settings, addedSetting,
 				] );
+				resolve();
 			} );
 		} else {
 			// update setting
@@ -376,10 +387,11 @@ const FieldsControl = ( { className } ) => {
 					const idx = newSettings.findIndex( sett => sett._id === setting._id );
 					newSettings.splice( idx, 1, newSetting );
 					setSettings( newSettings );
+					resolve();
 				}
 			} );
 		}
-	};
+	} );
 
 	const saveSelectedField = () => {
 		if ( selectedField.key ) {
@@ -391,7 +403,11 @@ const FieldsControl = ( { className } ) => {
 			if ( -1 !== index ) {
 				const newFields = [...fieldsState];
 				newFields[index] = newField;
-				doUpdate( newFields );
+				setIsUpdating( true );
+				doUpdate( newFields ).then( () => {
+					setSelectedField( {} );
+					setIsUpdating( false );
+			 	} );
 			}
 		}
 	};
@@ -415,7 +431,10 @@ const FieldsControl = ( { className } ) => {
 			const newIndex = fields.findIndex( field => field.key === over.id );
 			const newFields = sortFields( arrayMove( fields, oldIndex, newIndex ) );
 			setFieldsState( newFields );
-			doUpdate( newFields );
+			setIsUpdating( true );
+			doUpdate( newFields ).then( () => {
+				setIsUpdating( false );
+			 } );
 		}
 	};
 
@@ -425,6 +444,7 @@ const FieldsControl = ( { className } ) => {
 			setSelectedField,
 			selectedFieldIsDirty,
 			saveSelectedField,
+			isUpdating,
 		} }
 	>
 		<div className={ className }>
@@ -443,16 +463,34 @@ const FieldsControl = ( { className } ) => {
 								items={ fieldsState }
 								strategy={ verticalListSortingStrategy }
 							>
-								{ [...fieldsState].map( ( field, index ) => <SortableItem
+								{ [...fieldsState].map( field => <SortableItem
 									id={ field.key }
 									key={ field.key }
-									index={ index }
+									// index={ index }
 									field={ field }
 									handle={ true }
 								/> ) }
 							</SortableContext>
 						</ul>
 					</DndContext>
+
+					<div class="w-100">
+						{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
+							<div className="spinner-border spinner-border-sm ms-2 me-3" aria-hidden="true"></div>
+							<span className="ms-2" role="status">Updating...</span>
+						</span> }
+
+						<button
+							className="btn float-end"
+							title="Add new field"
+							disabled={ isUpdating || ( selectedField.key && selectedFieldIsDirty ) }
+						>
+							<Icon type="plus" />
+						</button>
+					</div>
+						{/* <span className='p-2'>
+							{ true && <Icon type="arrow-repeat" /> }
+						</span> */}
 				</div>
 
 				{ selectedField.key && <FieldDetails
