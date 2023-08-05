@@ -190,10 +190,10 @@ const FieldDetails = () => {
 					{ selectedFieldIsDirty && ! isUpdating && <>Press <i className='mx-1'>Enter</i> to</> }
 					{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
 						<div className="spinner-border spinner-border-sm ms-auto me-2" aria-hidden="true"></div>
-						<span className="me-2" role="status">Updating...</span>
+						<span role="status">Updating...</span>
 					</span> }
 					<button
-						className="btn btn-primary ms-1"
+						className="btn btn-primary ms-2"
 						disabled={ isUpdating || ! selectedFieldIsDirty }
 						onClick={ () => {
 							// ??? TODO check valid
@@ -232,10 +232,12 @@ const Field = forwardRef( ( {
 		ref={ ref }
 		disabled={ disabled }
 		className={ classnames( [
+			'field',
 			'input-group',
 			'position-relative',
 			'sortable-item',
 			disabled && 'opacity-25',
+			get( selectedField, 'key' ) === field.key && 'highlight',
 		] ) }
 		style={ style }
 	>
@@ -311,7 +313,7 @@ const SortableItem = ( {
 					field.required ? 'disabled opacity-25' : (
 						selectedField.key && selectedFieldIsDirty && selectedField.key === field.key
 							? 'border-success'
-							: 'border-light-subtle'
+							: ''
 					),
 					disabled && 'disabled',
 				] ) }
@@ -405,7 +407,7 @@ const FieldsControl = ( { className } ) => {
 				newFields[index] = newField;
 				setIsUpdating( true );
 				doUpdate( newFields ).then( () => {
-					setSelectedField( {} );
+					setSelectedField( {...newField} );
 					setIsUpdating( false );
 			 	} );
 			}
@@ -434,7 +436,7 @@ const FieldsControl = ( { className } ) => {
 			setIsUpdating( true );
 			doUpdate( newFields ).then( () => {
 				setIsUpdating( false );
-			 } );
+			} );
 		}
 	};
 
@@ -447,7 +449,7 @@ const FieldsControl = ( { className } ) => {
 			isUpdating,
 		} }
 	>
-		<div className={ className }>
+		<div className={ classnames( [className, 'fields-control']) }>
 			<label id={ 'setting-label-' + settingKey } className="form-label">Fields</label>
 			<div className="row">
 				<div className="col-1"></div>

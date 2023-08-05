@@ -32,3 +32,7 @@ $grid-gutter-width:           1rem;
 
 $input-placeholder-color:               var(--#{$prefix}gray-400);
 $input-placeholder-color-dark:          var(--#{$prefix}gray-700);
+
+
+$input-focus-box-shadow:                none;
+$input-border-color:                    var(--#{$prefix}border-color) !default;
