@@ -646,23 +646,27 @@ const TimeSlotsFilters = () => {
 
 		{ getSetting( 'fields' ).filter( field => '_id' !== field.key )
 				.map( field => {
-					if ( 'text' !== field.type ) {
-						switch( field.key ) {
-							case 'dateStart':
+					switch( field.type ) {
+						case 'text':
+							return <InputFilter
+								key={ field.key }
+								fieldKey={ field.key }
+							/>;
+						case 'bool':
+							// ??? TODO add filter for bool fields.
+							return <div key={ field.key } className='col-1'></div>;
+						default:
+							if ( 'dateStart' === field.key ) {
 								return <DateStartFilter
 									key={ field.key }
 									field={ field.key }
 								/>;
-							default:
+							} else {
 								return <Fragment key={ field.key } />;
-						}
+							}
 					}
-					return <InputFilter
-						key={ field.key }
-						fieldKey={ field.key }
-					/>;
-				} ) }
-
+				},
+				) }
 		<div className="col-3"></div>
 
 		<div className="col-4"></div>
