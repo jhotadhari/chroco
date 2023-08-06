@@ -32,11 +32,10 @@ const GroupToggleBool = ( {
 	setEditTimeSlot,
 } ) => {
 
-	const { timeSlotSchema } = useContext( Context );
+	const { getSetting } = useContext( Context );
 
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
+	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
+	const title = get( fieldSchema, 'title', '' );
 
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 	const value = get( editTimeSlot, field, get( timeSlot, field, '0' ) );
@@ -89,20 +88,17 @@ const GroupInput = ( {
 } ) => {
 
 	const {
-		timeSlotSchema,
 		fieldSuggestions,
 		addFieldSuggestion,
+		getSetting,
 	} = useContext( Context );
 
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
+	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
+	const title = get( fieldSchema, 'title', '' );
+	const hasSuggestions = get( fieldSchema, 'hasSuggestions', '' );
 	const value = get( editTimeSlot, field, get( timeSlot, field, '' ) );
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 
-	const hasSuggestions = get( timeSlotSchema, [
-		field, 'hasSuggestions',
-	] );
 	const [
 		suggestions, setSuggestions,
 	] = useState( get( fieldSuggestions, field, [] ) );
@@ -258,7 +254,6 @@ const GroupHeader = ( {
 		setTimeSlots,
 		setTimeSlotCurrentEdit,
 		timeSlots,
-		timeSlotSchema,
 		getSetting,
 	} = useContext( Context );
 
@@ -311,6 +306,7 @@ const GroupHeader = ( {
 	return <div
 		className={ classnames( [
 			'row',
+			'timeslot-group',
 			! expanded && timeSlotsSliceCurrents.length > 0 ? 'highlight' : '',
 		] ) }
 	>
@@ -330,28 +326,20 @@ const GroupHeader = ( {
 
 		{ <>
 
-			{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
-				if ( 'date' === timeSlotSchema[key].type ) {
-					return false;
-				}
-				return ! [
-					...getSetting( 'hideFields' ),
-					'_id',
-				].includes( key );
-			} )
-				.map( key => {
-					switch( timeSlotSchema[key].type ) {
+			{ getSetting( 'fields' ).filter( field => 'date' !== field.type && '_id' !== field.key )
+				.map( field => {
+					switch( field.type ) {
 						case 'text':
 							return <div
-								key={ key }
+								key={ field.key }
 								className={ classnames( [
-									'timeSlot--' + key,
-									'title' === key ? 'col-9' : 'col',
+									'timeSlot--' + field.key,
+									'title' === field.key ? 'col-9' : 'col',
 									'position-relative',
 								] ) }
 							>
 								<GroupInput
-									field={ key }
+									field={ field.key }
 									timeSlot={ timeSlotsSlice[0] }
 									updateTimeSlots={ updateTimeSlots }
 									editTimeSlot={ editTimeSlot }
@@ -361,10 +349,10 @@ const GroupHeader = ( {
 
 						case 'bool':
 							return <div
-								key={ key }
-								className={ 'col-1 timeSlot--' + key }
+								key={ field.key }
+								className={ 'col-1 timeSlot--' + field.key }
 							><GroupToggleBool
-									field={ key }
+									field={ field.key }
 									timeSlot={ timeSlotsSlice[0] }
 									updateTimeSlots={ updateTimeSlots }
 									editTimeSlot={ editTimeSlot }
@@ -373,7 +361,7 @@ const GroupHeader = ( {
 						default:
 							return null;
 					}
-				} ) : null }
+				} ) }
 
 			<div className="col-4"></div>
 			<div className="col-4"></div>
@@ -446,7 +434,6 @@ const TimeSlotsTable = () => {
 
 	const {
 		timeSlots,
-		timeSlotSchema,
 		getSetting,
 	} = useContext( Context );
 
@@ -460,16 +447,9 @@ const TimeSlotsTable = () => {
 		if ( ! timeSlotsGrouped[groupDateId] ) {
 			timeSlotsGrouped[groupDateId] = {};
 		}
-		const groupId = Object.keys( timeSlotSchema ).filter( key => {
-			if ( 'date' === timeSlotSchema[key].type ) {
-				return false;
-			}
-			return ! [
-				...getSetting( 'hideFields' ),
-				'_id',
-			].includes( key );
-		} )
-			.map( key => timeSlot[key] )
+		const groupId = getSetting( 'fields' )
+			.filter( field => 'date' !== field.type && '_id' !== field.key )
+			.map( field => timeSlot[field.key] )
 			.join( '#####' );
 		if ( timeSlotsGrouped[groupDateId][groupId] ) {
 			timeSlotsGrouped[groupDateId][groupId] = [

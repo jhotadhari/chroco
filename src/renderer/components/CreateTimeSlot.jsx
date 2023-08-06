@@ -27,7 +27,6 @@ const CreateTimeSlot = () => {
 	const ref = useRef( null );
 
 	const {
-		timeSlotSchema,
 		getSetting,
 		timeSlotCurrent,
 		timeSlotCurrentEdit,
@@ -90,27 +89,19 @@ const CreateTimeSlot = () => {
 
 		<div className="col-1"></div>
 
-		{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
-				if ( 'date' === timeSlotSchema[key].type ) {
-					return false;
-				}
-				return ! [
-					...getSetting( 'hideFields' ),
-					'_id',
-				].includes( key );
-			} )
-				.map( key => {
-					switch( timeSlotSchema[key].type ) {
+		{ getSetting( 'fields' ).filter( field => 'date' !== field.type && '_id' !== field.key )
+				.map( field => {
+					switch( field.type ) {
 						case 'text':
 							return <div
-								key={ key }
+								key={ field.key }
 								className={ classnames( [
-									'timeSlot--' + key,
-									'title' === key ? 'col-9' : 'col',
+									'timeSlot--' + field.key,
+									'title' === field.key ? 'col-9' : 'col',
 									'position-relative',
 								] ) }
 							><Input
-									field={ key }
+									field={ field.key }
 									useDefault={ true }
 									timeSlot={ timeSlot }
 									editTimeSlot={ _editTimeSlot }
@@ -118,10 +109,10 @@ const CreateTimeSlot = () => {
 								/></div>;
 						case 'bool':
 							return <div
-								key={ key }
-								className={ 'col-1 timeSlot--' + key }
+								key={ field.key }
+								className={ 'col-1 timeSlot--' + field.key }
 							><ToggleBool
-									field={ key }
+									field={ field.key }
 									useDefault={ true }
 									timeSlot={ timeSlot }
 									editTimeSlot={ _editTimeSlot }
@@ -131,7 +122,7 @@ const CreateTimeSlot = () => {
 							return null;
 					}
 				},
-				) : '' }
+				) }
 
 		<div className="col-4">
 				{ timeSlot && <DateInput

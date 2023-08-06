@@ -464,23 +464,19 @@ const DateStartFilter = ( { field } ) => {
 	</div>;
 };
 
-const InputFilter = ( { field } ) => {
+const InputFilter = ( { fieldKey } ) => {
 
 	const {
 		getSetting,
-		timeSlotSchema,
 		themeSource,
 	} = useContext( Context );
 
 	const settingKey = 'filters';
 	const doUpdate = useDoUpdate( { settingKey } );
 
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
-	const titlePlural = get( timeSlotSchema, [
-		field, 'titlePlural',
-	], title );
+	const fieldSchema = getSetting( 'fields' ).find( f => f.key === fieldKey );
+	const title = get( fieldSchema, 'title', '' );
+	const titlePlural = get( fieldSchema, 'titlePlural', title );
 
 	const options = [
 		{
@@ -503,12 +499,12 @@ const InputFilter = ( { field } ) => {
 
 	const filters = getSetting( 'filters' );
 	const filterIdx = filters && Array.isArray( filters )
-		? filters.findIndex( filter => filter.field === field )
+		? filters.findIndex( filter => filter.field === fieldKey )
 		: -1;
 
 	const filterSett = get( filters, filterIdx );
 	const filter = {
-		...( filterSett ? filterSett : { field } ),
+		...( filterSett ? filterSett : { field: fieldKey } ),
 		...editFilter,
 	};
 
@@ -524,8 +520,8 @@ const InputFilter = ( { field } ) => {
 	//   key={ field }
 		className={ classnames( [
 			'timeSlot--filter',
-			'timeSlot--filter--' + field,
-			'title' === field ? 'col-9' : 'col',
+			'timeSlot--filter--' + fieldKey,
+			'title' === fieldKey ? 'col-9' : 'col',
 			'position-relative',
 
 			isFiltered ? '' : 'unfiltered',
@@ -627,7 +623,7 @@ const InputFilter = ( { field } ) => {
 					}
 				} }
 				value={ get( filter, 'value', '' ) }
-				title={ 'Filter ' + timeSlotSchema[field].title + ' by RegExp' }
+				title={ 'Filter ' + fieldSchema.title + ' by RegExp' }
 				placeholder={ 'RegExp' }
 			/> }
 		</div>
@@ -636,10 +632,7 @@ const InputFilter = ( { field } ) => {
 
 const TimeSlotsFilters = () => {
 
-	const {
-		getSetting,
-		timeSlotSchema,
-	} = useContext( Context );
+	const { getSetting } = useContext( Context );
 
   	return <div className='container-fluid mb-5 timeSlots-filters'>
 		<div className="row">
@@ -651,34 +644,31 @@ const TimeSlotsFilters = () => {
 
 		<div className="col-1"></div>
 
-		{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( field => ! [
-				...getSetting( 'hideFields' ),
-				'_id',
-			].includes( field ) )
+		{ getSetting( 'fields' ).filter( field => '_id' !== field.key )
 				.map( field => {
-					if ( 'text' !== timeSlotSchema[field].type ) {
-						switch( field ) {
+					if ( 'text' !== field.type ) {
+						switch( field.key ) {
 							case 'dateStart':
 								return <DateStartFilter
-									key={ field }
-									field={ field }
+									key={ field.key }
+									field={ field.key }
 								/>;
 							default:
-								return <Fragment key={ field } />;
+								return <Fragment key={ field.key } />;
 						}
 					}
 					return <InputFilter
-						key={ field }
-						field={ field }
+						key={ field.key }
+						fieldKey={ field.key }
 					/>;
-				} ) : '' }
+				} ) }
 
 		<div className="col-3"></div>
 
 		<div className="col-4"></div>
 
 	</div>
-	</div> ;
+	</div>;
 };
 
 export default TimeSlotsFilters;

@@ -78,10 +78,6 @@ const App = () => {
 	const [
 		themeSource, setThemeSource,
 	] = useState( false );
-
-	const [
-		timeSlotSchema, setTimeSlotSchema,
-	] = useState( null );
 	const [
 		timeSlots, setTimeSlots,
 	] = useState( [] );
@@ -91,7 +87,6 @@ const App = () => {
 	const [
 		timeSlotCurrentEdit, setTimeSlotCurrentEdit,
 	] = useState( null );
-
 	const [
 		fieldSuggestions, setFieldSuggestions,
 	] = useState( {} );
@@ -132,13 +127,6 @@ const App = () => {
 		} );
 	}, [] );
 
-	// Initially set timeSlotSchema.
-	useEffect( () => {
-		api.timeSlots.schema().then( schema => {
-			setTimeSlotSchema( schema );
-		} );
-	}, [] );
-
 	// Initially set appInfo.
 	useEffect( () => {
 		api.app.getInfo().then( newAppInfo => {
@@ -156,9 +144,7 @@ const App = () => {
 				}
 			} )
 				.catch( err => {
-
 					console.log( 'debug err', err ); // debug
-
 				} );
 		}
 	}, [
@@ -176,19 +162,19 @@ const App = () => {
 		newFieldSuggestions = newFieldSuggestions ? newFieldSuggestions : { ...fieldSuggestions };
 		shouldSet = undefined === shouldSet ? true : shouldSet;
 
-		Object.keys( timeSlotSchema ).filter( field => get( timeSlotSchema[field], 'hasSuggestions' ) )
+		getSetting( 'fields' ).filter( field => get( field, 'hasSuggestions' ) )
 			.map( field => {
-				const val = get( timeSlot, field );
+				const val = get( timeSlot, field.key );
 				if ( val && val.length ) {
-					if ( newFieldSuggestions[field] ) {
-						if ( ! newFieldSuggestions[field].includes( val ) ) {
-							newFieldSuggestions[field] = [
-								...newFieldSuggestions[field],
+					if ( newFieldSuggestions[field.key] ) {
+						if ( ! newFieldSuggestions[field.key].includes( val ) ) {
+							newFieldSuggestions[field.key] = [
+								...newFieldSuggestions[field.key],
 								val,
 							];
 						}
 					} else {
-						newFieldSuggestions[field] = [val];
+						newFieldSuggestions[field.key] = [val];
 					}
 				}
 			} );
@@ -212,7 +198,6 @@ const App = () => {
 		value={ {
 			appInfo,
 
-			timeSlotSchema,
 			timeSlots,
 			setTimeSlots,
 

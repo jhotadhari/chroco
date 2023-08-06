@@ -12,8 +12,8 @@ import classnames from 'classnames';
 import {
 	get,
 	isEqual,
-	sortBy,
 	omit,
+	camelCase,
 } from 'lodash';
 import { MultiSelect } from 'react-multi-select-component';
 import {
@@ -65,6 +65,19 @@ const sortFields = fields => {
 	return fields;
 };
 
+const getDefaultField = () => {
+	const key = ( Math.random() + 1 ).toString( 36 ).substring( 7 );
+	return {
+		key,
+		type: 'text',
+		title: camelCase( key ),
+		titlePlural: '',
+		hasSuggestions: false,
+		useDefault: 0,
+		default: '',
+	};
+};
+
 const shouldUpdateKeysOptions = [
 	{
 		value: 'update', label: 'Update all records keys in database',
@@ -98,7 +111,11 @@ const useDefaultMarks = {
 	2: 'Apply default value when restarting a record, regardless of given value',
 };
 
-const FieldDetails = ( { field } ) => {
+const FieldDetails = ( {
+	field,
+	fieldsState,
+	setFieldsState,
+} ) => {
 	const { themeSource } = useContext( Context );
 
 	const {
@@ -107,6 +124,8 @@ const FieldDetails = ( { field } ) => {
 		selectedFieldIsDirty,
 		saveSelectedField,
 		selectedFieldValidErrors,
+		doUpdate,
+		setIsUpdating,
 		isUpdating,
 		hasFocus,
 		shouldUpdateKeys,
@@ -155,7 +174,9 @@ const FieldDetails = ( { field } ) => {
 					/>
 					{ selectedField.newKey && <MultiSelect
 						ClearSelectedIcon={ null }
-						className={ classnames( [themeSource, 'w-50' ] ) }
+						className={ classnames( [
+							themeSource, 'w-50',
+						] ) }
 						hasSelectAll={ false }
 						disableSearch={ true }
 						options={ shouldUpdateKeysOptions }
@@ -358,7 +379,26 @@ const FieldDetails = ( { field } ) => {
 			</div>
 
 			<div className="card-footer">
-				<span className='float-end d-inline-flex align-items-center'>
+				<span className='d-flex align-items-center justify-content-between'>
+					<button
+						className="btn me-2 btn-outline-danger"
+						title="Delete field"
+						disabled={ isUpdating }
+						onClick={ () => {
+							const newFields = fieldsState.filter( f => f.key !== selectedField.key );
+							setFieldsState( newFields );
+							setIsUpdating( true );
+							doUpdate( newFields ).then( () => {
+								setIsUpdating( false );
+								setSelectedField( {} );
+							} );
+						} }
+					>
+						Delete
+					</button>
+
+					<span className='flex-grow-1'></span>
+
 					{ selectedFieldValidErrors.length > 0 && <span className='text-danger'>{ selectedFieldValidErrors.join( ' ' ) }</span> }
 					{ selectedFieldIsDirty && 0 === selectedFieldValidErrors.length && ! isUpdating && hasFocus && <>Press <i className='mx-1'>Enter</i> to</> }
 					{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
@@ -495,7 +535,6 @@ const FieldsControl = ( { className } ) => {
 		// themeSource,
 		settings,
 		setSettings,
-		// timeSlotSchema,
 		settingsDefaults,
 	} = useContext( Context );
 
@@ -513,7 +552,7 @@ const FieldsControl = ( { className } ) => {
 	const settingKey = 'fields';
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => get( sett, 'key' ) === settingKey ) : undefined;
 
-	const fields = get( setting, 'value', settingsDefaults[settingKey], [] ).filter( field => field.key !== '_id' );
+	let fields = get( setting, 'value', settingsDefaults[settingKey], [] ).filter( field => field.key !== '_id' );
 
 	const selectedFieldIsDirty = selectedField.key && ! isEqual( fields.find( f => f.key === selectedField.key ), selectedField );
 
@@ -627,6 +666,8 @@ const FieldsControl = ( { className } ) => {
 			selectedFieldValidErrors,
 			selectedFieldIsDirty,
 			saveSelectedField,
+			doUpdate,
+			setIsUpdating,
 			isUpdating,
 			hasFocus,
 			shouldUpdateKeys,
@@ -686,6 +727,23 @@ const FieldsControl = ( { className } ) => {
 					</DndContext>
 
 					<div className="w-100">
+
+						{ ! isEqual(
+							[
+								settingsDefaults[settingKey].find( f => f.key === '_id' ), ...fields,
+							],
+							settingsDefaults[settingKey],
+						) && <button
+						// { [...fields].map( f => JSON.stringify( f ) ).join( '' ) != [...settingsDefaults[settingKey]].map( f => JSON.stringify( f ) ).join( '' ) && <button
+						// { ! isEqual( fields, settingsDefaults[settingKey] ) && <button
+							onClick={ () => {
+								setSelectedField( {} );
+								doUpdate( settingsDefaults[settingKey] );
+							} }
+							type="button"
+							className="btn btn-link border-0"
+						>Reset</button> }
+
 						{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
 							<div className="spinner-border spinner-border-sm ms-2 me-3" aria-hidden="true"></div>
 							<span className="ms-2" role="status">Updating...</span>
@@ -695,25 +753,32 @@ const FieldsControl = ( { className } ) => {
 							className="btn float-end"
 							title="Add new field"
 							disabled={ isUpdating || ( selectedField.key && selectedFieldIsDirty ) }
+							onClick={ () => {
+								const newField = getDefaultField();
+								const newFields = sortFields( [
+									...fieldsState, newField,
+								] );
+								setFieldsState( newFields );
+								setIsUpdating( true );
+								doUpdate( newFields ).then( () => {
+									setIsUpdating( false );
+									setSelectedField( { ...newField } );
+								} );
+							} }
 						>
-							<Icon type="plus" />
+							Add Field
 						</button>
 					</div>
 				</div>
 
 				{ selectedField.key && <FieldDetails
 					field={ fields.find( f => f.key === selectedField.key ) }
+					fieldsState={ fieldsState }
+					setFieldsState={ setFieldsState }
 				/> }
 
 				<div className='col-1'></div>
 
-				{/* { difference( get( setting, 'value' ), settingsDefaults[settingKey] ).length > 0 && <div className="col">
-					<button
-						onClick={ () => doUpdate( settingsDefaults[settingKey] ) }
-						type="button"
-						className="btn btn-link border-0"
-					>Reset</button>
-				</div> } */}
 			</div>
 		</div>
 	</FieldsControlContext.Provider> : null;

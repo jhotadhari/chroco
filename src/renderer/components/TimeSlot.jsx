@@ -19,7 +19,6 @@ const TimeSlot = ( { timeSlot } ) => {
 	] = useState( {} );
 
 	const {
-		timeSlotSchema,
 		getSetting,
 		timeSlotCurrent,
 		timeSlotCurrentEdit,
@@ -40,56 +39,54 @@ const TimeSlot = ( { timeSlot } ) => {
 	return <div
 		className={ classnames( [
 			'row',
+			'timeslot',
 			! timeSlot.dateStop > 0 ? 'highlight' : '',
 		] ) }
 	>
 
 		<div className="col-1"></div>
 
-		{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => ! [
-			...getSetting( 'hideFields' ),
-			'_id',
-		].includes( key ) )
-			.map( key => {
-				switch( timeSlotSchema[key].type ) {
+		{ getSetting( 'fields' ).filter( field => '_id' !== field.key )
+			.map( field => {
+				switch( field.type ) {
 					case 'text':
 						return <div
-							key={ key }
+							key={ field.key }
 							className={ classnames( [
-								'timeSlot--' + key,
-								'title' === key ? 'col-9' : 'col',
+								'timeSlot--' + field.key,
+								'title' === field.key ? 'col-9' : 'col',
 								'position-relative',
 							] ) }
 						><Input
-							field={ key }
-							timeSlot={ timeSlot }
-							editTimeSlot={ _editTimeSlot }
-							setEditTimeSlot={ _setEditTimeSlot }
-						/></div>;
+								field={ field.key }
+								timeSlot={ timeSlot }
+								editTimeSlot={ _editTimeSlot }
+								setEditTimeSlot={ _setEditTimeSlot }
+							/></div>;
 					case 'date':
 						return <div
-							className={ 'col-4 timeSlot--' + key }
-							key={ key }
+							className={ 'col-4 timeSlot--' + field.key }
+							key={ field.key }
 						><DateInput
-							field={ key }
-							timeSlot={ timeSlot }
-							editTimeSlot={ _editTimeSlot }
-							setEditTimeSlot={ _setEditTimeSlot }
-						/></div>;
+								field={ field.key }
+								timeSlot={ timeSlot }
+								editTimeSlot={ _editTimeSlot }
+								setEditTimeSlot={ _setEditTimeSlot }
+							/></div>;
 					case 'bool':
 						return <div
-							className={ 'col-1 timeSlot--' + key }
-							key={ key }
+							className={ 'col-1 timeSlot--' + field.key }
+							key={ field.key }
 						><ToggleBool
-							field={ key }
-							timeSlot={ timeSlot }
-							editTimeSlot={ _editTimeSlot }
-							setEditTimeSlot={ _setEditTimeSlot }
-						/></div>;
+								field={ field.key }
+								timeSlot={ timeSlot }
+								editTimeSlot={ _editTimeSlot }
+								setEditTimeSlot={ _setEditTimeSlot }
+							/></div>;
 					default:
 						return null;
 				}
-			} ) : '' }
+			} ) }
 
 		<Duration
 			timeSlot={ timeSlot }
