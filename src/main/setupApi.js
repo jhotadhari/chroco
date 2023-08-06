@@ -11,7 +11,6 @@ const {
 	get,
 } = require( 'lodash' );
 const dayjs = require( 'dayjs' );
-const { exec } = require( 'child_process' );
 const getDb = require( './nedb/db' );
 const { settingsDefaults } = require( './constants' );
 const {
@@ -273,7 +272,7 @@ const validateSetting = setting => {
 			if ( ! isArray( setting.value ) ) {
 				return [setting.key + ' must be type of array.'];
 			}
-			// ??? TODO validate filters
+			// ??? TODO validate fields
 			return true;
 		case 'startOfWeek':
 			if ( ! isString( setting.value ) || ! /[0-6]/.test( setting.value ) ) {

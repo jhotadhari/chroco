@@ -338,7 +338,6 @@ const FieldDetails = ( {
 										default: e.target.value,
 									} ) }
 								/>
-								<div id={ selectedField.key + '-' + 'default' + '-desc' } className="form-text">{ '??? TODO use template {{ git.user.name }} ' }</div>
 							</> }
 
 							{ 'bool' === selectedField.type && <>

@@ -58,15 +58,6 @@ const settingsDefaults = {
 			useDefault: 0,
 		},
 		{
-			key: 'user',
-			type: 'text',
-			title: 'User',
-			titlePlural: 'Users',
-			hasSuggestions: true,
-			useDefault: '1',
-			default: '{{ git.user.name }}',
-		},
-		{
 			key: 'billable',
 			type: 'bool',
 			title: 'Billable',
