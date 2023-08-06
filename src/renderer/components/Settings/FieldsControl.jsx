@@ -39,14 +39,19 @@ const { api } = window;
 
 const FieldsControlContext = createContext( {} );
 
-const getFieldValidErrors = selectedField => {
+const getFieldValidErrors = field => {
 	let errors = [];
-	if ( selectedField.hasOwnProperty( 'newKey' ) && ! selectedField.newKey.length ) {
+	if ( field.hasOwnProperty( 'newKey' ) && ! field.newKey.length ) {
 		errors = [
 			...errors, 'Field key can\'t be empty.',
 		];
 	}
-	if ( ! get( selectedField, 'title', '' ).length ) {
+	if ( field.hasOwnProperty( 'newKey' ) && ! /^[a-zA-Z0-9]+$/.test( field.newKey ) ) {
+		errors = [
+			...errors, 'Field key contains wrong characters.',
+		];
+	}
+	if ( ! get( field, 'title', '' ).length ) {
 		errors = [
 			...errors, 'Field title is required.',
 		];
