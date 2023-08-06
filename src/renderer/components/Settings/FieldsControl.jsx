@@ -65,6 +65,39 @@ const sortFields = fields => {
 	return fields;
 };
 
+const shouldUpdateKeysOptions = [
+	{
+		value: 'update', label: 'Update all records keys in database',
+	},
+	{
+		value: 'noupdate', label: 'Don\'t update records keys in database',
+	},
+];
+
+const typeOptions = [
+	{
+		value: 'text', label: 'Text',
+	},
+	{
+		value: 'bool', label: 'Boolean',
+	},
+];
+
+const suggestionsOptions = [
+	{
+		value: true, label: 'Provide suggestions',
+	},
+	{
+		value: false, label: 'Don\'t provide suggestions',
+	},
+];
+
+const useDefaultMarks = {
+	0: 'Do not use a default value',
+	1: 'Use default value for new records',
+	2: 'Apply default value when restarting a record, regardless of given value',
+};
+
 const FieldDetails = ( { field } ) => {
 	const { themeSource } = useContext( Context );
 
@@ -76,40 +109,9 @@ const FieldDetails = ( { field } ) => {
 		selectedFieldValidErrors,
 		isUpdating,
 		hasFocus,
+		shouldUpdateKeys,
+		setShouldUpdateKeys,
 	} = useContext( FieldsControlContext );
-
-	const typeOptions = [
-		{
-			value: 'text', label: 'Text',
-		},
-		{
-			value: 'bool', label: 'Boolean',
-		},
-	];
-
-	const updateKeyOptions = [
-		{
-			value: 'text', label: 'Update all records keys in database',
-		},
-		{
-			value: 'bool', label: 'Don\'t update records keys in database',
-		},
-	];
-
-	const suggestionsOptions = [
-		{
-			value: true, label: 'Provide suggestions',
-		},
-		{
-			value: false, label: 'Don\'t provide suggestions',
-		},
-	];
-
-	const useDefaultMarks = {
-		0: 'Do not use a default value',
-		1: 'Use default value for new records',
-		2: 'Apply default value when restarting a record, regardless of given value',
-	};
 
 	return selectedField.required ? null : <div className='col'>
 		<div
@@ -153,14 +155,18 @@ const FieldDetails = ( { field } ) => {
 					/>
 					{ selectedField.newKey && <MultiSelect
 						ClearSelectedIcon={ null }
-						closeOnChangedValue={ true }
-						className={ themeSource }
+						className={ classnames( [themeSource, 'w-50' ] ) }
 						hasSelectAll={ false }
 						disableSearch={ true }
-						options={ updateKeyOptions }
-						value={ [updateKeyOptions[0]] }
+						options={ shouldUpdateKeysOptions }
+						value={ [shouldUpdateKeysOptions.find( opt => opt.value === shouldUpdateKeys )] }
 						onChange={ selectedOptions => {
-							// ??? TODO
+							if ( selectedOptions.length ) {
+								if ( selectedOptions.length === 2 ) {
+									selectedOptions = selectedOptions.filter( opt => opt.value !== shouldUpdateKeys );
+								}
+								setShouldUpdateKeys( selectedOptions[0].value );
+							}
 						} }
 					/> }
 				</div>
@@ -512,6 +518,9 @@ const FieldsControl = ( { className } ) => {
 	const selectedFieldIsDirty = selectedField.key && ! isEqual( fields.find( f => f.key === selectedField.key ), selectedField );
 
 	const [
+		shouldUpdateKeys, setShouldUpdateKeys,
+	] = useState( 'update' );
+	const [
 		fieldsState, setFieldsState,
 	] = useState( fields );
 	const [
@@ -527,13 +536,20 @@ const FieldsControl = ( { className } ) => {
 	}, [[...fields].map( f => JSON.stringify( f ) ).join( '' )] );
 
 	const doUpdate = newVal => new Promise( ( resolve, reject ) => {
+		const options = {};
+		if ( selectedField.newKey && shouldUpdateKeys ) {
+			options.shouldUpdateKeys = {
+				oldKey: selectedField.key,
+				newKey: selectedField.newKey,
+			};
+		}
 		if ( undefined === setting ) {
 			// add new setting
 			const newSetting = {
 				key: settingKey,
 				value: newVal,
 			};
-			api.settings.add( newSetting ).then( ( addedSetting ) => {
+			api.settings.add( newSetting, options ).then( ( addedSetting ) => {
 				setSettings( [
 					...settings, addedSetting,
 				] );
@@ -545,7 +561,7 @@ const FieldsControl = ( { className } ) => {
 				...setting,
 				value: newVal,
 			};
-			api.settings.update( newSetting ).then( numberUpdated => {
+			api.settings.update( newSetting, options ).then( numberUpdated => {
 				if ( numberUpdated ) {
 					const newSettings = [...settings];
 					const idx = newSettings.findIndex( sett => sett._id === setting._id );
@@ -613,6 +629,8 @@ const FieldsControl = ( { className } ) => {
 			saveSelectedField,
 			isUpdating,
 			hasFocus,
+			shouldUpdateKeys,
+			setShouldUpdateKeys,
 		} }
 	>
 		<div

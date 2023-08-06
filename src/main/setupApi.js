@@ -316,11 +316,15 @@ api.settings.get = () => new Promise( ( resolve, reject ) => {
 } );
 
 // return   promise resolve object  addedTimeSlot
-api.settings.add = newSetting => new Promise( ( resolve, reject ) => {
+api.settings.add = ( newSetting, options ) => new Promise( ( resolve, reject ) => {
 	const valid = validateSetting( newSetting );
 	if ( true !== valid ) {
 		return reject( valid.join( '#####' ) );
 	}
+
+	// ??? TODO maybe update timeSlots keys
+	console.log( 'debug newSetting, options', newSetting, options ); // debug
+
 	getDb().then( db => {
 		db.settings.insert( newSetting, ( err, addedSetting ) => {
 			resolve( addedSetting );
@@ -329,11 +333,17 @@ api.settings.add = newSetting => new Promise( ( resolve, reject ) => {
 } );
 
 // return   promise resolve number  numberUpdated
-api.settings.update = newSetting => new Promise( ( resolve, reject ) => {
+api.settings.update = ( newSetting, options ) => new Promise( ( resolve, reject ) => {
 	const valid = validateSetting( newSetting );
 	if ( true !== valid ) {
 		return reject( valid.join( '#####' ) );
 	}
+
+
+	// ??? TODO maybe update timeSlots keys
+	console.log( 'debug newSetting, options', newSetting, options ); // debug
+
+
 	getDb().then( db => {
 		if ( ! newSetting._id ) {
 			reject( '??? err no _id' );
@@ -370,8 +380,8 @@ const setupApi = () => {
      */
 	ipcMain.handle( 'api:settings:getDefaults', ( _ ) =>              api.settings.getDefaults() );
 	ipcMain.handle( 'api:settings:get', ( _ ) =>                      api.settings.get() );
-	ipcMain.handle( 'api:settings:add', ( _, newSetting ) =>          api.settings.add( newSetting ) );
-	ipcMain.handle( 'api:settings:update', ( _, newSetting ) =>       api.settings.update( newSetting ) );
+	ipcMain.handle( 'api:settings:add', ( _, newSetting, options ) =>          api.settings.add( newSetting, options ) );
+	ipcMain.handle( 'api:settings:update', ( _, newSetting, options ) =>       api.settings.update( newSetting, options ) );
 
 	/**
      * darkMode
