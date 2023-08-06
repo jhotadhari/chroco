@@ -6,10 +6,13 @@ import React, {
 	useEffect,
 	createContext,
 } from 'react';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import classnames from 'classnames';
 import {
 	get,
 	isEqual,
+	sortBy,
 	omit,
 } from 'lodash';
 import { MultiSelect } from 'react-multi-select-component';
@@ -62,7 +65,7 @@ const sortFields = fields => {
 	return fields;
 };
 
-const FieldDetails = () => {
+const FieldDetails = ( { field } ) => {
 	const { themeSource } = useContext( Context );
 
 	const {
@@ -72,6 +75,7 @@ const FieldDetails = () => {
 		saveSelectedField,
 		selectedFieldValidErrors,
 		isUpdating,
+		hasFocus,
 	} = useContext( FieldsControlContext );
 
 	const typeOptions = [
@@ -83,7 +87,29 @@ const FieldDetails = () => {
 		},
 	];
 
-	const selectedTypeOption = typeOptions.find( opt => opt.value === selectedField.type );
+	const updateKeyOptions = [
+		{
+			value: 'text', label: 'Update all records keys in database',
+		},
+		{
+			value: 'bool', label: 'Don\'t update records keys in database',
+		},
+	];
+
+	const suggestionsOptions = [
+		{
+			value: true, label: 'Provide suggestions',
+		},
+		{
+			value: false, label: 'Don\'t provide suggestions',
+		},
+	];
+
+	const useDefaultMarks = {
+		0: 'Do not use a default value',
+		1: 'Use default value for new records',
+		2: 'Apply default value when restarting a record, regardless of given value',
+	};
 
 	return selectedField.required ? null : <div className='col'>
 		<div
@@ -101,15 +127,15 @@ const FieldDetails = () => {
 				</button>
 				<div className='d-flex align-items-center'>
 
-					<label htmlFor={ selectedField.key + '-' + 'key' } className="form-label me-2 mb-0">Field Key</label>
+					<label htmlFor={ selectedField.key + '-' + 'key' } className="form-label me-2 mb-0 nowrap">Field Key</label>
 					<input
 						type="text"
 						id={ selectedField.key + '-' + 'key' }
 						className={ classnames( [
 							'form-control',
-							'w-50 d-inline-block',
+							'w-50 d-inline-block me-2',
 							! /^[a-zA-Z0-9]+$/.test( get( selectedField, 'newKey',  selectedField.key ) ) && 'invalid',
-							selectedFieldIsDirty && 'dirty',
+							selectedField.newKey && 'dirty',
 						] ) }
 						value={ get( selectedField, 'newKey',  selectedField.key ) }
 						onChange={ e => {
@@ -125,55 +151,75 @@ const FieldDetails = () => {
 							}
 						} }
 					/>
+					{ selectedField.newKey && <MultiSelect
+						ClearSelectedIcon={ null }
+						closeOnChangedValue={ true }
+						className={ themeSource }
+						hasSelectAll={ false }
+						disableSearch={ true }
+						options={ updateKeyOptions }
+						value={ [updateKeyOptions[0]] }
+						onChange={ selectedOptions => {
+							// ??? TODO
+						} }
+					/> }
 				</div>
 			</div>
 
 			<div className="card-body">
 
 				<div className='row'>
-					<div className='col mb-3'>
+					<div className='col-17 mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'title' } className="form-label">Title Singular</label>
 						<input
-							className="form-control"
+							className={ classnames( [
+								'form-control',
+								selectedField.title !== field.title && 'dirty',
+								! selectedField.title.length && 'invalid',
+							] ) }
 							id={ selectedField.key + '-' + 'title' }
-							aria-describedby={ selectedField.key + '-' + 'title' + 'desc' }
+							aria-describedby={ selectedField.key + '-' + 'title' + '-desc' }
 							value={ get( selectedField, 'title', '' ) }
 							onChange={ e => setSelectedField( {
 								...selectedField,
 								title: e.target.value,
 							} ) }
 						/>
-						<div id={ selectedField.key + '-' + 'title' + 'desc' } className="form-text">Required</div>
+						<div id={ selectedField.key + '-' + 'title' + '-desc' } className="form-text">Required</div>
 					</div>
-					<div className='col mb-3'>
+					<div className='col-17 mb-3'>
 						<label htmlFor={ selectedField.key + '-' + 'titlePlural' } className="form-label">Title Plural</label>
 						<input
-							className="form-control"
+							className={ classnames( [
+								'form-control',
+								selectedField.titlePlural !== field.titlePlural && 'dirty',
+							] ) }
 							id={ selectedField.key + '-' + 'titlePlural' }
-							aria-describedby={ selectedField.key + '-' + 'titlePlural' + 'desc' }
+							aria-describedby={ selectedField.key + '-' + 'titlePlural' + '-desc' }
 							value={ get( selectedField, 'titlePlural', '' ) }
 							onChange={ e => setSelectedField( {
 								...selectedField,
 								titlePlural: e.target.value,
 							} ) }
 						/>
-						<div id={ selectedField.key + '-' + 'titlePlural' + 'desc' } className="form-text">Fallback to singular title</div>
+						<div id={ selectedField.key + '-' + 'titlePlural' + '-desc' } className="form-text">Fallback to singular title</div>
 					</div>
-				</div>
 
-				<div className='row'>
-
-					<div className="col mb-3">
-						<label id={ selectedField.key + '-' + 'type' } className="form-label">Field Type</label>
+					<div className="col-17 mb-3">
+						<label id={ selectedField.key + '-' + 'type' } className="form-label">Type</label>
 						<MultiSelect
 							labelledBy={ selectedField.key + '-' + 'type' }
 							ClearSelectedIcon={ null }
 							closeOnChangedValue={ true }
-							className={ themeSource }
+							className={ classnames( [
+								themeSource,
+								'border rounded',
+								selectedField.type !== field.type && 'border-success',
+							] ) }
 							hasSelectAll={ false }
 							disableSearch={ true }
 							options={ typeOptions }
-							value={ selectedTypeOption ? [selectedTypeOption] : [] }
+							value={ [typeOptions.find( opt => opt.value === selectedField.type ) || typeOptions[0]] }
 							onChange={ selectedOptions => {
 								if ( selectedOptions.length ) {
 									if ( selectedOptions.length === 2 ) {
@@ -186,22 +232,129 @@ const FieldDetails = () => {
 								}
 							} }
 						/>
+						<div id={ selectedField.key + '-' + 'type' + '-desc' } className="form-text">Required</div>
 					</div>
 
-					<div className='col'></div>
+					<div className='col-17 mb-3'>
+						{ 'text' === selectedField.type && <>
+							<label id={ selectedField.key + '-' + 'type' } className="form-label">Suggestions</label>
+							<MultiSelect
+								labelledBy={ selectedField.key + '-' + 'type' }
+								aria-describedby={ selectedField.key + '-' + 'hasSuggestions' + '-desc' }
+								ClearSelectedIcon={ null }
+								closeOnChangedValue={ true }
+								className={ classnames( [
+									themeSource,
+									'border rounded',
+									selectedField.hasSuggestions !== field.hasSuggestions && 'border-success',
+								] ) }
+								hasSelectAll={ false }
+								disableSearch={ true }
+								options={ suggestionsOptions }
+								value={ [suggestionsOptions.find( opt => opt.value === selectedField.hasSuggestions ) || suggestionsOptions[0]] }
+								onChange={ selectedOptions => {
+									if ( selectedOptions.length ) {
+										if ( selectedOptions.length === 2 ) {
+											selectedOptions = selectedOptions.filter( opt => opt.value !== selectedField.hasSuggestions );
+										}
+										setSelectedField( {
+											...selectedField,
+											hasSuggestions: selectedOptions[0].value,
+										} );
+									}
+								} }
+							/>
+							<div id={ selectedField.key + '-' + 'hasSuggestions' + '-desc' } className="form-text">Whether to show suggestions while typing</div>
+						</> }
+					</div>
 
+					<div className="col-17 mb-3">
+						<label id={ selectedField.key + '-' + 'useDefault' } className="form-label">Use default value</label>
+						<div className='px-2'>
+							<Slider
+								className={ classnames( [
+									themeSource,
+									selectedField.useDefault !== field.useDefault && 'dirty',
+								] ) }
+								min={ 0 }
+								max={ 2 }
+								marks={ useDefaultMarks }
+								step={ 1 }
+								value={ get( selectedField, 'useDefault', 0 ) }
+								onChange={ newValue => setSelectedField( {
+									...selectedField,
+									useDefault: newValue,
+								} ) }
+								defaultValue={ 0 }
+							/>
+						</div>
+						<div
+							id={ selectedField.key + '-' + 'useDefault' + '-desc' }
+							className='form-text useDefault-desc'
+						>{ useDefaultMarks[get( selectedField, 'useDefault', 0 )] }</div>
+					</div>
+
+					<div className='col-17 mb-3'>
+						{ '0' != get( selectedField, 'useDefault', '0' ) && <>
+							<label htmlFor={ selectedField.key + '-' + 'default' } className="form-label">Default value</label>
+
+							{ 'text' === selectedField.type && <>
+								<input
+									className={ classnames( [
+										'form-control',
+										selectedField.default !== field.default && 'dirty',
+									] ) }
+									id={ selectedField.key + '-' + 'default' }
+									value={ get( selectedField, 'default', '' ) }
+									onChange={ e => setSelectedField( {
+										...selectedField,
+										default: e.target.value,
+									} ) }
+								/>
+								<div id={ selectedField.key + '-' + 'default' + '-desc' } className="form-text">{ '??? TODO use template {{ git.user.name }} ' }</div>
+							</> }
+
+							{ 'bool' === selectedField.type && <>
+								<div className="form-check form-switch">
+									<input
+										title={ 'Default value' }
+										id={ selectedField.key + '-' + 'default' }
+										className={ classnames( [
+											'form-check-input',
+											selectedField.default !== field.default && 'dirty',
+										] ) }
+										type="checkbox"
+										role="switch"
+										checked={ get( selectedField, 'default', '0' ) !== '0' }
+										onChange={ () => setSelectedField( {
+											...selectedField,
+											default: get( selectedField, 'default', '0' ) === '0' ? '1' : '0',
+										} ) }
+									/>
+								</div>
+								<div
+									id={ selectedField.key + '-' + 'default' + '-desc' }
+									className={ classnames( [
+										'form-text',
+										'default' + '-desc',
+										'type-bool',
+									] ) }
+								>{ get( selectedField, 'default', '0' ) === '0'
+										? <>The field is initially <i>off</i></>
+										: <>The field is initially <i>on</i></>
+									}</div>
+
+							</> }
+
+						</> }
+					</div>
 				</div>
-
-				{/* ??? TODO default */}
-
-				{/* ??? TODO default force */}
-
 			</div>
 
 			<div className="card-footer">
 				<span className='float-end d-inline-flex align-items-center'>
 					{ selectedFieldValidErrors.length > 0 && <span className='text-danger'>{ selectedFieldValidErrors.join( ' ' ) }</span> }
-					{ selectedFieldIsDirty && 0 === selectedFieldValidErrors.length && ! isUpdating && <>Press <i className='mx-1'>Enter</i> to</> }
+					{ selectedFieldIsDirty && 0 === selectedFieldValidErrors.length && ! isUpdating && hasFocus && <>Press <i className='mx-1'>Enter</i> to</> }
 					{ isUpdating &&<span className="ms-1 d-inline-flex align-items-center">
 						<div className="spinner-border spinner-border-sm ms-auto me-2" aria-hidden="true"></div>
 						<span role="status">Updating...</span>
@@ -364,6 +517,9 @@ const FieldsControl = ( { className } ) => {
 	const [
 		isUpdating, setIsUpdating,
 	] = useState( false );
+	const [
+		hasFocus, setHasFocus,
+	] = useState( false );
 
 	// Update fieldsState if fields have changed.
 	useEffect( () => {
@@ -456,13 +612,17 @@ const FieldsControl = ( { className } ) => {
 			selectedFieldIsDirty,
 			saveSelectedField,
 			isUpdating,
+			hasFocus,
 		} }
 	>
 		<div
 			className={ classnames( [
 				className,
 				'fields-control',
+				'outline-none',
 			] ) }
+			onFocus={ () => setHasFocus( true ) }
+			onBlur={ () => setHasFocus( false ) }
 			onKeyDown={ e => {
 				if (
 					'Enter' === e.key

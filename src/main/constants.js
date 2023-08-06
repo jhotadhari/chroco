@@ -8,6 +8,7 @@ const timeSlotsSchemaBase = {
 		key: '_id',
 		type: 'text',
 		title: '',
+		useDefault: 0,
 	},
 
 	title: {
@@ -16,6 +17,7 @@ const timeSlotsSchemaBase = {
 		title: 'Title',
 		titlePlural: 'Titles',
 		required: true,
+		useDefault: 0,
 	},
 
 
@@ -25,6 +27,7 @@ const timeSlotsSchemaBase = {
 		title: 'Project',
 		titlePlural: 'Projects',
 		hasSuggestions: true,
+		useDefault: 0,
 	},
 	client: {
 		key: 'client',
@@ -32,6 +35,7 @@ const timeSlotsSchemaBase = {
 		title: 'Client',
 		titlePlural: 'Clients',
 		hasSuggestions: true,
+		useDefault: 0,
 	},
 	user: {
 		key: 'user',
@@ -39,11 +43,14 @@ const timeSlotsSchemaBase = {
 		title: 'User',
 		titlePlural: 'Users',
 		hasSuggestions: true,
+		useDefault: '1',
+		default: '{{ git.user.name }}',
 	},
 	billable: {
 		key: 'billable',
 		type: 'bool',
 		title: 'Billable',
+		useDefault: 2,
 		default: '0',
 	},
 
@@ -54,12 +61,14 @@ const timeSlotsSchemaBase = {
 		type: 'date',
 		title: 'Start',
 		required: true,
+		useDefault: 0,
 	},
 	dateStop: {
 		key: 'dateStop',
 		type: 'date',
 		title: 'Stop',
 		required: true,
+		useDefault: 0,
 	},
 };
 
