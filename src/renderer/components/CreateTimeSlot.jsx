@@ -14,6 +14,7 @@ import Icon from './Icon.jsx';
 import DateInput from './DateInput.jsx';
 import Duration from './Duration.jsx';
 import Input from './Input.jsx';
+import ToggleBool from './ToggleBool.jsx';
 
 const CreateTimeSlot = () => {
 
@@ -26,7 +27,6 @@ const CreateTimeSlot = () => {
 	const ref = useRef( null );
 
 	const {
-		timeSlotSchema,
 		getSetting,
 		timeSlotCurrent,
 		timeSlotCurrentEdit,
@@ -89,31 +89,40 @@ const CreateTimeSlot = () => {
 
 		<div className="col-1"></div>
 
-		{ timeSlotSchema ? Object.keys( timeSlotSchema ).filter( key => {
-				if ( 'date' === timeSlotSchema[key].type ) {
-					return false;
-				}
-				return ! [
-					...getSetting( 'hideFields' ),
-					'_id',
-				].includes( key );
-			} )
-				.map( key => {
-					return <div
-						key={ key }
-						className={ classnames( [
-							'timeSlot--' + key,
-							'title' === key ? 'col-9' : 'col',
-							'position-relative',
-						] ) }
-					><Input
-							field={ key }
-							useDefault={ true }
-							timeSlot={ timeSlot }
-							editTimeSlot={ _editTimeSlot }
-							setEditTimeSlot={ _setEditTimeSlot }
-						/></div>;
-				} ) : '' }
+		{ getSetting( 'fields' ).filter( field => 'date' !== field.type && '_id' !== field.key )
+				.map( field => {
+					switch( field.type ) {
+						case 'text':
+							return <div
+								key={ field.key }
+								className={ classnames( [
+									'timeSlot--' + field.key,
+									'title' === field.key ? 'col-9' : 'col',
+									'position-relative',
+								] ) }
+							><Input
+									field={ field.key }
+									useDefault={ true }
+									timeSlot={ timeSlot }
+									editTimeSlot={ _editTimeSlot }
+									setEditTimeSlot={ _setEditTimeSlot }
+								/></div>;
+						case 'bool':
+							return <div
+								key={ field.key }
+								className={ 'col-1 timeSlot--' + field.key }
+							><ToggleBool
+									field={ field.key }
+									useDefault={ true }
+									timeSlot={ timeSlot }
+									editTimeSlot={ _editTimeSlot }
+									setEditTimeSlot={ _setEditTimeSlot }
+								/></div>;
+						default:
+							return null;
+					}
+				},
+				) }
 
 		<div className="col-4">
 				{ timeSlot && <DateInput
