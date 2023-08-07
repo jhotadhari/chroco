@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "bash ./scripts/publish.sh",
-    "_publish": "electron-forge publish",
+    "_publish-dry-run": "electron-forge publish --dry-run",
+    "_publish-from-dry-run": "electron-forge publish --from-dry-run",
     "format": "eslint --fix --config ./eslint.config.js ."
   },
   "keywords": [],
