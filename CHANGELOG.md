@@ -5,8 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+Customizable fields.
+
 ### Added
+- Feature to customize the fields.
+- New field type `bool`.
 - The project does have a `CHANGELOG.md` now. The publish script automatically updates the `CHANGELOG.md`.
+
+### Removed
+- Feature `hideFields`. Because the fields itself are customizable now.
 
 ## [0.0.4] - 2023-07-23
 Change github actions release
