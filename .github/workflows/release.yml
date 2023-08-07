@@ -19,7 +19,6 @@ jobs:
       - name: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CI: false
         run: npm run _publish
 
   publish_on_mac:
@@ -34,7 +33,6 @@ jobs:
       - name: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CI: false
         run: npm run _publish
 
   publish_on_win:
@@ -49,5 +47,4 @@ jobs:
       - name: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CI: false
         run: npm run _publish
