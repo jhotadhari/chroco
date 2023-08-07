@@ -3,44 +3,6 @@
 const path = require( 'path' );
 const { app } = require( 'electron' );
 
-const timeSlotsSchemaBase = {
-	_id: {
-		type: 'text',
-		title: '',
-	},
-	title: {
-		type: 'text',
-		title: 'Title',
-		titlePlural: 'Titles',
-	},
-	project: {
-		type: 'text',
-		title: 'Project',
-		titlePlural: 'Projects',
-		hasSuggestions: true,
-	},
-	client: {
-		type: 'text',
-		title: 'Client',
-		titlePlural: 'Clients',
-		hasSuggestions: true,
-	},
-	user: {
-		type: 'text',
-		title: 'User',
-		titlePlural: 'Users',
-		hasSuggestions: true,
-	},
-	dateStart: {
-		type: 'date',
-		title: 'Start',
-	},
-	dateStop: {
-		type: 'date',
-		title: 'Stop',
-	},
-};
-
 const settingsDefaults = {
 
 	themeSource: 'system',
@@ -63,9 +25,60 @@ const settingsDefaults = {
 			value: 0,
 		},
 	],
+
+	fields: [
+		{
+			key: '_id',
+			type: 'text',
+			title: '',
+			useDefault: 0,
+		},
+		{
+			key: 'title',
+			type: 'text',
+			title: 'Title',
+			titlePlural: 'Titles',
+			required: true,
+			useDefault: 0,
+		},
+		{
+			key: 'project',
+			type: 'text',
+			title: 'Project',
+			titlePlural: 'Projects',
+			hasSuggestions: true,
+			useDefault: 0,
+		},
+		{
+			key: 'client',
+			type: 'text',
+			title: 'Client',
+			titlePlural: 'Clients',
+			hasSuggestions: true,
+			useDefault: 0,
+		},
+		{
+			key: 'billable',
+			type: 'bool',
+			title: 'Billable',
+			useDefault: 2,
+			default: '0',
+		},
+		{
+			key: 'dateStart',
+			type: 'date',
+			title: 'Start',
+			required: true,
+			useDefault: 0,
+		},
+		{
+			key: 'dateStop',
+			type: 'date',
+			title: 'Stop',
+			required: true,
+			useDefault: 0,
+		},
+	],
 };
 
-module.exports = {
-	timeSlotsSchemaBase,
-	settingsDefaults,
-};
+module.exports = { settingsDefaults };

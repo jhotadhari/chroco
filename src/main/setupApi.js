@@ -4,6 +4,7 @@ const {
 	app,
 } = require( 'electron' );
 const {
+	omit,
 	isString,
 	isObject,
 	isArray,
@@ -11,12 +12,8 @@ const {
 	get,
 } = require( 'lodash' );
 const dayjs = require( 'dayjs' );
-const { exec } = require( 'child_process' );
 const getDb = require( './nedb/db' );
-const {
-	timeSlotsSchemaBase,
-	settingsDefaults,
-} = require( './constants' );
+const { settingsDefaults } = require( './constants' );
 const {
 	isPathValid,
 	isValidTimezones,
@@ -55,85 +52,71 @@ api.app.getInfo = () => new Promise( ( resolve, reject ) => {
 	resolve( appInfo );
 } );
 
-// return   promise resolve object timeSlot schema
-let schema = false;
-api.timeSlots.schema = () => new Promise( ( resolve, reject ) => {
-	if ( ! schema ) {
-		schema = { ...timeSlotsSchemaBase };
-		exec( 'git config --global user.name', { encoding: 'utf-8' }, ( error, stdout ) => {
-			if ( ! error && stdout.length ) {
-				schema.user.default = stdout.replace( /^[\s\n]+/, '' ).replace( /[\s\n]+$/, '' );
-			}
-			resolve( schema );
-		} );
-	} else {
-		resolve( schema );
-	}
-} );
-
 // return   promise resolve array   timeSlots
 api.timeSlots.get = filters => new Promise( ( resolve, reject ) => {
 	getDb().then( db => {
 		db.settings.findOne( { key: 'startOfWeek' }, ( err, startOfWeek ) => {
-		    startOfWeek = startOfWeek ? startOfWeek.value : get( settingsDefaults, 'startOfWeek' );
-			let query = {};
-			if ( filters && Array.isArray( filters ) ) {
-				[...filters].map( filter => {
-
-					switch( timeSlotsSchemaBase[filter.field].type ) {
-						case 'text':
-							if ( filter.value.length && isValidRegex( filter.value ) ) {
-								// query['$and'] = query['$and'] ? query['$and'] : {};
-								switch( filter.type ) {
-									case 'include':
-										set( query, [
-											filter.field, '$regex',
-										], new RegExp( filter.value ) );
-										break;
-									case 'exclude':
-										set( query, [
-											'$not', '$or',
-										], [
-											...get( query, [
+			db.settings.findOne( { key: 'fields' }, ( err, fields ) => {
+				fields = fields ? fields.value : get( settingsDefaults, 'fields' );
+				startOfWeek = startOfWeek ? startOfWeek.value : get( settingsDefaults, 'startOfWeek' );
+				let query = {};
+				if ( filters && Array.isArray( filters ) ) {
+					[...filters].map( filter => {
+						switch( fields.find( f => filter.field === f.key ).type ) {
+							case 'text':
+								if ( filter.value.length && isValidRegex( filter.value ) ) {
+									// query['$and'] = query['$and'] ? query['$and'] : {};
+									switch( filter.type ) {
+										case 'include':
+											set( query, [
+												filter.field, '$regex',
+											], new RegExp( filter.value ) );
+											break;
+										case 'exclude':
+											set( query, [
 												'$not', '$or',
-											], [] ),
-											{ [filter.field]: new RegExp( filter.value ) },
-										] );
-										break;
+											], [
+												...get( query, [
+													'$not', '$or',
+												], [] ),
+												{ [filter.field]: new RegExp( filter.value ) },
+											] );
+											break;
+									}
 								}
-							}
-							break;
-						case 'date':
-							if ( 'dateStart' === filter.field ) {
-								if ( 'custom' === filter.type ) {
-									set( query, [
-										'dateStart', '$gte',
-									], filter.value.from );
-									set( query, [
-										'dateStart', '$lte',
-									], filter.value.to );
-								} else {
-									const values = getDateValuesForFilter( {
-										timeFrame: filter.type,
-										value: filter.value,
-										startOfWeek,
-									} );
-									set( query, [
-										'dateStart', '$gte',
-									], values.from );
-									set( query, [
-										'dateStart', '$lte',
-									], values.to );
+								break;
+							case 'date':
+								if ( 'dateStart' === filter.field ) {
+									if ( 'custom' === filter.type ) {
+										set( query, [
+											'dateStart', '$gte',
+										], filter.value.from );
+										set( query, [
+											'dateStart', '$lte',
+										], filter.value.to );
+									} else {
+										const values = getDateValuesForFilter( {
+											timeFrame: filter.type,
+											value: filter.value,
+											startOfWeek,
+										} );
+										set( query, [
+											'dateStart', '$gte',
+										], values.from );
+										set( query, [
+											'dateStart', '$lte',
+										], values.to );
+									}
 								}
-							}
-							break;
-					}
-				} );
-			}
-			db.timeSlots.find( query ).sort( { dateStart: -1 } )
-				.exec( ( err, timeSlots ) => {
-					resolve( timeSlots );
-				} );
+								break;
+						}
+					} );
+				}
+				db.timeSlots.find( query ).sort( { dateStart: -1 } )
+					.exec( ( err, timeSlots ) => {
+						resolve( timeSlots );
+					} );
+			} );
 		} );
 	} );
 } );
@@ -286,6 +269,12 @@ const validateSetting = setting => {
 			}
 			// ??? TODO validate filters
 			return true;
+		case 'fields':
+			if ( ! isArray( setting.value ) ) {
+				return [setting.key + ' must be type of array.'];
+			}
+			// ??? TODO validate fields
+			return true;
 		case 'startOfWeek':
 			if ( ! isString( setting.value ) || ! /[0-6]/.test( setting.value ) ) {
 				return [setting.key + ' must be type of string. Between 0 and 6.'];
@@ -309,21 +298,60 @@ api.settings.get = () => new Promise( ( resolve, reject ) => {
 	} );
 } );
 
+const renameFieldKey = ( oldKey, newKey ) => new Promise( ( resolve, reject ) => {
+	if ( oldKey && newKey && oldKey !== newKey ) {
+		getDb().then( db => {
+			db.timeSlots.find( {}, ( err, timeSlots ) => {
+				Promise.all( [
+					api.db.compact(),
+					...[...timeSlots].map( timeSlot => new Promise( ( res, rej ) => {
+						const newTimeSlot = {
+							[newKey]: timeSlot[oldKey],
+							...omit( timeSlot, oldKey ),
+						};
+						db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, ( err, numberUpdated ) => {
+							res( numberUpdated );
+						} );
+					} ) ),
+					api.db.compact(),
+				] ).then( () => {
+					resolve();
+				} );
+			} );
+		} );
+	} else {
+		resolve();
+	}
+} );
+
 // return   promise resolve object  addedTimeSlot
-api.settings.add = newSetting => new Promise( ( resolve, reject ) => {
+api.settings.add = ( newSetting, options ) => new Promise( ( resolve, reject ) => {
 	const valid = validateSetting( newSetting );
 	if ( true !== valid ) {
 		return reject( valid.join( '#####' ) );
 	}
 	getDb().then( db => {
 		db.settings.insert( newSetting, ( err, addedSetting ) => {
-			resolve( addedSetting );
+			if ( 'fields' === newSetting.key ) {
+				renameFieldKey(
+					get( options, [
+						'shouldUpdateKeys', 'oldKey',
+					] ),
+					get( options, [
+						'shouldUpdateKeys', 'newKey',
+					] ),
+				).then( () => {
+					resolve( addedSetting );
+				} );
+			} else {
+				resolve( addedSetting );
+			}
 		} );
 	} );
 } );
 
 // return   promise resolve number  numberUpdated
-api.settings.update = newSetting => new Promise( ( resolve, reject ) => {
+api.settings.update = ( newSetting, options ) => new Promise( ( resolve, reject ) => {
 	const valid = validateSetting( newSetting );
 	if ( true !== valid ) {
 		return reject( valid.join( '#####' ) );
@@ -333,7 +361,20 @@ api.settings.update = newSetting => new Promise( ( resolve, reject ) => {
 			reject( '??? err no _id' );
 		} else {
 			db.settings.update( { _id: newSetting._id }, newSetting, {}, ( err, numberUpdated ) => {
-				resolve( numberUpdated );
+				if ( 'fields' === newSetting.key ) {
+					renameFieldKey(
+						get( options, [
+							'shouldUpdateKeys', 'oldKey',
+						] ),
+						get( options, [
+							'shouldUpdateKeys', 'newKey',
+						] ),
+					).then( () => {
+						resolve( numberUpdated );
+					} );
+				} else {
+					resolve( numberUpdated );
+				}
 			} );
 		}
 	} );
@@ -364,8 +405,8 @@ const setupApi = () => {
      */
 	ipcMain.handle( 'api:settings:getDefaults', ( _ ) =>              api.settings.getDefaults() );
 	ipcMain.handle( 'api:settings:get', ( _ ) =>                      api.settings.get() );
-	ipcMain.handle( 'api:settings:add', ( _, newSetting ) =>          api.settings.add( newSetting ) );
-	ipcMain.handle( 'api:settings:update', ( _, newSetting ) =>       api.settings.update( newSetting ) );
+	ipcMain.handle( 'api:settings:add', ( _, newSetting, options ) =>          api.settings.add( newSetting, options ) );
+	ipcMain.handle( 'api:settings:update', ( _, newSetting, options ) =>       api.settings.update( newSetting, options ) );
 
 	/**
      * darkMode
