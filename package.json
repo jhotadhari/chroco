@@ -43,6 +43,7 @@
     "electron": "25.3.2",
     "eslint": "^8.46.0",
     "eslint-plugin-react": "^7.33.0",
+    "keep-a-changelog": "^2.3.0",
     "lodash": "^4.17.21",
     "nedb": "^1.8.0",
     "node-loader": "^2.0.0",
