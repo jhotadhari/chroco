@@ -1,0 +1,63 @@
+
+.timeSlot--filter {
+    .dropdown-container {
+      border-color: transparent !important;
+      background-color: transparent  !important;
+    }
+    .dropdown-heading-dropdown-arrow {
+      display: none;
+    }
+    &.unfiltered {
+      .dropdown-heading:hover {
+        .dropdown-heading-dropdown-arrow {
+          display: block;
+        }
+      }
+    }
+    .dropdown-search-clear-icon {
+      display: block;
+    }
+    &--dateStart {
+      & > .row {
+        &.actions {
+          & > .col {
+            display: flex;
+            justify-content: flex-start;
+            flex-grow: 1;
+            &:first-child,
+            &:last-child {
+                flex-grow: 0;
+            }
+            &:last-child {
+              justify-content: flex-end;
+            }
+          }
+        }
+      }
+    }
+    &.unfiltered {
+      .dropdown-search-clear-icon {
+        display: none;
+      }
+    }
+  }
+  [data-bs-theme="light"] {
+    .timeSlot--filter {
+      &.unfiltered {
+        .dropdown-heading {
+          color: $input-placeholder-color;
+        }
+      }
+    }
+  }
+  [data-bs-theme="dark"] {
+    .timeSlot--filter {
+      &.unfiltered {
+        .dropdown-heading {
+          color: $input-placeholder-color-dark;
+        }
+      }
+    }
+  }
+
+
