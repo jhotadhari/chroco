@@ -81,6 +81,4 @@ const settingsDefaults = {
 	],
 };
 
-module.exports = {
-	settingsDefaults,
-};
+module.exports = { settingsDefaults };

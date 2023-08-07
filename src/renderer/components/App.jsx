@@ -148,7 +148,10 @@ const App = () => {
 				} );
 		}
 	}, [
-		getSetting( 'dbPath' ), getSetting( 'filters' ), getSetting( 'startOfWeek' ),
+		getSetting( 'dbPath' ),
+		getSetting( 'filters' ),
+		getSetting( 'startOfWeek' ),
+		getSetting( 'fields' ),
 	] );
 
 	// Set timeSlotCurrent when timeSlots change.

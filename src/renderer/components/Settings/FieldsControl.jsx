@@ -580,7 +580,7 @@ const FieldsControl = ( { className } ) => {
 
 	const doUpdate = newVal => new Promise( ( resolve, reject ) => {
 		const options = {};
-		if ( selectedField.newKey && shouldUpdateKeys ) {
+		if ( selectedField.newKey && 'update' === shouldUpdateKeys ) {
 			options.shouldUpdateKeys = {
 				oldKey: selectedField.key,
 				newKey: selectedField.newKey,

@@ -4,6 +4,7 @@ const {
 	app,
 } = require( 'electron' );
 const {
+	omit,
 	isString,
 	isObject,
 	isArray,
@@ -297,19 +298,54 @@ api.settings.get = () => new Promise( ( resolve, reject ) => {
 	} );
 } );
 
+const renameFieldKey = ( oldKey, newKey ) => new Promise( ( resolve, reject ) => {
+	if ( oldKey && newKey && oldKey !== newKey ) {
+		getDb().then( db => {
+			db.timeSlots.find( {}, ( err, timeSlots ) => {
+				Promise.all( [
+					api.db.compact(),
+					...[...timeSlots].map( timeSlot => new Promise( ( res, rej ) => {
+						const newTimeSlot = {
+							[newKey]: timeSlot[oldKey],
+							...omit( timeSlot, oldKey ),
+						};
+						db.timeSlots.update( { _id: newTimeSlot._id }, newTimeSlot, {}, ( err, numberUpdated ) => {
+							res( numberUpdated );
+						} );
+					} ) ),
+					api.db.compact(),
+				] ).then( () => {
+					resolve();
+				} );
+			} );
+		} );
+	} else {
+		resolve();
+	}
+} );
+
 // return   promise resolve object  addedTimeSlot
 api.settings.add = ( newSetting, options ) => new Promise( ( resolve, reject ) => {
 	const valid = validateSetting( newSetting );
 	if ( true !== valid ) {
 		return reject( valid.join( '#####' ) );
 	}
-
-	// ??? TODO maybe update timeSlots keys
-	console.log( 'debug newSetting, options', newSetting, options ); // debug
-
 	getDb().then( db => {
 		db.settings.insert( newSetting, ( err, addedSetting ) => {
-			resolve( addedSetting );
+			if ( 'fields' === newSetting.key ) {
+				renameFieldKey(
+					get( options, [
+						'shouldUpdateKeys', 'oldKey',
+					] ),
+					get( options, [
+						'shouldUpdateKeys', 'newKey',
+					] ),
+				).then( () => {
+					resolve( addedSetting );
+				} );
+			} else {
+				resolve( addedSetting );
+			}
 		} );
 	} );
 } );
@@ -320,18 +356,25 @@ api.settings.update = ( newSetting, options ) => new Promise( ( resolve, reject 
 	if ( true !== valid ) {
 		return reject( valid.join( '#####' ) );
 	}
-
-
-	// ??? TODO maybe update timeSlots keys
-	console.log( 'debug newSetting, options', newSetting, options ); // debug
-
-
 	getDb().then( db => {
 		if ( ! newSetting._id ) {
 			reject( '??? err no _id' );
 		} else {
 			db.settings.update( { _id: newSetting._id }, newSetting, {}, ( err, numberUpdated ) => {
-				resolve( numberUpdated );
+				if ( 'fields' === newSetting.key ) {
+					renameFieldKey(
+						get( options, [
+							'shouldUpdateKeys', 'oldKey',
+						] ),
+						get( options, [
+							'shouldUpdateKeys', 'newKey',
+						] ),
+					).then( () => {
+						resolve( numberUpdated );
+					} );
+				} else {
+					resolve( numberUpdated );
+				}
 			} );
 		}
 	} );
