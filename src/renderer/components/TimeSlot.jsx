@@ -112,7 +112,9 @@ const TimeSlot = ( { timeSlot } ) => {
 			<button
 				type='button'
 				className={ 'btn me-2 ' + ( timeSlot.dateStop ? 'start' : 'stop' ) }
-				onClick={ () => timeSlot.dateStop ? startTimeSlot( { timeSlot } ) : stopTimeSlot( { timeSlot } ) }
+				onClick={ () => timeSlot.dateStop ? startTimeSlot( {
+					timeSlot, maybeForceDefaults: true,
+				} ) : stopTimeSlot( { timeSlot } ) }
 				title={ timeSlot.dateStop ? 'Start' : 'Stop' }
 			>
 				{ timeSlot.dateStop && <Icon type='play' /> }

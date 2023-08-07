@@ -20,7 +20,7 @@ const ToggleBool = ( {
 
 	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
 	const title = get( fieldSchema, 'title', '' );
-	const defaultVal = useDefault && get( fieldSchema, 'title', '' ).useDefault ? get( fieldSchema, 'default', '' ) : '';
+	const defaultVal = useDefault && 0 !== get( fieldSchema, 'useDefault', 0 ) ? get( fieldSchema, 'default', '' ) : '';
 
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
