@@ -72,8 +72,13 @@ git tag "v${next_version}"
 git push
 git push origin "v${next_version}"
 
-# publish, this should trigger gh actions to build for other os
+# publish, this should trigger gh actions to build for other os.
 electron-forge publish --auth-token="${GITHUB_TOKEN}"
+
+# add release description from changelog and publish the release.
+line_from=$(( $( awk "/## \[${next_version}\]/{ print NR; exit }" CHANGELOG.md ) + 1 ))
+line_to=$(( $( awk "/## \[${newest_version}\]/{ print NR; exit }" CHANGELOG.md ) - 1 ))
+sed -n ${line_from},${line_to}p CHANGELOG.md | gh release edit "v${next_version}" --draft=false -F -
 
 # checkout develop, merge main, Add Unreleased section to CHANGELOG.md and push.
 git checkout develop
