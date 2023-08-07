@@ -3,66 +3,6 @@
 const path = require( 'path' );
 const { app } = require( 'electron' );
 
-const timeSlotsSchemaBase = {
-	_id: {
-		key: '_id',
-		type: 'text',
-		title: '',
-	},
-
-	title: {
-		key: 'title',
-		type: 'text',
-		title: 'Title',
-		titlePlural: 'Titles',
-		required: true,
-	},
-
-
-	project: {
-		key: 'project',
-		type: 'text',
-		title: 'Project',
-		titlePlural: 'Projects',
-		hasSuggestions: true,
-	},
-	client: {
-		key: 'client',
-		type: 'text',
-		title: 'Client',
-		titlePlural: 'Clients',
-		hasSuggestions: true,
-	},
-	user: {
-		key: 'user',
-		type: 'text',
-		title: 'User',
-		titlePlural: 'Users',
-		hasSuggestions: true,
-	},
-	billable: {
-		key: 'billable',
-		type: 'bool',
-		title: 'Billable',
-		default: '0',
-	},
-
-
-
-	dateStart: {
-		key: 'dateStart',
-		type: 'date',
-		title: 'Start',
-		required: true,
-	},
-	dateStop: {
-		key: 'dateStop',
-		type: 'date',
-		title: 'Stop',
-		required: true,
-	},
-};
-
 const settingsDefaults = {
 
 	themeSource: 'system',
@@ -86,10 +26,59 @@ const settingsDefaults = {
 		},
 	],
 
-	fields: [...Object.values( timeSlotsSchemaBase )],
+	fields: [
+		{
+			key: '_id',
+			type: 'text',
+			title: '',
+			useDefault: 0,
+		},
+		{
+			key: 'title',
+			type: 'text',
+			title: 'Title',
+			titlePlural: 'Titles',
+			required: true,
+			useDefault: 0,
+		},
+		{
+			key: 'project',
+			type: 'text',
+			title: 'Project',
+			titlePlural: 'Projects',
+			hasSuggestions: true,
+			useDefault: 0,
+		},
+		{
+			key: 'client',
+			type: 'text',
+			title: 'Client',
+			titlePlural: 'Clients',
+			hasSuggestions: true,
+			useDefault: 0,
+		},
+		{
+			key: 'billable',
+			type: 'bool',
+			title: 'Billable',
+			useDefault: 2,
+			default: '0',
+		},
+		{
+			key: 'dateStart',
+			type: 'date',
+			title: 'Start',
+			required: true,
+			useDefault: 0,
+		},
+		{
+			key: 'dateStop',
+			type: 'date',
+			title: 'Stop',
+			required: true,
+			useDefault: 0,
+		},
+	],
 };
 
-module.exports = {
-	timeSlotsSchemaBase,
-	settingsDefaults,
-};
+module.exports = { settingsDefaults };

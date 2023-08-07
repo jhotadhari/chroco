@@ -24,7 +24,7 @@ const DateInput = ( {
 	editTimeSlot,
 	setEditTimeSlot,
 } ) => {
-	const { timeSlotSchema } = useContext( Context );
+	const { getSetting } = useContext( Context );
 
 	const { updateTimeSlot } = useTimeSlotCrud();
 
@@ -35,9 +35,7 @@ const DateInput = ( {
 		? dayjs( get( editTimeSlot, field, get( timeSlot, field ) ) ).format( dateFormat )
 		: '';
 	const isDirty = tempVal || ( get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field ) );
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
+	const title = get( getSetting( 'fields' ).find( f => f.key === field ), 'title', '' );
 
 	const tooltipId = get( timeSlot, '_id' ) + '-' + field + '-' + Math.round( Math.random() * 100000 );
 

@@ -94,6 +94,11 @@
 // scss-docs-end import-stack
 
 
+
+@import "./settings";
+@import "./utils";
+@import "./timeSlot--filter";
+
 :root {
   color-scheme: light dark;
 }
@@ -110,10 +115,21 @@
     background: $body-bg;
     color: $body-color;
   }
+  .form-switch {
+    .form-check-input {
+      &:checked {
+        --#{$prefix}form-switch-bg: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$gray-500}'/></svg>"))};
+      }
+    }
+  }
 }
 
-
-
+// Remove root outline on focus. It is outlined because it has tabIndex attribute to be able to always listen for keyDown events.
+#root > * {
+  &, &:focus {
+    outline: none !important;
+  }
+}
 
 [data-bs-theme="light"] {
   .btn {
@@ -136,6 +152,9 @@
 .form-check-input {
   outline: 2px solid transparent !important;
   background-color: transparent !important;
+  // &:checked {
+  //   border-color: var(--bsgray-500) !important;
+  // }
   &.dirty {
     outline-color: var(--bssuccess) !important;
     border-color: var(--bssuccess) !important;
@@ -145,6 +164,12 @@
   &.invalid {
       border-color: var(--bsdanger) !important;
   }
+  &.dirty {
+    border-color: var(--bssuccess) !important;
+  }
+  &.invalid {
+    border-color: var(--bsdanger) !important;
+  }
 }
 
 .timeSlot--duration {
@@ -152,12 +177,6 @@
   span {
     border: $btn-border-width solid transparent;
     border-radius: $btn-border-radius;
-  }
-  .dirty {
-    border-color: var(--bssuccess) !important;
-  }
-  .invalid {
-    border-color: var(--bsdanger) !important;
   }
 }
 
@@ -171,7 +190,7 @@
       margin-bottom: map-get($spacers, 2 );
     }
     &.highlight {
-      background-color: rgba(var(--bswarning-rgb), 0.25);
+      background-color: rgba(var(--bswarning-rgb), 0.1);
     }
     & > div {
       display: flex;
@@ -229,15 +248,6 @@
   color: var(--bsbody-color);
 }
 
-.font-style-italic {
-  font-style: italic;
-}
-.bg-blur {
-  backdrop-filter: blur(0.75px);
-}
-
-
-
 .react-autosuggest {
   &__container {
     &[aria-expanded="false"] {
@@ -256,7 +266,7 @@
   &__suggestion {
     cursor: pointer;
     padding-left: 1rem;
-    padding-top: 0.25rem;
+    padding-top: 0.15rem;
     margin-left: -2rem;
     &:last-child {
       margin-bottom: -1rem;
@@ -272,12 +282,6 @@
   }
 }
 
-// Remove root outline on focus. It is outlined because it has tabIndex attribute to be able to always listen for keyDown events.
-#root > * {
-  &, &:focus {
-    outline: none !important;
-  }
-}
 
 
 .timeSlot--filter {
@@ -290,85 +294,10 @@
 
 
 
-.timeSlot--filter {
-
-  .dropdown-container {
-    border-color: transparent !important;
-    background-color: transparent  !important;
-  }
-
-  .dropdown-heading-dropdown-arrow {
-    display: none;
-  }
-  &.unfiltered {
-    .dropdown-heading:hover {
-      .dropdown-heading-dropdown-arrow {
-        display: block;
-      }
-    }
-  }
-  .dropdown-search-clear-icon {
-    display: block;
-  }
-
-
-  &--dateStart {
-    // flex-grow: 2;
-
-
-    & > .row {
-
-
-      &.actions {
-        & > .col {
-
-          display: flex;
-          justify-content: flex-start;
-          flex-grow: 1;
-
-          &:first-child,
-          &:last-child {
-              flex-grow: 0;
-          }
-          &:last-child {
-            justify-content: flex-end;
-          }
-        }
-
-      }
-
-    }
-
-  }
-
-
-
-  &.unfiltered {
-    .dropdown-search-clear-icon {
-      display: none;
-    }
+.timeslot,
+.timeslot-group {
+  &:hover {
+    background-color: rgba(var(--bswarning-rgb), 0.1);
   }
 }
 
-[data-bs-theme="light"] {
-  .timeSlot--filter {
-    &.unfiltered {
-      .dropdown-heading {
-        color: $input-placeholder-color;
-      }
-    }
-  }
-}
-[data-bs-theme="dark"] {
-  .timeSlot--filter {
-    &.unfiltered {
-      .dropdown-heading {
-        color: $input-placeholder-color-dark;
-      }
-    }
-  }
-}
-
-.drag-handle.disabled {
-  cursor: auto !important;
-}

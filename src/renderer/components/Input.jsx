@@ -33,25 +33,20 @@ const Input = ( {
 	setEditTimeSlot,
 } ) => {
 	const {
-		timeSlotSchema,
+		getSetting,
 		fieldSuggestions,
 		addFieldSuggestion,
 	} = useContext( Context );
 
 	const { updateTimeSlot } = useTimeSlotCrud();
 
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
-	const defaultVal = useDefault ? get( timeSlotSchema, [
-		field, 'default',
-	], '' ) : '';
+	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
+	const title = get( fieldSchema, 'title', '' );
+	const defaultVal = useDefault && 0 !== get( fieldSchema, 'useDefault', 0 ) ? get( fieldSchema, 'default', '' ) : '';
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
 
-	const hasSuggestions = get( timeSlotSchema, [
-		field, 'hasSuggestions',
-	] );
+	const hasSuggestions = get( fieldSchema, 'hasSuggestions', false );
 	const [
 		suggestions, setSuggestions,
 	] = useState( get( fieldSuggestions, field, [] ) );
