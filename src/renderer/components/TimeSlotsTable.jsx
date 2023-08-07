@@ -390,7 +390,7 @@ const GroupHeader = ( {
 							setTimeSlotCurrentEdit( {} );
 						} else {
 							// start new one
-							startTimeSlot( { timeSlot: timeSlotsSlice[0] } );
+							startTimeSlot( { timeSlot: timeSlotsSlice[0], maybeForceDefaults: true, } );
 						}
 					} }
 					title={ timeSlotsSliceCurrents.length ? 'Stop' : 'Start' }
