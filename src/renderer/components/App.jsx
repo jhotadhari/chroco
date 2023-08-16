@@ -86,7 +86,7 @@ const App = () => {
 	] = useState( null );
 	const [
 		timeSlotCurrentEdit, setTimeSlotCurrentEdit,
-	] = useState( null );
+	] = useState( {} );
 	const [
 		fieldSuggestions, setFieldSuggestions,
 	] = useState( {} );

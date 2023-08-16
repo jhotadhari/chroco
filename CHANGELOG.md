@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Default boolean value does not get applied when starting a record.
+
 ## [0.1.0] - 2023-08-07
 Customizable fields.
 

@@ -160,15 +160,30 @@ api.timeSlots.delete = id => new Promise( ( resolve, reject ) => {
 } );
 
 // return   promise resolve object  addedTimeSlot, stoppedTimeSlot
-api.timeSlots.add = newTimeSlot => new Promise( ( resolve, reject ) => {
+api.timeSlots.add = ( newTimeSlot, { maybeForceDefaults } ) => new Promise( ( resolve, reject ) => {
 	getDb().then( db => {
 		const add = stoppedTimeSlot => {
-			db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
-				const result = {
-					addedTimeSlot,
-					stoppedTimeSlot,
-				};
-				resolve( result );
+			api.settings.get( 'fields' ).then( fields => {
+				// Maybe apply or force defaults.
+				[...( fields ? fields.value : settingsDefaults.fields )].map( field => {
+					if ( field.hasOwnProperty( 'default' ) ) {
+						if ( get( field, 'useDefault', 0 ) > 0 && ! newTimeSlot.hasOwnProperty( field.key ) ) {
+							newTimeSlot[field.key] = field.default;
+						}
+						if ( get( field, 'useDefault', 0 ) > 1 && maybeForceDefaults ) {
+							newTimeSlot[field.key] = field.default;
+						}
+					}
+				} );
+				// Insert into db.
+				db.timeSlots.insert( newTimeSlot, ( err, addedTimeSlot ) => {
+					const result = {
+						addedTimeSlot,
+						stoppedTimeSlot,
+					};
+					resolve( result );
+				} );
+
 			} );
 		};
 		// Maybe stop current one first, before adding a new one.
@@ -289,12 +304,18 @@ const validateSetting = setting => {
 api.settings.getDefaults = () => new Promise( ( resolve, reject ) => {
 	resolve( settingsDefaults );
 } );
-// return   promise resolve array   settings
-api.settings.get = () => new Promise( ( resolve, reject ) => {
+// return   promise resolve array|object   array of settings, or single setting if settingsKey given.
+api.settings.get = ( settingKey ) => new Promise( ( resolve, reject ) => {
 	getDb().then( db => {
-		db.settings.find( {}, ( err, settings ) => {
-			resolve( settings );
-		} );
+		if ( settingKey ) {
+			db.settings.findOne( { key: settingKey }, ( err, setting ) => {
+				resolve( setting );
+			} );
+		} else {
+			db.settings.find( {}, ( err, settings ) => {
+				resolve( settings );
+			} );
+		}
 	} );
 } );
 
@@ -396,7 +417,7 @@ const setupApi = () => {
 	ipcMain.handle( 'api:timeSlots:getCurrent', ( _ ) =>              api.timeSlots.getCurrent() );
 	ipcMain.handle( 'api:timeSlots:stop', ( _, timeSlot ) =>        api.timeSlots.stop( timeSlot ) );
 	ipcMain.handle( 'api:timeSlots:delete', ( _, id ) =>            api.timeSlots.delete( id ) );
-	ipcMain.handle( 'api:timeSlots:add', ( _, newTimeSlot ) =>      api.timeSlots.add( newTimeSlot ) );
+	ipcMain.handle( 'api:timeSlots:add', ( _, newTimeSlot, options ) =>      api.timeSlots.add( newTimeSlot, options ) );
 	ipcMain.handle( 'api:timeSlots:update', ( _, newTimeSlot ) =>   api.timeSlots.update( newTimeSlot ) );
 
 	/**
@@ -404,7 +425,7 @@ const setupApi = () => {
      *
      */
 	ipcMain.handle( 'api:settings:getDefaults', ( _ ) =>              api.settings.getDefaults() );
-	ipcMain.handle( 'api:settings:get', ( _ ) =>                      api.settings.get() );
+	ipcMain.handle( 'api:settings:get', ( _, settingKey ) =>                      api.settings.get( settingKey ) );
 	ipcMain.handle( 'api:settings:add', ( _, newSetting, options ) =>          api.settings.add( newSetting, options ) );
 	ipcMain.handle( 'api:settings:update', ( _, newSetting, options ) =>       api.settings.update( newSetting, options ) );
 

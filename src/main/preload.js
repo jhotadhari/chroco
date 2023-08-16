@@ -18,13 +18,13 @@ contextBridge.exposeInMainWorld( 'api', {
 		getCurrent: () => ipcRenderer.invoke( 'api:timeSlots:getCurrent' ),
 		stop: timeSlot => ipcRenderer.invoke( 'api:timeSlots:stop', timeSlot ),
 		delete: id => ipcRenderer.invoke( 'api:timeSlots:delete', id ),
-		add: newTimeSlot => ipcRenderer.invoke( 'api:timeSlots:add', newTimeSlot ),
+		add: ( newTimeSlot, options ) => ipcRenderer.invoke( 'api:timeSlots:add', newTimeSlot, options ),
 		update: newTimeSlot => ipcRenderer.invoke( 'api:timeSlots:update', newTimeSlot ),
 	},
 
 	settings: {
 		getDefaults: () => ipcRenderer.invoke( 'api:settings:getDefaults' ),
-		get: () => ipcRenderer.invoke( 'api:settings:get' ),
+		get: settingKey => ipcRenderer.invoke( 'api:settings:get', settingKey ),
 		add: ( newSetting, options ) => ipcRenderer.invoke( 'api:settings:add', newSetting, options ),
 		update: ( newSetting, options ) => ipcRenderer.invoke( 'api:settings:update', newSetting, options ),
 	},
