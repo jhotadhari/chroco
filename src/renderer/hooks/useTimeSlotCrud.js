@@ -1,8 +1,5 @@
 import dayjs from 'dayjs';
-import {
-	omit,
-	get,
-} from 'lodash';
+import { omit } from 'lodash';
 import { useContext } from 'react';
 import Context from '../Context';
 const { api } = window;
@@ -11,7 +8,6 @@ const useTimeSlotCrud = () => {
 	const {
 		timeSlots,
 		setTimeSlots,
-		getSetting,
 	} = useContext( Context );
 
 	const startTimeSlot = ( {
@@ -28,15 +24,7 @@ const useTimeSlotCrud = () => {
 			'updatedAt',
 		] );
 
-		if ( maybeForceDefaults ) {
-			getSetting( 'fields' ).map( field => {
-				if ( 2 === get( field, 'useDefault', 0 ) && field.hasOwnProperty( 'default' ) ) {
-					newTimeSlot[field.key] = field.default;
-				}
-			} );
-		}
-
-		api.timeSlots.add( newTimeSlot ).then( ( {
+		api.timeSlots.add( newTimeSlot, { maybeForceDefaults } ).then( ( {
 			addedTimeSlot, stoppedTimeSlot,
 		} ) => {
 			const newTimeSlots = [
