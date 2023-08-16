@@ -24,7 +24,7 @@ contextBridge.exposeInMainWorld( 'api', {
 
 	settings: {
 		getDefaults: () => ipcRenderer.invoke( 'api:settings:getDefaults' ),
-		get: () => ipcRenderer.invoke( 'api:settings:get' ),
+		get: settingKey => ipcRenderer.invoke( 'api:settings:get', settingKey ),
 		add: ( newSetting, options ) => ipcRenderer.invoke( 'api:settings:add', newSetting, options ),
 		update: ( newSetting, options ) => ipcRenderer.invoke( 'api:settings:update', newSetting, options ),
 	},

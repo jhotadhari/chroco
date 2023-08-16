@@ -289,12 +289,18 @@ const validateSetting = setting => {
 api.settings.getDefaults = () => new Promise( ( resolve, reject ) => {
 	resolve( settingsDefaults );
 } );
-// return   promise resolve array   settings
-api.settings.get = () => new Promise( ( resolve, reject ) => {
+// return   promise resolve array|object   array of settings, or single setting if settingsKey given.
+api.settings.get = ( settingKey ) => new Promise( ( resolve, reject ) => {
 	getDb().then( db => {
-		db.settings.find( {}, ( err, settings ) => {
-			resolve( settings );
-		} );
+		if ( settingKey ) {
+			db.settings.findOne( { key: settingKey }, ( err, setting ) => {
+				resolve( setting );
+			} );
+		} else {
+			db.settings.find( {}, ( err, settings ) => {
+				resolve( settings );
+			} );
+		}
 	} );
 } );
 
@@ -404,7 +410,7 @@ const setupApi = () => {
      *
      */
 	ipcMain.handle( 'api:settings:getDefaults', ( _ ) =>              api.settings.getDefaults() );
-	ipcMain.handle( 'api:settings:get', ( _ ) =>                      api.settings.get() );
+	ipcMain.handle( 'api:settings:get', ( _, settingKey ) =>                      api.settings.get( settingKey ) );
 	ipcMain.handle( 'api:settings:add', ( _, newSetting, options ) =>          api.settings.add( newSetting, options ) );
 	ipcMain.handle( 'api:settings:update', ( _, newSetting, options ) =>       api.settings.update( newSetting, options ) );
 
