@@ -56,21 +56,6 @@ const Input = ( {
 		'dirty': isDirty,
 	} );
 
-	// Apply defaultVal to editTimeSlot.
-	useEffect( () => {
-		if ( useDefault
-			&& value
-			&& value === defaultVal
-			&& ! ( get( timeSlot, field ) || get( editTimeSlot, field ) )
-		) {
-			setEditTimeSlot( {
-				...editTimeSlot, [field]: value,
-			} );
-		}
-	}, [
-		timeSlot, editTimeSlot,
-	] );
-
 	const onKeyDown = e => {
 		if ( isDirty ) {
 			switch( e.key ) {
