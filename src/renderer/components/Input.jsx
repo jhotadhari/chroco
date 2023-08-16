@@ -5,12 +5,12 @@ import {
 } from 'lodash';
 import React, {
   	useContext,
-  	useEffect,
   	useState,
 } from 'react';
 import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
+import useFieldMightDefaultValue from '../hooks/useFieldMightDefaultValue';
 
 export const getFilteredSuggestions = ( value, suggestions ) => {
 	const inputValue = value.trim().toLowerCase();
@@ -40,13 +40,22 @@ const Input = ( {
 
 	const { updateTimeSlot } = useTimeSlotCrud();
 
-	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
-	const title = get( fieldSchema, 'title', '' );
-	const defaultVal = useDefault && 0 !== get( fieldSchema, 'useDefault', 0 ) ? get( fieldSchema, 'default', '' ) : '';
-	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
-	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
+	const {
+		title,
+		isDirty,
+		value,
+	} = useFieldMightDefaultValue( {
+		useDefault,
+		fieldKey: field,
+		timeSlot,
+		editTimeSlot,
+	} );
 
-	const hasSuggestions = get( fieldSchema, 'hasSuggestions', false );
+	const hasSuggestions = get(
+		getSetting( 'fields' ).find( f => f.key === field ),
+		'hasSuggestions',
+		false,
+	);
 	const [
 		suggestions, setSuggestions,
 	] = useState( get( fieldSuggestions, field, [] ) );
