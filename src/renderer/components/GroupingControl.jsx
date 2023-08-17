@@ -2,14 +2,13 @@ import React, { useContext } from 'react';
 import {
 	// toString,
 	get,
-	omit,
+	// omit,
 } from 'lodash';
 import { MultiSelect } from 'react-multi-select-component';
 import classnames from 'classnames';
 import Context from '../Context';
 import Icon from './Icon.jsx';
 // const { api } = window;
-
 
 const ItemRenderer = ( {
 	checked,
@@ -49,7 +48,7 @@ export const getOptionsGroupingAll = ( getSetting, groups ) => {
 	let optionsGroupingKeysRemaining = [...optionsGroupingAll].map( o => o.value );
 	[...groups].map( group => {
 		if ( 'restFields' !== group.id ) {
-			optionsGroupingKeysRemaining = optionsGroupingKeysRemaining.filter( okr => ! group.fields.includes( okr ) );
+			optionsGroupingKeysRemaining = optionsGroupingKeysRemaining.filter( okr => ! get( group, 'fields', [] ).includes( okr ) );
 
 		}
 	} );
@@ -64,7 +63,7 @@ const GroupingControl = ( { className } ) => {
 		themeSource,
 		settings,
 		setSettings,
-		settingsDefaults,
+		// settingsDefaults,
 		getSetting,
 	} = useContext( Context );
 
@@ -75,6 +74,39 @@ const GroupingControl = ( { className } ) => {
 		optionsGroupingAll,
 		optionsGroupingKeysRemaining,
 	} = getOptionsGroupingAll( getSetting );
+
+	const groups = getSetting( 'groups' );
+
+	const doUpdate = newVal => {
+
+		if ( undefined === setting ) {
+			// add new setting
+			const newSetting = {
+				key: settingKey,
+				value: newVal,
+			};
+			api.settings.add( newSetting ).then( ( addedSetting ) => {
+				setSettings( [
+					...settings, addedSetting,
+				] );
+
+			} );
+		} else {
+			// update setting
+			const newSetting = {
+				...setting,
+				value: newVal,
+			};
+			api.settings.update( newSetting ).then( numberUpdated => {
+				if ( numberUpdated ) {
+					const newSettings = [...settings];
+					const idx = newSettings.findIndex( sett => sett._id === setting._id );
+					newSettings.splice( idx, 1, newSetting );
+					setSettings( newSettings );
+				}
+			} );
+		}
+	};
 
     return <div
 		className={ classnames( [
@@ -91,7 +123,7 @@ const GroupingControl = ( { className } ) => {
 
             <div className="col-1"></div>
 
-            { [...getSetting( 'groups' )].map( group => {
+            { [...groups].map( group => {
 
 				let selected;
 				let options;
@@ -103,7 +135,7 @@ const GroupingControl = ( { className } ) => {
 					selected = options.filter( o => optionsGroupingKeysRemaining.includes( o.value ) );
 				} else {
 					options = [...optionsGroupingAll];
-					selected = options.filter( o => group.fields.includes( o.value ) );
+					selected = options.filter( o => get( group, 'fields', [] ).includes( o.value ) );
 					if ( selected.find( s => 'dateStartDay' === s.value ) ) {
 						// If dateStartDay is selected, nothing else can be selected.
 						options = [...options].map( o => ( {
@@ -125,8 +157,6 @@ const GroupingControl = ( { className } ) => {
 				}
 				let label = [...selected].map( o => o.label ).join( ' + ' );
 
-                const checked = true;
-
 				// console.log( 'debug options', options ); // debug
 
 				// ??? TODO onChange callbacks doUpdate
@@ -138,8 +168,6 @@ const GroupingControl = ( { className } ) => {
                     <div className='card'>
 
                         <div className='d-flex align-items-center justify-content-between position-relative'>
-
-
                             <span
                                 className={ classnames( [
                                     'btn',
@@ -172,17 +200,24 @@ const GroupingControl = ( { className } ) => {
 
                             <div className="form-check form-switch">
                                 <input
-                                    title={ 'Grouping by "' + label + '" is ' + ( checked
+                                    title={ 'Grouping by "' + label + '" is ' + ( group.enabled
                                         ? 'enabled'
                                         : 'disabled'
                                     ) }
                                     className="form-check-input"
                                     type="checkbox"
                                     role="switch"
-                                    checked={ checked }
+                                    checked={ group.enabled }
                                     disabled={ parseInt( group.enabled, 10 ) > 1 }
                                     onChange={ () => {
-                                    	// setShouldGroupDays( ! shouldGroupDays );
+										const newGroup = {
+											...group,
+											enabled: ! group.enabled,
+										};
+										const newGroups = [...groups];
+										const idx = newGroups.findIndex( g => g.id === group.id );
+										newGroups.splice( idx, 1, newGroup );
+										doUpdate( newGroups );
                                     } }
                                 />
                             </div>

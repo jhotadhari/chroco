@@ -455,8 +455,6 @@ const TimeSlotsTable = () => {
 		getSetting,
 	} = useContext( Context );
 
-	const[shouldGroupDays,setShouldGroupDays] = useState( true )
-
 	let groups = getSetting( 'groups' );
 	groups = groups.filter( g => 'restFields' === g.id || ( g.fields && g.fields.includes( 'dateStartDay' ) ) );	// TODO ??? For now, the control is just a mockup, skip some groups.
 	const { optionsGroupingKeysRemaining } = getOptionsGroupingAll( getSetting, groups );
@@ -488,19 +486,6 @@ const TimeSlotsTable = () => {
 	sortTimeSlotsGrouped( timeSlotsGrouped );
 
   	return <div className='container-fluid mb-3'>
-
-		<div className="form-check form-switch">
-			<input
-				title="Group record by day"
-				className="form-check-input"
-				type="checkbox"
-				role="switch"
-				checked={ shouldGroupDays }
-				onChange={ () => {
-					setShouldGroupDays( ! shouldGroupDays );
-				} }
-			/>
-		</div>
 
 		<div className="timeSlots-table">
 		{ Object.keys( timeSlotsGrouped ).map( groupDateId => <Fragment key={ groupDateId }>
