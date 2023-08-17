@@ -10,6 +10,7 @@ import Settings from './Settings/Settings.jsx';
 import CreateTimeSlot from './CreateTimeSlot.jsx';
 import TimeSlotsTable from './TimeSlotsTable.jsx';
 import TimeSlotsFilters from './TimeSlotsFilters.jsx';
+import GroupingControl from './GroupingControl.jsx';
 import { sortTimeSlotsCompare } from '../utils';
 const { api } = window;
 
@@ -60,6 +61,8 @@ const AppInner = () => {
 		<CreateTimeSlot />
 
 		<TimeSlotsFilters />
+
+		<GroupingControl />
 
 		<TimeSlotsTable />
 	</div>;

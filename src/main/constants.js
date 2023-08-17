@@ -79,6 +79,37 @@ const settingsDefaults = {
 			useDefault: 0,
 		},
 	],
+	groups: [
+		{
+			id: 'l9axp',
+			enabled: '1',
+			fields: [
+				'dateStartDay'
+			],
+			// required: true,	// Group can't be removed.
+			// disabledDnd: true,	// Group position can't be changed.
+		},
+		{
+			id: 'zeq9l',
+			enabled: '1',
+			fields: [
+				'billed'
+			],
+		},
+		{
+			id: 'zxu12',
+			enabled: '1',
+			fields: [],
+		},
+
+		// Remaining fields.
+		{
+			id: 'restFields',
+			enabled: '2',	// Can't be disabled.
+			required: true,	// Group can't be removed.
+			disabledDnd: true,	// Group position can't be changed
+		},
+	],
 };
 
 module.exports = { settingsDefaults };

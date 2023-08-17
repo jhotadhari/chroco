@@ -1,0 +1,25 @@
+@use 'sass:math';
+
+.timeSlots-groups {
+
+	.col.group {
+		flex-grow: 0;
+		flex-basis: math.div( percentage( divide( 9, $grid-columns ) ), 2 );
+	}
+
+	.rmsc {
+		.dropdown-heading {
+			padding-left: 0;
+		}
+		.dropdown-container {
+			position: unset;
+			border-color: transparent !important;
+			background-color: transparent !important;
+			box-shadow: none !important;
+		}
+		.dropdown-content {
+			left: 0;
+		}
+	}
+
+}
