@@ -1,4 +1,10 @@
 
+# Check if gh cli is installed.
+if [[ -z $( gh --version ) ]]; then
+    echo "GitHub CLI should be installed. See https://cli.github.com"
+    exit 1
+fi
+
 # Check if CHANGELOG.md is valid.
 if [[ -z $( ./node_modules/.bin/changelog ) ]]; then
     echo 'Unable to parse `CHANGELOG.md`'
@@ -34,7 +40,7 @@ fi
 next_version=$1
 pat="[0-9]+\.[0-9]+\.[0-9]+"
 if ! [[ "$next_version" =~ $pat ]]; then
-    echo 'Version should be SemVer. Run `npm run publish <major>.<minor>.<path>`'
+    echo 'Version should be SemVer. Run `npm run publish <major>.<minor>.<patch>`'
     exit 1
 fi
 
