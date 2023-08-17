@@ -58,10 +58,10 @@ if ! [ -z $( verlt $newest_version $next_version || echo "1") ]; then
     exit 1
 fi
 
-# current branch should start with release-*.
+# current branch should start with release*.
 release_branch=$( git rev-parse --abbrev-ref HEAD )
-if ! [[ $release_branch == release-* ]]; then
-    echo 'Current branch name should start with `release-`'
+if ! [[ $release_branch == release* ]]; then
+    echo 'Current branch name should start with `release`'
     exit 1
 fi
 
