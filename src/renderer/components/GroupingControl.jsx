@@ -32,6 +32,33 @@ const ItemRenderer = ( {
 	</div>
 );
 
+export const getOptionsGroupingAll = ( getSetting, groups ) => {
+	groups = groups || getSetting( 'groups' );
+	const optionsGroupingAll = [
+		{
+			label: 'Start day',
+			value: 'dateStartDay',
+		},
+		...getSetting( 'fields' ).filter( field => '_id' !== field.key && (
+			'title' === field.key || ! field.required
+		) ).map( field => ( {
+			value: field.key,
+			label: field.title,
+		} ) ),
+	];
+	let optionsGroupingKeysRemaining = [...optionsGroupingAll].map( o => o.value );
+	[...groups].map( group => {
+		if ( 'restFields' !== group.id ) {
+			optionsGroupingKeysRemaining = optionsGroupingKeysRemaining.filter( okr => ! group.fields.includes( okr ) );
+
+		}
+	} );
+	return {
+		optionsGroupingAll,
+		optionsGroupingKeysRemaining,
+	};
+};
+
 const GroupingControl = ( { className } ) => {
 	const {
 		themeSource,
@@ -44,28 +71,10 @@ const GroupingControl = ( { className } ) => {
 	const settingKey = 'groups';
 	const setting = settings && Array.isArray( settings ) ? settings.find( sett => sett.key && sett.key === settingKey ) : undefined;
 
-	const groups = getSetting( 'groups' );
-
-	const optionsAll = [
-		{
-			label: 'Start day',
-			value: 'dateStartDay',
-		},
-		...getSetting( 'fields' ).filter( field => '_id' !== field.key && (
-			'title' === field.key || ! field.required
-		) ).map( field => ( {
-			value: field.key,
-			label: field.title,
-		} ) ),
-	];
-
-	let optionKeysRemaining = [...optionsAll].map( o => o.value );
-	[...groups].map( group => {
-		if ( 'restFields' !== group.id ) {
-			optionKeysRemaining = optionKeysRemaining.filter( okr => ! group.fields.includes( okr ) );
-
-		}
-	} )
+	const {
+		optionsGroupingAll,
+		optionsGroupingKeysRemaining,
+	} = getOptionsGroupingAll( getSetting );
 
     return <div
 		className={ classnames( [
@@ -82,18 +91,18 @@ const GroupingControl = ( { className } ) => {
 
             <div className="col-1"></div>
 
-            { [...groups].map( group => {
+            { [...getSetting( 'groups' )].map( group => {
 
 				let selected;
 				let options;
 				if ( 'restFields' === group.id ) {
-					options = [...optionsAll].map( o => ( {
+					options = [...optionsGroupingAll].map( o => ( {
 						...o,
 						disabled: true,
 					} ) );
-					selected = options.filter( o => optionKeysRemaining.includes( o.value ) );
+					selected = options.filter( o => optionsGroupingKeysRemaining.includes( o.value ) );
 				} else {
-					options = [...optionsAll];
+					options = [...optionsGroupingAll];
 					selected = options.filter( o => group.fields.includes( o.value ) );
 					if ( selected.find( s => 'dateStartDay' === s.value ) ) {
 						// If dateStartDay is selected, nothing else can be selected.
@@ -105,7 +114,7 @@ const GroupingControl = ( { className } ) => {
 					} else {
 						// Fields selected in other groups should be disabled.
 						options = [...options].map( o => {
-							const disabled = ! optionKeysRemaining.includes( o.value ) && ! [...selected].map( s => s.value ).includes( o.value )
+							const disabled = ! optionsGroupingKeysRemaining.includes( o.value ) && ! [...selected].map( s => s.value ).includes( o.value )
 							return {
 								...o,
 								disabled,

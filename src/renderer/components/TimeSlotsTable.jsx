@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import dayjs from 'dayjs';
 import {
 	get,
+	set,
 	isObject,
 	omit,
 } from 'lodash';
@@ -17,6 +18,7 @@ import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 import useTick from '../hooks/useTick';
 import TimeSlot from './TimeSlot.jsx';
 import { getFilteredSuggestions } from './Input.jsx';
+import { getOptionsGroupingAll } from './GroupingControl.jsx';
 import Icon from './Icon.jsx';
 import {
 	sortTimeSlotsCompare,
@@ -432,6 +434,20 @@ const DateGroup = ( { timeSlotsSlice } ) => {
 	</>;
 };
 
+// Sort timeSlotsGrouped. The deepest nested array is the timeSlots, sort by date..
+const sortTimeSlotsGrouped = ( timeSlotsGrouped, grouped, path ) => {
+	path = path || [];
+	grouped = grouped || timeSlotsGrouped;
+	Object.keys( grouped ).map( groupId => {
+		const newPath = [...path,groupId];
+		if ( Array.isArray( grouped[groupId] ) ) {
+			set( timeSlotsGrouped, newPath, get( timeSlotsGrouped, newPath, [] ).sort( sortTimeSlotsCompare ) );
+		} else {
+			sortTimeSlotsGrouped( timeSlotsGrouped, grouped[groupId], newPath );
+		}
+	} );
+};
+
 const TimeSlotsTable = () => {
 
 	const {
@@ -441,38 +457,35 @@ const TimeSlotsTable = () => {
 
 	const[shouldGroupDays,setShouldGroupDays] = useState( true )
 
+	let groups = getSetting( 'groups' );
+	groups = groups.filter( g => 'restFields' === g.id || ( g.fields && g.fields.includes( 'dateStartDay' ) ) );	// TODO ??? For now, the control is just a mockup, skip some groups.
+	const { optionsGroupingKeysRemaining } = getOptionsGroupingAll( getSetting, groups );
 	const timeSlotsGrouped = {};
 	[...timeSlots].map( ( timeSlot ) => {
+		const groupIds = [...groups].map( ( group, groupIdx ) => {
+			let groupId;
+			if ( 'restFields' !== group.id ) {
+				groupId = group.enabled
+					? ( group.fields && group.fields.includes( 'dateStartDay' )
+						? /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat ) )
+						: [...group.fields].map( k => get( timeSlot, k ) ).join( '#####' )
+					)
+					: ['all'];
 
-		let groupDateId = shouldGroupDays
-			? /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec( dayjs( timeSlot.dateStart ).format( dateFormat ) )
-			: ['all'];
-		if ( ! groupDateId || ! groupDateId.length ) {
-			return;
-		}
-		groupDateId = groupDateId[0];
-		if ( ! timeSlotsGrouped[groupDateId] ) {
-			timeSlotsGrouped[groupDateId] = {};
-		}
-		const groupId = getSetting( 'fields' )
-			.filter( field => 'date' !== field.type && '_id' !== field.key )
-			.map( field => timeSlot[field.key] )
-			.join( '#####' );
-		if ( timeSlotsGrouped[groupDateId][groupId] ) {
-			timeSlotsGrouped[groupDateId][groupId] = [
-				...timeSlotsGrouped[groupDateId][groupId],
-				timeSlot,
-			];
-		} else {
-			timeSlotsGrouped[groupDateId][groupId] = [timeSlot];
-		}
-	} );
-
-	Object.keys( timeSlotsGrouped ).map( groupDateId => {
-		Object.keys( timeSlotsGrouped[groupDateId] ).map( groupId => {
-			timeSlotsGrouped[groupDateId][groupId].sort( sortTimeSlotsCompare );
+				if ( groupId && groupId.length ) {
+					groupId = groupId[0];
+				}
+			} else {
+				groupId = [...optionsGroupingKeysRemaining].map( k => timeSlot[k] ).join( '#####' );
+			}
+			return groupId;
 		} );
+		set( timeSlotsGrouped, groupIds, [
+			...get( timeSlotsGrouped, groupIds, [] ),
+			timeSlot,
+		] );
 	} );
+	sortTimeSlotsGrouped( timeSlotsGrouped );
 
   	return <div className='container-fluid mb-3'>
 
