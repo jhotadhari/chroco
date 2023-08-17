@@ -301,3 +301,13 @@
   }
 }
 
+.drag-handle {
+	.bi {
+		@include transition( $transition-base );
+	}
+	&:hover {
+		.bi {
+			transform: scale( 1.25 );
+		}
+	}
+}
