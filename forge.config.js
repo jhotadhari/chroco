@@ -1,7 +1,8 @@
 const fs = require( 'fs' );
 const path = require('path');
 const { serialHooks } = require( 'electron-packager/src/hooks' );
-const appRootDir = require('app-root-dir').get();
+const { getAppRootDirSync } = require( './src/main/utils' );
+const appRootDir = getAppRootDirSync( __dirname );
 
 module.exports = {
 	packagerConfig: {
