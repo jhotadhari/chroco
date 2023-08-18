@@ -5,7 +5,7 @@
 
 ## Install
 
-To Install **chroco** on Linux, MacOS or Windows download the installer for our system from the [latest release](https://github.com/jhotadhari/chroco/releases/latest) and install it.
+To Install **chroco** on Linux, MacOS or Windows, download the installer for our system from the [latest release](https://github.com/jhotadhari/chroco/releases/latest) and install it.
 
 The releases are not signed, your system might complain about that.
 
@@ -60,11 +60,11 @@ Contributions welcome. You can report [issues or suggest features](https://githu
 
 ## Credits
 
-- Build with [Electron Forge](https://www.electronforge.io), [React](reactjs.org/), [Babel](https://babeljs.io/) and [webpack](https://webpack.js.org/).
-- The CSS/[SASS](sass-lang.com/) framework is [Bootstrap](https://getbootstrap.com).
-- The embedded persistent JSON based database is [NeDB](https://github.com/louischatriot/nedb).
+- Build with [Electron Forge](https://www.electronforge.io), [React](https://reactjs.org/), [Babel](https://babeljs.io/) and [webpack](https://webpack.js.org/).
+- [Bootstrap](https://getbootstrap.com) serves as a CSS/[SASS](https://sass-lang.com/) framework.
+- The embedded persistent JSON based database is implemented with [NeDB](https://github.com/louischatriot/nedb).
 - Dates are processed by [Day.js](https://day.js.org/).
-- Drag and drop features are implemented with [dnd kit](dndkit.com).
+- Drag and drop features are implemented with [dnd kit](https://dndkit.com).
 - Got around some headaches by using utilities by [Lodash](https://lodash.com), [array-move](https://github.com/sindresorhus/array-move) or [classnames](https://github.com/JedWatson/classnames).
 - [Keep a Changelog](https://www.npmjs.com/package/keep-a-changelog) helps maintaining a `CHANGELOG.md`.
 - [markdown-it](https://github.com/markdown-it/markdown-it#readme) parses markdown.
