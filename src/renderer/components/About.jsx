@@ -11,9 +11,7 @@ const About = ( {
 	setShowAbout,
 } ) => {
 
-	const {
-		appInfo,
-	} = useContext( Context );
+	const { appInfo } = useContext( Context );
 
 	const ref = useRef( null );
 
@@ -46,18 +44,18 @@ const About = ( {
 				</div>
 				<div className="modal-body">
 
-                    { [...appInfo.readmeMdParts].filter( part => [
+					{ [...appInfo.readmeMdParts].filter( part => [
 						'About',
 						'Contribution',
 						'Credits',
 						'License',
 					].includes( part.key ) ).map( part => {
-                        return <div key={ part.key } >
-                            { 'About' !== part.key && <div className='h5'>{ part.key }</div> }
-                            <div dangerouslySetInnerHTML={ {__html: part.html.replace( /href=/g, 'target="_blank" href=' ) } } />
-                            { 'License' === part.key && <Icon type="license" /> }
-                        </div>
-                    } ) }
+						return <div key={ part.key }>
+							{ 'About' !== part.key && <div className='h5'>{ part.key }</div> }
+							<div dangerouslySetInnerHTML={ { __html: part.html.replace( /href=/g, 'target="_blank" href=' ) } } />
+							{ 'License' === part.key && <Icon type="license" /> }
+						</div>;
+					} ) }
 
 				</div>
 			</div>
