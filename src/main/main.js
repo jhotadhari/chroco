@@ -1,6 +1,7 @@
 const {
 	app,
 	BrowserWindow,
+	shell,
 } = require( 'electron' );
 const path = require( 'path' );
 const {
@@ -27,11 +28,18 @@ const createWindow = () => {
 		},
 	} );
 
-	// and load the index.html of the app.
+	// Load the index.html of the app.
 	mainWindow.loadURL( MAIN_WINDOW_WEBPACK_ENTRY );
 
+	// Change window title.
 	mainWindow.webContents.on( 'did-stop-loading', () => {
 		mainWindow.setTitle( app.getName() + ' - offline time tracker' );
+	} );
+
+	// Open external url in external browser.
+	mainWindow.webContents.setWindowOpenHandler( ( { url } ) => {
+		shell.openExternal( url );
+		return { action: 'deny' };
 	} );
 
 	setupWindowMenu( mainWindow );

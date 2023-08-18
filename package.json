@@ -1,7 +1,7 @@
 {
   "name": "chroco",
   "productName": "chroco",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Simple electron offline time tracker",
   "main": ".webpack/main",
   "scripts": {
@@ -15,9 +15,26 @@
   "keywords": [],
   "author": {
     "name": "jhotadhari",
-    "email": "tellme@waterproof-webdesign.info"
+    "email": "tellme@waterproof-webdesign.info",
+    "url": "https://waterproof-webdesign.info"
   },
-  "license": "MIT",
+  "funding": {
+    "type": "individual",
+    "url": "https://waterproof-webdesign.info/donate"
+  },
+  "homepage": "https://github.com/jhotadhari/chroco#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhotadhari/chroco.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jhotadhari/chroco/issues"
+  },
+  "license": "CC-BY-NC-SA-4.0",
+  "licenseUrl": {
+    "deed": "https://creativecommons.org/licenses/by-nc-sa/4.0",
+    "legalcode": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@babel/preset-react": "^7.22.5",
@@ -59,6 +76,7 @@
     "webpack": "^5.88.2"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "markdown-it": "^13.0.1"
   }
 }
