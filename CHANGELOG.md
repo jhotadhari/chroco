@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed.
+- Added some info to `README.md`. Now it is not empty anymore.
+
 ### Fixed
 - Default boolean value does not get applied when starting a record.
 
