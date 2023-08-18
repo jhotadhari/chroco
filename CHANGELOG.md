@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed.
 - Added some info to `README.md`. Now it is not empty anymore.
+- Changed license to `CC-BY-NC-SA-4.0`.
 
 ### Fixed
 - Default boolean value does not get applied when starting a record.

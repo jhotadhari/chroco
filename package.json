@@ -15,9 +15,26 @@
   "keywords": [],
   "author": {
     "name": "jhotadhari",
-    "email": "tellme@waterproof-webdesign.info"
+    "email": "tellme@waterproof-webdesign.info",
+    "url": "https://waterproof-webdesign.info"
   },
-  "license": "MIT",
+  "funding": {
+    "type": "individual",
+    "url": "https://waterproof-webdesign.info/donate"
+  },
+  "homepage": "https://github.com/jhotadhari/chroco#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhotadhari/chroco.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jhotadhari/chroco/issues"
+  },
+  "license": "CC-BY-NC-SA-4.0",
+  "licenseUrl": {
+    "deed": "https://creativecommons.org/licenses/by-nc-sa/4.0",
+    "legalcode": "https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@babel/preset-react": "^7.22.5",

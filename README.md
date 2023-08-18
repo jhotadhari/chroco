@@ -69,8 +69,13 @@ Contributions welcome. You can report [issues or suggest features](https://githu
 - [Keep a Changelog](https://www.npmjs.com/package/keep-a-changelog) helps maintaining a `CHANGELOG.md`.
 - Some UI components are based on [react-multi-select-component](https://github.com/hc-oss/react-multi-select-component), [rc-slider](https://github.com/react-component/slider), [react-autosuggest](https://github.com/moroshko/react-autosuggest) or [react-tooltip](https://react-tooltip.com/).
 
+## License
 
+Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
 
+This license lets you remix, adapt, and build upon this project non-commercially, as long as you credit [me](https://waterproof-webdesign.info) and license your new creations under the identical terms.
+
+[View License Deed](https://creativecommons.org/licenses/by-nc-sa/4.0) | [View Legal Code](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
 
 
 
