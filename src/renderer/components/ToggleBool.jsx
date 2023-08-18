@@ -1,11 +1,8 @@
 import classnames from 'classnames';
-import {
-  	get,
-  	omit,
-} from 'lodash';
-import React, { useContext } from 'react';
-import Context from '../Context';
+import { omit } from 'lodash';
+import React from 'react';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
+import useFieldMightDefaultValue from '../hooks/useFieldMightDefaultValue';
 
 const ToggleBool = ( {
 	field,
@@ -14,16 +11,18 @@ const ToggleBool = ( {
 	editTimeSlot,
 	setEditTimeSlot,
 } ) => {
-	const { getSetting } = useContext( Context );
-
 	const { updateTimeSlot } = useTimeSlotCrud();
 
-	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
-	const title = get( fieldSchema, 'title', '' );
-	const defaultVal = useDefault && 0 !== get( fieldSchema, 'useDefault', 0 ) ? get( fieldSchema, 'default', '' ) : '';
-
-	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
-	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
+	const {
+		title,
+		isDirty,
+		value,
+	} = useFieldMightDefaultValue( {
+		useDefault,
+		fieldKey: field,
+		timeSlot,
+		editTimeSlot,
+	} );
 
 	const inputClassName = classnames( {
 		'form-check-input': true,

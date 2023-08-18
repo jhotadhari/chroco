@@ -7,6 +7,7 @@ import React, {
 import Context from '../Context';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 import Settings from './Settings/Settings.jsx';
+import About from './About.jsx';
 import CreateTimeSlot from './CreateTimeSlot.jsx';
 import TimeSlotsTable from './TimeSlotsTable.jsx';
 import TimeSlotsFilters from './TimeSlotsFilters.jsx';
@@ -31,12 +32,26 @@ const AppInner = () => {
 	const [
 		showSettings, setShowSettings,
 	] = useState( false );
+	const [
+		showAbout, setShowAbout,
+	] = useState( false );
 
 	useEffect( () => {
 		api.app.onTogglePreferences( () => {
 			setShowSettings( ! showSettings );
+			if ( ! showSettings ) {
+				setShowAbout( false );
+			}
 		} );
-	}, [showSettings] );
+		api.app.onToggleAbout( () => {
+			setShowAbout( ! showAbout );
+			if ( ! showAbout ) {
+				setShowSettings( false );
+			}
+		} );
+	}, [
+		showSettings, showAbout,
+	] );
 
 	return <div
 		data-bs-theme={ themeSource }
@@ -55,6 +70,11 @@ const AppInner = () => {
 		{ showSettings && <Settings
 			showSettings={ showSettings }
 			setShowSettings={ setShowSettings }
+		/> }
+
+		{ showAbout && <About
+			showAbout={ showAbout }
+			setShowAbout={ setShowAbout }
 		/> }
 
 		<CreateTimeSlot />
@@ -86,7 +106,7 @@ const App = () => {
 	] = useState( null );
 	const [
 		timeSlotCurrentEdit, setTimeSlotCurrentEdit,
-	] = useState( null );
+	] = useState( {} );
 	const [
 		fieldSuggestions, setFieldSuggestions,
 	] = useState( {} );
