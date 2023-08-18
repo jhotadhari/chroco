@@ -16,16 +16,17 @@ const path = require( 'path' );
 const dayjs = require( 'dayjs' );
 const MarkdownIt = require( 'markdown-it' );
 const getDb = require( './nedb/db' );
-const appRootDir = require('app-root-dir').get();
 const { settingsDefaults } = require( './constants' );
 const {
 	isPathValid,
 	parseSerialized,
+	getAppRootDirSync,
 	isValidTimezones,
 	isValidRegex,
 	getDateValuesForFilter,
 } = require( './utils' );
 
+const appRootDir = getAppRootDirSync( __dirname );
 const md = new MarkdownIt();
 const pkg = parseSerialized( fs.readFileSync( path.join( appRootDir, 'package.json' ), 'utf8' ) );
 const readmeMd = fs.readFileSync( path.join( appRootDir, 'README.md' ), 'utf8' );

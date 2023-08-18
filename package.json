@@ -1,7 +1,7 @@
 {
   "name": "chroco",
   "productName": "chroco",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Simple electron offline time tracker",
   "main": ".webpack/main",
   "scripts": {
@@ -76,7 +76,6 @@
     "webpack": "^5.88.2"
   },
   "dependencies": {
-    "app-root-dir": "^1.0.2",
     "electron-squirrel-startup": "^1.0.0",
     "markdown-it": "^13.0.1"
   }

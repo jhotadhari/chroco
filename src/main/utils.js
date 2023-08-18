@@ -1,6 +1,7 @@
 
 const {
 	existsSync,
+	readFileSync,
 	accessSync,
 	constants,
 } = require( 'fs' );
@@ -50,6 +51,24 @@ const parseSerialized = ( str, fallback ) => {
 		object = object;
 	}
 	return object;
+};
+
+const getAppRootDirSync = pa => {
+	const paPkg = path.join( pa, 'package.json' );
+    const walkUp = () => path.dirname( pa ) === pa
+        ? false
+        : getAppRootDirSync( path.dirname( pa ) );
+    try {
+        accessSync( paPkg, constants.F_OK );
+        const pkg = parseSerialized( readFileSync( paPkg, 'utf8' ) );
+        if ( pkg && pkg.name && 'chroco' === pkg.name ) {
+            return pa;
+        } else {
+            return walkUp();
+        }
+    } catch ( err ) {
+        return walkUp();
+    }
 };
 
 // same in chroco/src/renderer//utils.js
@@ -122,6 +141,7 @@ const getDateValuesForFilter = ( {
 module.exports = {
 	isPathValid,
 	parseSerialized,
+	getAppRootDirSync,
 	isValidTimezones,
 	isValidRegex,
 	getDateValuesForFilter,
