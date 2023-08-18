@@ -5,12 +5,12 @@ import {
 } from 'lodash';
 import React, {
   	useContext,
-  	useEffect,
   	useState,
 } from 'react';
 import Autosuggest from 'react-autosuggest';
 import Context from '../Context';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
+import useFieldMightDefaultValue from '../hooks/useFieldMightDefaultValue';
 
 export const getFilteredSuggestions = ( value, suggestions ) => {
 	const inputValue = value.trim().toLowerCase();
@@ -33,25 +33,29 @@ const Input = ( {
 	setEditTimeSlot,
 } ) => {
 	const {
-		timeSlotSchema,
+		getSetting,
 		fieldSuggestions,
 		addFieldSuggestion,
 	} = useContext( Context );
 
 	const { updateTimeSlot } = useTimeSlotCrud();
 
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
-	const defaultVal = useDefault ? get( timeSlotSchema, [
-		field, 'default',
-	], '' ) : '';
-	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
-	const value = get( editTimeSlot, field, get( timeSlot, field, defaultVal ) );
+	const {
+		title,
+		isDirty,
+		value,
+	} = useFieldMightDefaultValue( {
+		useDefault,
+		fieldKey: field,
+		timeSlot,
+		editTimeSlot,
+	} );
 
-	const hasSuggestions = get( timeSlotSchema, [
-		field, 'hasSuggestions',
-	] );
+	const hasSuggestions = get(
+		getSetting( 'fields' ).find( f => f.key === field ),
+		'hasSuggestions',
+		false,
+	);
 	const [
 		suggestions, setSuggestions,
 	] = useState( get( fieldSuggestions, field, [] ) );
@@ -60,21 +64,6 @@ const Input = ( {
 		'form-control': true,
 		'dirty': isDirty,
 	} );
-
-	// Apply defaultVal to editTimeSlot.
-	useEffect( () => {
-		if ( useDefault
-			&& value
-			&& value === defaultVal
-			&& ! ( get( timeSlot, field ) || get( editTimeSlot, field ) )
-		) {
-			setEditTimeSlot( {
-				...editTimeSlot, [field]: value,
-			} );
-		}
-	}, [
-		timeSlot, editTimeSlot,
-	] );
 
 	const onKeyDown = e => {
 		if ( isDirty ) {

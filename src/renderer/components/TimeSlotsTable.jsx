@@ -24,6 +24,61 @@ import {
 } from '../utils';
 const { api } = window;
 
+const GroupToggleBool = ( {
+	field,
+	timeSlot,
+	updateTimeSlots,
+	editTimeSlot,
+	setEditTimeSlot,
+} ) => {
+
+	const { getSetting } = useContext( Context );
+
+	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
+	const title = get( fieldSchema, 'title', '' );
+
+	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
+	const value = get( editTimeSlot, field, get( timeSlot, field, '0' ) );
+
+	const inputClassName = classnames( {
+		'form-check-input': true,
+		'dirty': isDirty,
+	} );
+
+	const checked = value && '0' != value;
+
+	const onKeyDown = e => {
+		if ( isDirty ) {
+			switch( e.key ) {
+				case 'Enter':
+					updateTimeSlots( {
+						// includeFields: [field],	// ??? TODO Bug: other dirty fields loose their changes.
+					} );
+					break;
+				case 'Escape':
+					setEditTimeSlot( omit( editTimeSlot, field ) );
+					break;
+			}
+		}
+	};
+
+	return <div className="form-check form-switch">
+		<input
+			title={ title }
+			onKeyDown={ onKeyDown }
+			className={ inputClassName }
+			type="checkbox"
+			role="switch"
+			checked={ checked }
+			onChange={ () => {
+				setEditTimeSlot( {
+					...editTimeSlot, [field]: checked ? '0' : '1',
+				} );
+			} }
+		/>
+	</div>;
+};
+
 const GroupInput = ( {
 	field,
 	timeSlot,
@@ -33,20 +88,17 @@ const GroupInput = ( {
 } ) => {
 
 	const {
-		timeSlotSchema,
 		fieldSuggestions,
 		addFieldSuggestion,
+		getSetting,
 	} = useContext( Context );
 
-	const title = get( timeSlotSchema, [
-		field, 'title',
-	], '' );
+	const fieldSchema = getSetting( 'fields' ).find( f => f.key === field );
+	const title = get( fieldSchema, 'title', '' );
+	const hasSuggestions = get( fieldSchema, 'hasSuggestions', '' );
 	const value = get( editTimeSlot, field, get( timeSlot, field, '' ) );
 	const isDirty = get( editTimeSlot, field, get( timeSlot, field ) ) !== get( timeSlot, field );
 
-	const hasSuggestions = get( timeSlotSchema, [
-		field, 'hasSuggestions',
-	] );
 	const [
 		suggestions, setSuggestions,
 	] = useState( get( fieldSuggestions, field, [] ) );
@@ -254,6 +306,7 @@ const GroupHeader = ( {
 	return <div
 		className={ classnames( [
 			'row',
+			'timeslot-group',
 			! expanded && timeSlotsSliceCurrents.length > 0 ? 'highlight' : '',
 		] ) }
 	>
@@ -272,32 +325,43 @@ const GroupHeader = ( {
 		</div>
 
 		{ <>
-			{ [
-				'title',
-				'project',
-				'client',
-				'user',
-			].filter( key => ! [
-				...getSetting( 'hideFields' ),
-				'_id',
-			].includes( key ) ).map( key => {
-				return <div
-					key={ key }
-					className={ classnames( [
-						'timeSlot--' + key,
-						'title' === key ? 'col-9' : 'col',
-						'position-relative',
-					] ) }
-				>
-					<GroupInput
-						field={ key }
-						timeSlot={ timeSlotsSlice[0] }
-						updateTimeSlots={ updateTimeSlots }
-						editTimeSlot={ editTimeSlot }
-						setEditTimeSlot={ setEditTimeSlot }
-					/>
-				</div>;
-			} ) }
+
+			{ getSetting( 'fields' ).filter( field => 'date' !== field.type && '_id' !== field.key )
+				.map( field => {
+					switch( field.type ) {
+						case 'text':
+							return <div
+								key={ field.key }
+								className={ classnames( [
+									'timeSlot--' + field.key,
+									'title' === field.key ? 'col-9' : 'col',
+									'position-relative',
+								] ) }
+							>
+								<GroupInput
+									field={ field.key }
+									timeSlot={ timeSlotsSlice[0] }
+									updateTimeSlots={ updateTimeSlots }
+									editTimeSlot={ editTimeSlot }
+									setEditTimeSlot={ setEditTimeSlot }
+								/>
+							</div>;
+
+						case 'bool':
+							return <div
+								key={ field.key }
+								className={ 'col-1 timeSlot--' + field.key }
+							><GroupToggleBool
+									field={ field.key }
+									timeSlot={ timeSlotsSlice[0] }
+									updateTimeSlots={ updateTimeSlots }
+									editTimeSlot={ editTimeSlot }
+									setEditTimeSlot={ setEditTimeSlot }
+								/></div>;
+						default:
+							return null;
+					}
+				} ) }
 
 			<div className="col-4"></div>
 			<div className="col-4"></div>
@@ -326,7 +390,9 @@ const GroupHeader = ( {
 							setTimeSlotCurrentEdit( {} );
 						} else {
 							// start new one
-							startTimeSlot( { timeSlot: timeSlotsSlice[0] } );
+							startTimeSlot( {
+								timeSlot: timeSlotsSlice[0], maybeForceDefaults: true,
+							} );
 						}
 					} }
 					title={ timeSlotsSliceCurrents.length ? 'Stop' : 'Start' }
@@ -368,7 +434,10 @@ const DateGroup = ( { timeSlotsSlice } ) => {
 
 const TimeSlotsTable = () => {
 
-	const { timeSlots } = useContext( Context );
+	const {
+		timeSlots,
+		getSetting,
+	} = useContext( Context );
 
 	const timeSlotsGrouped = {};
 	[...timeSlots].map( ( timeSlot ) => {
@@ -380,12 +449,10 @@ const TimeSlotsTable = () => {
 		if ( ! timeSlotsGrouped[groupDateId] ) {
 			timeSlotsGrouped[groupDateId] = {};
 		}
-		const groupId = [
-			'title',
-			'project',
-			'client',
-			'user',
-		].map( key => timeSlot[key] ).join( '#####' );
+		const groupId = getSetting( 'fields' )
+			.filter( field => 'date' !== field.type && '_id' !== field.key )
+			.map( field => timeSlot[field.key] )
+			.join( '#####' );
 		if ( timeSlotsGrouped[groupDateId][groupId] ) {
 			timeSlotsGrouped[groupDateId][groupId] = [
 				...timeSlotsGrouped[groupDateId][groupId],

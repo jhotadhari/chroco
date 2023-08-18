@@ -7,6 +7,7 @@ import React, {
 import Context from '../Context';
 import useTimeSlotCrud from '../hooks/useTimeSlotCrud';
 import Settings from './Settings/Settings.jsx';
+import About from './About.jsx';
 import CreateTimeSlot from './CreateTimeSlot.jsx';
 import TimeSlotsTable from './TimeSlotsTable.jsx';
 import TimeSlotsFilters from './TimeSlotsFilters.jsx';
@@ -31,12 +32,26 @@ const AppInner = () => {
 	const [
 		showSettings, setShowSettings,
 	] = useState( false );
+	const [
+		showAbout, setShowAbout,
+	] = useState( false );
 
 	useEffect( () => {
 		api.app.onTogglePreferences( () => {
 			setShowSettings( ! showSettings );
+			if ( ! showSettings ) {
+				setShowAbout( false );
+			}
 		} );
-	}, [showSettings] );
+		api.app.onToggleAbout( () => {
+			setShowAbout( ! showAbout );
+			if ( ! showAbout ) {
+				setShowSettings( false );
+			}
+		} );
+	}, [
+		showSettings, showAbout,
+	] );
 
 	return <div
 		data-bs-theme={ themeSource }
@@ -55,6 +70,11 @@ const AppInner = () => {
 		{ showSettings && <Settings
 			showSettings={ showSettings }
 			setShowSettings={ setShowSettings }
+		/> }
+
+		{ showAbout && <About
+			showAbout={ showAbout }
+			setShowAbout={ setShowAbout }
 		/> }
 
 		<CreateTimeSlot />
@@ -78,10 +98,6 @@ const App = () => {
 	const [
 		themeSource, setThemeSource,
 	] = useState( false );
-
-	const [
-		timeSlotSchema, setTimeSlotSchema,
-	] = useState( null );
 	const [
 		timeSlots, setTimeSlots,
 	] = useState( [] );
@@ -90,8 +106,7 @@ const App = () => {
 	] = useState( null );
 	const [
 		timeSlotCurrentEdit, setTimeSlotCurrentEdit,
-	] = useState( null );
-
+	] = useState( {} );
 	const [
 		fieldSuggestions, setFieldSuggestions,
 	] = useState( {} );
@@ -132,13 +147,6 @@ const App = () => {
 		} );
 	}, [] );
 
-	// Initially set timeSlotSchema.
-	useEffect( () => {
-		api.timeSlots.schema().then( schema => {
-			setTimeSlotSchema( schema );
-		} );
-	}, [] );
-
 	// Initially set appInfo.
 	useEffect( () => {
 		api.app.getInfo().then( newAppInfo => {
@@ -156,13 +164,14 @@ const App = () => {
 				}
 			} )
 				.catch( err => {
-
 					console.log( 'debug err', err ); // debug
-
 				} );
 		}
 	}, [
-		getSetting( 'dbPath' ), getSetting( 'filters' ), getSetting( 'startOfWeek' ),
+		getSetting( 'dbPath' ),
+		getSetting( 'filters' ),
+		getSetting( 'startOfWeek' ),
+		getSetting( 'fields' ),
 	] );
 
 	// Set timeSlotCurrent when timeSlots change.
@@ -176,19 +185,19 @@ const App = () => {
 		newFieldSuggestions = newFieldSuggestions ? newFieldSuggestions : { ...fieldSuggestions };
 		shouldSet = undefined === shouldSet ? true : shouldSet;
 
-		Object.keys( timeSlotSchema ).filter( field => get( timeSlotSchema[field], 'hasSuggestions' ) )
+		getSetting( 'fields' ).filter( field => get( field, 'hasSuggestions' ) )
 			.map( field => {
-				const val = get( timeSlot, field );
+				const val = get( timeSlot, field.key );
 				if ( val && val.length ) {
-					if ( newFieldSuggestions[field] ) {
-						if ( ! newFieldSuggestions[field].includes( val ) ) {
-							newFieldSuggestions[field] = [
-								...newFieldSuggestions[field],
+					if ( newFieldSuggestions[field.key] ) {
+						if ( ! newFieldSuggestions[field.key].includes( val ) ) {
+							newFieldSuggestions[field.key] = [
+								...newFieldSuggestions[field.key],
 								val,
 							];
 						}
 					} else {
-						newFieldSuggestions[field] = [val];
+						newFieldSuggestions[field.key] = [val];
 					}
 				}
 			} );
@@ -212,7 +221,6 @@ const App = () => {
 		value={ {
 			appInfo,
 
-			timeSlotSchema,
 			timeSlots,
 			setTimeSlots,
 

@@ -26,9 +26,18 @@ $body-color-dark:           $gray-200;
 //
 // Set the number of columns and specify the width of the gutters.
 
-$grid-columns:                33;
+$grid-columns:                34;
 $grid-gutter-width:           1rem;
 // $grid-row-columns:            6 !default;
 
 $input-placeholder-color:               var(--#{$prefix}gray-400);
 $input-placeholder-color-dark:          var(--#{$prefix}gray-700);
+
+
+$input-focus-box-shadow:                none;
+$input-border-color:                    var(--#{$prefix}border-color) !default;
+
+$component-active-bg:                   $gray-500;
+
+$focus-ring-opacity:    .25 !default;
+$focus-ring-color:      rgba($gray-500, $focus-ring-opacity);

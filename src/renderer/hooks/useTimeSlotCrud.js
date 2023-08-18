@@ -10,7 +10,10 @@ const useTimeSlotCrud = () => {
 		setTimeSlots,
 	} = useContext( Context );
 
-	const startTimeSlot = ( { timeSlot } ) => {
+	const startTimeSlot = ( {
+		timeSlot,
+		maybeForceDefaults,
+	} ) => {
 		const newTimeSlot = omit( {
 			...timeSlot,
 			dateStart: dayjs().valueOf(),
@@ -21,7 +24,7 @@ const useTimeSlotCrud = () => {
 			'updatedAt',
 		] );
 
-		api.timeSlots.add( newTimeSlot ).then( ( {
+		api.timeSlots.add( newTimeSlot, { maybeForceDefaults } ).then( ( {
 			addedTimeSlot, stoppedTimeSlot,
 		} ) => {
 			const newTimeSlots = [

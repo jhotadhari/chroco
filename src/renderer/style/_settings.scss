@@ -1,0 +1,62 @@
+
+
+
+/**
+ * fields-control
+ */
+.fields-control {
+  .field {
+    .btn {
+      border-color: var(--bslight-border-subtle);
+    }
+    &.highlight {
+      .form-control,
+      .btn {
+        border-color: $input-focus-border-color;
+      }
+    }
+  }
+  .form-check-input {
+    margin-top: 11px;
+  }
+}
+.rc-slider {
+  margin-top: 12px;
+  .rc-slider-mark-text {
+    display: none !important;
+  }
+  .rc-slider-rail {
+    background-color: var(--bsborder-color);
+  }
+  @each $key, $value in (
+    "dark": var(--bsgray-400),
+    "light": var(--bsgray-500),
+    "dirty": var(--bssuccess),
+  ) {
+    &.#{$key} {
+      .rc-slider-handle,
+      .rc-slider-dot,
+      .rc-slider-track {
+        background-color: $value;
+      }
+      .rc-slider-handle,
+      .rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging,
+      .rc-slider-dot {
+        border-color: $value;
+      }
+      .rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
+        box-shadow: 0 0 0 5px $value;
+      }
+    }
+  }
+}
+.drag-handle.disabled {
+  cursor: auto !important;
+}
+.useDefault-desc {
+  min-height: 42px;
+  margin-top: 16px;
+}
+.default-desc.type-bool {
+  margin-top: 18px;
+}
