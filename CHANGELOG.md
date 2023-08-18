@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Missing release notes.
 
 ## [0.2.1] - 2023-08-18
 ### Changed
@@ -12,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - README.md not existing in app bundle.
-- Ensure single instance. If chroco gets executed multible times, the additional instances will be closed directly.
+- Ensure single instance. If chroco gets executed multiple times, the additional instances will be closed directly.
 
 ## [0.2.0] - 2023-08-18
 ### Added
