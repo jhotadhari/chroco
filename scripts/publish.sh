@@ -17,12 +17,6 @@ if [[ -z $( grep '## \[Unreleased\]' CHANGELOG.md ) ]]; then
     exit 1
 fi
 
-# GITHUB_TOKEN env should be existing.
-if [[ -z "${GITHUB_TOKEN}" ]]; then
-    echo '`GITHUB_TOKEN` environment variable is unset'
-    exit 1
-fi
-
 # git status should be clean.
 if [[ ! -z $( git status --short ) ]]; then
     echo "Unable to publish. Uncommited changes."
@@ -75,16 +69,20 @@ git commit -m "Bump version ${next_version}"
 git checkout main
 git merge $release_branch --no-ff --commit --no-edit
 git tag "v${next_version}"
+
+# push, this should trigger gh actions to build for all os.
 git push
 git push origin "v${next_version}"
-
-# publish, this should trigger gh actions to build for other os.
-electron-forge publish --auth-token="${GITHUB_TOKEN}"
 
 # add release description from changelog and publish the release.
 line_from=$(( $( awk "/## \[${next_version}\]/{ print NR; exit }" CHANGELOG.md ) + 1 ))
 line_to=$(( $( awk "/## \[${newest_version}\]/{ print NR; exit }" CHANGELOG.md ) - 1 ))
-sed -n ${line_from},${line_to}p CHANGELOG.md | gh release edit "v${next_version}" --draft=false -F -
+if [[ -z $( gh release list | grep "v${next_version}" ) ]]; then
+    gh_command='create'
+else
+    gh_command='edit'
+fi
+sed -n ${line_from},${line_to}p CHANGELOG.md | gh release "${gh_command}" "v${next_version}" --draft=false -F -
 
 # checkout develop, merge main, Add Unreleased section to CHANGELOG.md and push.
 git checkout develop

@@ -37,7 +37,6 @@ The project uses [eslint](https://eslint.org/) to enforce coding standard rules.
 ### Publishing
 
 - New releases can only be published from branches starting with `release`.
-- Environment variable `GITHUB_TOKEN` should be set. The Token should have permissions to upload releases.
 - [GitHub CLI](https://cli.github.com) has to be installed.
 - All new changes should be documented in the `Unreleased` section of `CHANGELOG.md`. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -65,8 +64,8 @@ Contributions welcome. You can report [issues or suggest features](https://githu
 - The embedded persistent JSON based database is implemented with [NeDB](https://github.com/louischatriot/nedb).
 - Dates are processed by [Day.js](https://day.js.org/).
 - Drag and drop features are implemented with [dnd kit](https://dndkit.com).
-- Got around some headaches by using utilities by [Lodash](https://lodash.com), [array-move](https://github.com/sindresorhus/array-move) or [classnames](https://github.com/JedWatson/classnames).
-- [Keep a Changelog](https://www.npmjs.com/package/keep-a-changelog) helps maintaining a `CHANGELOG.md`.
+- Got around some headaches by using utilities by [Lodash](https://lodash.com), [array-move](https://github.com/sindresorhus/array-move), [classnames](https://github.com/JedWatson/classnames) or [node-app-root-dir](https://github.com/philidem/node-app-root-dir#readme).
+- [Keep a Changelog](https://www.npmjs.com/package/keep-a-changelog) helps maintaining a [CHANGELOG.md](https://github.com/jhotadhari/chroco/blob/main/CHANGELOG.md).
 - [markdown-it](https://github.com/markdown-it/markdown-it#readme) parses markdown.
 - Some UI components are based on [react-multi-select-component](https://github.com/hc-oss/react-multi-select-component), [rc-slider](https://github.com/react-component/slider), [react-autosuggest](https://github.com/moroshko/react-autosuggest) or [react-tooltip](https://react-tooltip.com/).
 
