@@ -1,5 +1,25 @@
+const fs = require( 'fs' );
+const path = require('path');
+const { serialHooks } = require( 'electron-packager/src/hooks' );
+const appRootDir = require('app-root-dir').get();
+
 module.exports = {
-	packagerConfig: { asar: true },
+	packagerConfig: {
+		asar: true,
+		afterCopy: [
+			serialHooks( [
+				buildPath => {
+			  		return new Promise( resolve => {
+						fs.copyFileSync(
+							path.join( appRootDir, 'README.md' ),
+							path.join( buildPath, 'README.md' )
+						);
+						resolve();
+					} );
+				},
+		  	] ),
+		],
+	},
 	rebuildConfig: {},
 	makers: [
 		{

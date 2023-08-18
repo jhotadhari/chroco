@@ -16,6 +16,7 @@ const path = require( 'path' );
 const dayjs = require( 'dayjs' );
 const MarkdownIt = require( 'markdown-it' );
 const getDb = require( './nedb/db' );
+const appRootDir = require('app-root-dir').get();
 const { settingsDefaults } = require( './constants' );
 const {
 	isPathValid,
@@ -26,9 +27,8 @@ const {
 } = require( './utils' );
 
 const md = new MarkdownIt();
-const packageRoot = path.dirname( path.dirname( __dirname ) );
-const pkg = parseSerialized( fs.readFileSync( path.join( packageRoot, 'package.json' ), 'utf8' ) );
-const readmeMd = fs.readFileSync( path.join( packageRoot, 'README.md' ), 'utf8' );
+const pkg = parseSerialized( fs.readFileSync( path.join( appRootDir, 'package.json' ), 'utf8' ) );
+const readmeMd = fs.readFileSync( path.join( appRootDir, 'README.md' ), 'utf8' );
 const readmeMdParts = [...readmeMd.split( /\n##\s[\s\S]*?/g )].map( str => {
 	const key = str.match( /(.*?)\n/ );
 	return key ? {
