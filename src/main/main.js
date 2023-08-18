@@ -3,7 +3,6 @@ const {
 	BrowserWindow,
 	shell,
 } = require( 'electron' );
-const path = require( 'path' );
 const {
 	setupApi, api,
 } = require( './setupApi' );
@@ -51,21 +50,41 @@ const createWindow = () => {
 const gotTheLock = app.requestSingleInstanceLock();
 if ( ! gotTheLock ) {
 	app.quit();
-}
-
-app.on( 'second-instance', ( event, commandLine, workingDirectory ) => {
-	if ( mainWindow ) {
-		if ( mainWindow.isMinimized() ) {
-			mainWindow.restore();
+} else {
+	app.on( 'second-instance', ( event, commandLine, workingDirectory ) => {
+		if ( mainWindow ) {
+			if ( mainWindow.isMinimized() ) {
+				mainWindow.restore();
+			}
+			mainWindow.focus();
 		}
-		mainWindow.focus();
-	}
-} );
+	} );
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on( 'ready', createWindow );
+	// This method will be called when Electron has finished
+	// initialization and is ready to create browser windows.
+	// Some APIs can only be used after this event occurs.
+	app.on( 'ready', createWindow );
+
+	app.on( 'activate', () => {
+		// On OS X it's common to re-create a window in the app when the
+		// dock icon is clicked and there are no other windows open.
+		if ( BrowserWindow.getAllWindows().length === 0 ) {
+			createWindow();
+		}
+	} );
+
+	// Compact db when closing app.
+	let shouldCompactDatafile = true;
+	app.on( 'before-quit', ( e ) => {
+		if ( shouldCompactDatafile ) {
+			e.preventDefault();
+			api.db.compact().then( () => {
+				shouldCompactDatafile = false;
+				app.quit();
+			} );
+		}
+	} );
+}
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -73,25 +92,5 @@ app.on( 'ready', createWindow );
 app.on( 'window-all-closed', () => {
 	if ( process.platform !== 'darwin' ) {
 		app.quit();
-	}
-} );
-
-app.on( 'activate', () => {
-	// On OS X it's common to re-create a window in the app when the
-	// dock icon is clicked and there are no other windows open.
-	if ( BrowserWindow.getAllWindows().length === 0 ) {
-		createWindow();
-	}
-} );
-
-// Compact db when closing app.
-let shouldCompactDatafile = true;
-app.on( 'before-quit', ( e ) => {
-	if ( shouldCompactDatafile ) {
-		e.preventDefault();
-		api.db.compact().then( () => {
-			shouldCompactDatafile = false;
-			app.quit();
-		} );
 	}
 } );
