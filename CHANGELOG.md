@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- App didn't start on Ubuntu when started by launcher, but was able to start via cli command.
 
 ## [0.2.2] - 2023-08-18
 ### Fixed
