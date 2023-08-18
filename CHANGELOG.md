@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Remove `electron-forge publish` command from publish script. Since gh actions builds are triggered by pushing the version tag
+
 ### Fixed
 - README.md not existing in app bundle.
 - Ensure single instance. If chroco gets executed multible times, the additional instances will be closed directly.

@@ -37,7 +37,6 @@ The project uses [eslint](https://eslint.org/) to enforce coding standard rules.
 ### Publishing
 
 - New releases can only be published from branches starting with `release`.
-- Environment variable `GITHUB_TOKEN` should be set. The Token should have permissions to upload releases.
 - [GitHub CLI](https://cli.github.com) has to be installed.
 - All new changes should be documented in the `Unreleased` section of `CHANGELOG.md`. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
