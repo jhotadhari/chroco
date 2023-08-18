@@ -1,9 +1,9 @@
 const {
 	ipcMain,
 	nativeTheme,
-	app,
 } = require( 'electron' );
 const {
+	pick,
 	omit,
 	isString,
 	isObject,
@@ -11,15 +11,31 @@ const {
 	set,
 	get,
 } = require( 'lodash' );
+const fs = require( 'fs' );
+const path = require( 'path' );
 const dayjs = require( 'dayjs' );
+const MarkdownIt = require( 'markdown-it' );
 const getDb = require( './nedb/db' );
 const { settingsDefaults } = require( './constants' );
 const {
 	isPathValid,
+	parseSerialized,
 	isValidTimezones,
 	isValidRegex,
 	getDateValuesForFilter,
 } = require( './utils' );
+
+const md = new MarkdownIt();
+const packageRoot = path.dirname( path.dirname( __dirname ) );
+const pkg = parseSerialized( fs.readFileSync( path.join( packageRoot, 'package.json' ), 'utf8' ) );
+const readmeMd = fs.readFileSync( path.join( packageRoot, 'README.md' ), 'utf8' );
+const readmeMdParts = [...readmeMd.split( /\n##\s[\s\S]*?/g )].map( str => {
+	const key = str.match( /(.*?)\n/ );
+	return key ? {
+		key: key[1],
+		html: md.render( str.replace( /(.*?)\n/, '' ).replace( /href=/g, 'target="_blank" href=' ) ),
+	} : null;
+} ).filter( p => p !== null );
 
 const api = {
 	app: {},
@@ -46,8 +62,17 @@ api.db.compact = () => new Promise( ( resolve, reject ) => {
 // return   promise resolve object appInfo
 api.app.getInfo = () => new Promise( ( resolve, reject ) => {
 	const appInfo = {
-		name: app.getName(),
-		version: app.getVersion(),
+		...pick( pkg, [
+			'name',
+			'version',
+			// 'homepage',
+			// 'funding',
+			// 'bugs',
+			// 'author',
+			// 'license',
+			// 'licenseUrl',
+		] ),
+		readmeMdParts,
 	};
 	resolve( appInfo );
 } );

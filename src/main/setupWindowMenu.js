@@ -55,18 +55,23 @@ const setupWindowMenu = win => {
 			],
 		},
 
-		// {
-		//     role: 'help',
-		//     submenu: [
-		//     {
-		//         label: 'Learn More',
-		//         click: async () => {
-		//             const { shell } = require( 'electron' )
-		//             await shell.openExternal('https://electronjs.org')
-		//         }
-		//     }
-		//     ]
-		// },
+		{
+		    role: 'help',
+		    submenu: [
+				// {
+				// 	label: 'Learn More',
+				// 	click: async () => {
+				// 		const { shell } = require( 'electron' )
+				// 		await shell.openExternal('https://electronjs.org')
+				// 	}
+				// }
+
+				{
+					label: 'About',
+					click: () => win.webContents.send( 'toggle-about' ),
+				},
+		    ],
+		},
 	];
 	const menu = Menu.buildFromTemplate( menuTemplate );
 	Menu.setApplicationMenu( menu );

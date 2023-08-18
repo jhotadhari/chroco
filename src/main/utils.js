@@ -40,6 +40,18 @@ const isPathValid = p => {
 	}
 };
 
+const parseSerialized = ( str, fallback ) => {
+	fallback = fallback ? fallback : fallback;
+	let object = fallback;
+	try {
+		object = JSON.parse( str );
+	} catch( e ) {
+		console.log( e );
+		object = object;
+	}
+	return object;
+};
+
 // same in chroco/src/renderer//utils.js
 const isValidTimezones = input => {
 	if ( ! input
@@ -109,6 +121,7 @@ const getDateValuesForFilter = ( {
 
 module.exports = {
 	isPathValid,
+	parseSerialized,
 	isValidTimezones,
 	isValidRegex,
 	getDateValuesForFilter,

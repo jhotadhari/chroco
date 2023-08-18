@@ -67,6 +67,7 @@ Contributions welcome. You can report [issues or suggest features](https://githu
 - Drag and drop features are implemented with [dnd kit](dndkit.com).
 - Got around some headaches by using utilities by [Lodash](https://lodash.com), [array-move](https://github.com/sindresorhus/array-move) or [classnames](https://github.com/JedWatson/classnames).
 - [Keep a Changelog](https://www.npmjs.com/package/keep-a-changelog) helps maintaining a `CHANGELOG.md`.
+- [markdown-it](https://github.com/markdown-it/markdown-it#readme) parses markdown.
 - Some UI components are based on [react-multi-select-component](https://github.com/hc-oss/react-multi-select-component), [rc-slider](https://github.com/react-component/slider), [react-autosuggest](https://github.com/moroshko/react-autosuggest) or [react-tooltip](https://react-tooltip.com/).
 
 ## License

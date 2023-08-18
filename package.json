@@ -76,6 +76,7 @@
     "webpack": "^5.88.2"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "markdown-it": "^13.0.1"
   }
 }
